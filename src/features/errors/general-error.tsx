@@ -1,4 +1,4 @@
-import { useNavigate, useRouter } from '@tanstack/react-router'
+import { useNavigate } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 
@@ -11,7 +11,14 @@ export function GeneralError({
   minimal = false,
 }: GeneralErrorProps) {
   const navigate = useNavigate()
-  const { history } = useRouter()
+  const handleGoBack = () => {
+    // Go back to previous page, or home if no history
+    if (window.history.length > 1) {
+      navigate(-1) // Go back one page
+    } else {
+      navigate('/') // Fallback to home
+    }
+  }
   return (
     <div className={cn('h-svh w-full', className)}>
       <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
@@ -24,10 +31,12 @@ export function GeneralError({
         </p>
         {!minimal && (
           <div className='mt-6 flex gap-4'>
-            <Button variant='outline' onClick={() => history.go(-1)}>
+            <Button variant='outline' onClick={handleGoBack}>
               Go Back
             </Button>
-            <Button onClick={() => navigate({ to: '/' })}>Back to Home</Button>
+            <Button onClick={() => navigate({ pathname: '/' })}>
+              Back to Home
+            </Button>
           </div>
         )}
       </div>

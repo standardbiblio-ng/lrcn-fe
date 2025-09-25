@@ -12,7 +12,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { cn } from '@/lib/utils'
-import { type NavigateFn, useTableUrlState } from '@/hooks/use-table-url-state'
+import { useTableUrlState } from '@/hooks/use-table-url-state'
 import {
   Table,
   TableBody,
@@ -36,8 +36,8 @@ declare module '@tanstack/react-table' {
 
 type DataTableProps = {
   data: User[]
-  search: Record<string, unknown>
-  navigate: NavigateFn
+  search: any
+  navigate: any
 }
 
 export function UsersTable({ data, search, navigate }: DataTableProps) {

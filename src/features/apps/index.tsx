@@ -1,6 +1,6 @@
-import { type ChangeEvent, useState } from 'react'
-import { getRouteApi } from '@tanstack/react-router'
+import { type ChangeEvent, useEffect, useState } from 'react'
 import { SlidersHorizontal, ArrowUpAZ, ArrowDownAZ } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
@@ -19,8 +19,6 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { apps } from './data/apps'
 
-const route = getRouteApi('/_authenticated/apps/')
-
 type AppType = 'all' | 'connected' | 'notConnected'
 
 const appText = new Map<AppType, string>([
@@ -30,20 +28,27 @@ const appText = new Map<AppType, string>([
 ])
 
 export function Apps() {
-  const {
-    filter = '',
-    type = 'all',
-    sort: initSort = 'asc',
-  } = route.useSearch()
-  const navigate = route.useNavigate()
+  const [searchParams, setSearchParams] = useSearchParams()
 
-  const [sort, setSort] = useState(initSort)
-  const [appType, setAppType] = useState(type)
+  // Get search parameters with defaults
+  const filter = searchParams.get('filter') || ''
+  const type = (searchParams.get('type') as AppType) || 'all'
+  const sort = (searchParams.get('sort') as 'asc' | 'desc') || 'asc'
+
+  const [appType, setAppType] = useState<AppType>(type)
   const [searchTerm, setSearchTerm] = useState(filter)
+  const [sortOrder, setSortOrder] = useState(sort)
+
+  // Sync local state with URL params
+  useEffect(() => {
+    setAppType(type)
+    setSearchTerm(filter)
+    setSortOrder(sort)
+  }, [filter, type, sort])
 
   const filteredApps = apps
     .sort((a, b) =>
-      sort === 'asc'
+      sortOrder === 'asc'
         ? a.name.localeCompare(b.name)
         : b.name.localeCompare(a.name)
     )
@@ -57,28 +62,39 @@ export function Apps() {
     .filter((app) => app.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value)
-    navigate({
-      search: (prev) => ({
-        ...prev,
-        filter: e.target.value || undefined,
-      }),
-    })
+    const value = e.target.value
+    setSearchTerm(value)
+
+    // Update URL search params
+    const newSearchParams = new URLSearchParams(searchParams)
+    if (value) {
+      newSearchParams.set('filter', value)
+    } else {
+      newSearchParams.delete('filter')
+    }
+    setSearchParams(newSearchParams)
   }
 
   const handleTypeChange = (value: AppType) => {
     setAppType(value)
-    navigate({
-      search: (prev) => ({
-        ...prev,
-        type: value === 'all' ? undefined : value,
-      }),
-    })
+
+    // Update URL search params
+    const newSearchParams = new URLSearchParams(searchParams)
+    if (value === 'all') {
+      newSearchParams.delete('type')
+    } else {
+      newSearchParams.set('type', value)
+    }
+    setSearchParams(newSearchParams)
   }
 
   const handleSortChange = (sort: 'asc' | 'desc') => {
-    setSort(sort)
-    navigate({ search: (prev) => ({ ...prev, sort }) })
+    setSortOrder(sort)
+
+    // Update URL search params
+    const newSearchParams = new URLSearchParams(searchParams)
+    newSearchParams.set('sort', sort)
+    setSearchParams(newSearchParams)
   }
 
   return (
@@ -123,7 +139,7 @@ export function Apps() {
             </Select>
           </div>
 
-          <Select value={sort} onValueChange={handleSortChange}>
+          <Select value={sortOrder} onValueChange={handleSortChange}>
             <SelectTrigger className='w-16'>
               <SelectValue>
                 <SlidersHorizontal size={18} />

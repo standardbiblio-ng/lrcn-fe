@@ -1,6 +1,6 @@
 import React from 'react'
-import { useNavigate } from '@tanstack/react-router'
 import { ArrowRight, ChevronRight, Laptop, Moon, Sun } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useSearch } from '@/context/search-provider'
 import { useTheme } from '@/context/theme-provider'
 import {
@@ -43,7 +43,7 @@ export function CommandMenu() {
                       key={`${navItem.url}-${i}`}
                       value={navItem.title}
                       onSelect={() => {
-                        runCommand(() => navigate({ to: navItem.url }))
+                        runCommand(() => navigate(navItem.url))
                       }}
                     >
                       <div className='flex size-4 items-center justify-center'>
@@ -53,12 +53,12 @@ export function CommandMenu() {
                     </CommandItem>
                   )
 
-                return navItem.items?.map((subItem, i) => (
+                return navItem.items?.map((subItem: any, i: any) => (
                   <CommandItem
                     key={`${navItem.title}-${subItem.url}-${i}`}
                     value={`${navItem.title}-${subItem.url}`}
                     onSelect={() => {
-                      runCommand(() => navigate({ to: subItem.url }))
+                      runCommand(() => navigate(subItem.url))
                     }}
                   >
                     <div className='flex size-4 items-center justify-center'>

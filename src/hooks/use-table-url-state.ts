@@ -16,8 +16,8 @@ export type NavigateFn = (opts: {
 }) => void
 
 type UseTableUrlStateParams = {
-  search: SearchRecord
-  navigate: NavigateFn
+  search: any
+  navigate: any
   pagination?: {
     pageKey?: string
     pageSizeKey?: string
@@ -124,7 +124,7 @@ export function useTableUrlState(
     const nextPage = next.pageIndex + 1
     const nextPageSize = next.pageSize
     navigate({
-      search: (prev) => ({
+      search: (prev: any) => ({
         ...(prev as SearchRecord),
         [pageKey]: nextPage <= defaultPage ? undefined : nextPage,
         [pageSizeKey]:
@@ -149,7 +149,7 @@ export function useTableUrlState(
           const value = trimGlobal ? next.trim() : next
           setGlobalFilter(value)
           navigate({
-            search: (prev) => ({
+            search: (prev: any) => ({
               ...(prev as SearchRecord),
               [pageKey]: undefined,
               [globalFilterKey]: value ? value : undefined,
@@ -182,7 +182,7 @@ export function useTableUrlState(
     }
 
     navigate({
-      search: (prev) => ({
+      search: (prev: any) => ({
         ...(prev as SearchRecord),
         [pageKey]: undefined,
         ...patch,
@@ -199,7 +199,7 @@ export function useTableUrlState(
     if (pageCount > 0 && pageNum > pageCount) {
       navigate({
         replace: true,
-        search: (prev) => ({
+        search: (prev: any) => ({
           ...(prev as SearchRecord),
           [pageKey]: opts.resetTo === 'last' ? pageCount : undefined,
         }),

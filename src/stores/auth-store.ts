@@ -13,8 +13,11 @@ interface AuthUser {
 interface AuthState {
   auth: {
     user: AuthUser | null
-    setUser: (user: AuthUser | null) => void
     accessToken: string
+    refreshToken: string | null
+    expiresAt: number | null
+    isAuthenticated: boolean
+    setUser: (user: AuthUser | null) => void
     setAccessToken: (accessToken: string) => void
     resetAccessToken: () => void
     reset: () => void
@@ -27,9 +30,13 @@ export const useAuthStore = create<AuthState>()((set) => {
   return {
     auth: {
       user: null,
+      accessToken: initToken,
+      refreshToken: null,
+      expiresAt: null,
+      isAuthenticated: false,
       setUser: (user) =>
         set((state) => ({ ...state, auth: { ...state.auth, user } })),
-      accessToken: initToken,
+
       setAccessToken: (accessToken) =>
         set((state) => {
           setCookie(ACCESS_TOKEN, JSON.stringify(accessToken))

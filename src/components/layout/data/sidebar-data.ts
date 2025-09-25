@@ -33,7 +33,7 @@ export const sidebarData: SidebarData = {
   },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'LRCN',
       logo: Command,
       plan: 'Vite + ShadcnUI',
     },
