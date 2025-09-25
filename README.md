@@ -1,4 +1,4 @@
-# Shadcn Admin Dashboard
+# LRCN Dashboard
 
 Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
 
@@ -82,15 +82,14 @@ Clone the project
 
 Go to the project directory
 
-```bash
-  cd shadcn-admin
-```
+````bash
+  cd llrcn```
 
 Install dependencies
 
 ```bash
   pnpm install
-```
+````
 
 Start the server
 
