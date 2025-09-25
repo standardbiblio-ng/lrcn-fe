@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react'
-import { Link, useLocation } from '@tanstack/react-router'
 import { ChevronRight } from 'lucide-react'
+import { Link, useLocation } from 'react-router-dom'
 import {
   Collapsible,
   CollapsibleContent,
@@ -35,7 +35,8 @@ import {
 
 export function NavGroup({ title, items }: NavGroupProps) {
   const { state, isMobile } = useSidebar()
-  const href = useLocation({ select: (location) => location.href })
+  const location = useLocation() // ✅ React Router's useLocation
+  const href = location.pathname + location.search // ✅ Construct full URL
   return (
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
@@ -177,7 +178,7 @@ function checkIsActive(href: string, item: NavItem, mainNav = false) {
   return (
     href === item.url || // /endpint?search=param
     href.split('?')[0] === item.url || // endpoint
-    !!item?.items?.filter((i) => i.url === href).length || // if child nav is active
+    !!item?.items?.filter((i: any) => i.url === href).length || // if child nav is active
     (mainNav &&
       href.split('/')[1] !== '' &&
       href.split('/')[1] === item?.url?.split('/')[1])

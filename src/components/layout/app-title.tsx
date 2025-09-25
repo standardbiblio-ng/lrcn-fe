@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router'
 import { Menu, X } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import {
   SidebarMenu,

@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router'
 import { Menu } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
@@ -34,7 +34,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
                 <Link
                   to={href}
                   className={!isActive ? 'text-muted-foreground' : ''}
-                  disabled={disabled}
+                  // disabled={disabled}
                 >
                   {title}
                 </Link>
@@ -55,7 +55,7 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
           <Link
             key={`${title}-${href}`}
             to={href}
-            disabled={disabled}
+            // disabled={disabled}
             className={`hover:text-primary text-sm font-medium transition-colors ${isActive ? '' : 'text-muted-foreground'}`}
           >
             {title}

@@ -1,4 +1,4 @@
-import { getRouteApi } from '@tanstack/react-router'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -11,11 +11,14 @@ import { UsersProvider } from './components/users-provider'
 import { UsersTable } from './components/users-table'
 import { users } from './data/users'
 
-const route = getRouteApi('/_authenticated/users/')
+// const route = getRouteApi('/_authenticated/users/')
 
 export function Users() {
-  const search = route.useSearch()
-  const navigate = route.useNavigate()
+  const [searchParams] = useSearchParams()
+  // If you need search functionality, get the search query from URL params
+  const searchQuery = searchParams.get('search') || ''
+  // const search = route.useSearch()
+  const navigate = useNavigate()
 
   return (
     <UsersProvider>
@@ -39,7 +42,7 @@ export function Users() {
           <UsersPrimaryButtons />
         </div>
         <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
-          <UsersTable data={users} search={search} navigate={navigate} />
+          <UsersTable data={users} search={searchQuery} navigate={navigate} />
         </div>
       </Main>
 
