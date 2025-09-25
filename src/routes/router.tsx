@@ -1,4 +1,3 @@
-import { lazy, Suspense } from 'react'
 import {
   createBrowserRouter,
   Navigate,
@@ -11,38 +10,11 @@ import { AuthLayout } from '@/features/auth/auth-layout'
 import { SignIn } from '@/features/auth/sign-in'
 import { SignUp } from '@/features/auth/sign-up'
 import { AuthGuard } from './guards/auth-guard'
-// import { SignIn } from '@/features/auth/sign-in'
 import { GuestGuard } from './guards/guest-guard'
+import { LazyPage } from './lazy-page'
 import { paths } from './paths'
 
 // Updated LazyPage utility function that handles both default and named exports
-const LazyPage = (
-  factory: () => Promise<any>,
-  exportName: string = 'default'
-) => {
-  const LazyComponent = lazy(async () => {
-    const module = await factory()
-
-    // Handle named exports (like export const Component)
-    if (exportName !== 'default' && exportName in module) {
-      return { default: module[exportName] }
-    }
-
-    // Handle default exports (like export default Component)
-    if ('default' in module) {
-      return module
-    }
-
-    // If no default export, assume the module itself is the component
-    return { default: module }
-  })
-
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LazyComponent />
-    </Suspense>
-  )
-}
 
 /**
  * ------------------------------------------------------------------------

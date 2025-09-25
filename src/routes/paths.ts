@@ -13,7 +13,7 @@ export const paths = {
   auth: {
     root: '/auth',
     login: '/auth/login',
-    signup: '/auth/sinup',
+    signup: '/auth/signup',
     forgotPassword: '/auth/forgot-password',
     resetPassword: '/auth/reset-password',
     // terms: '/auth/terms',
