@@ -113,7 +113,7 @@ export default function StepperForm() {
   }
 
   return (
-    <div className='flex min-h-screen'>
+    <div className='flex min-h-screen overflow-y-auto'>
       {/* Sidebar Steps */}
       <aside className='w-1/3 border-r bg-gray-50 p-6'>
         <ul className='space-y-4'>
@@ -142,7 +142,10 @@ export default function StepperForm() {
       </aside>
 
       {/* Main Content */}
-      <main className='flex-1 p-8'>
+      <main className='mb-40 flex-1 overflow-y-auto p-8'>
+        <p className='font-montserrat text-active font-normal italic'>
+          Step {currentStep}
+        </p>
         {renderStepContent()}
 
         {/* Navigation */}
@@ -161,7 +164,7 @@ export default function StepperForm() {
           <button
             onClick={handleNext}
             disabled={currentStep === steps.length}
-            className='rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-700'
+            className='bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700'
           >
             {currentStep === steps.length ? 'Finish' : 'Next'}
           </button>
