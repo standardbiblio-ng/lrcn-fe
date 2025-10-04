@@ -1,19 +1,23 @@
 function Instructions() {
   return (
-    <div className='space-y-4'>
-      <h2 className='text-xl font-semibold'>Institutions</h2>
-      <h4 className='text-md'>
-        It is recommended to read all instructions to ensure a smooth flow
-      </h4>
+    <div className='space-y-6'>
+      {/* Header */}
+      <header>
+        <h2 className='font-montserrat mb-1 text-xl font-semibold text-gray-800'>
+          Instructions
+        </h2>
+        <h4 className='font-montserrat text-md text-active font-normal'>
+          Please read all instructions carefully to ensure a smooth application
+          flow.
+        </h4>
+      </header>
 
-      <div className='mt-4'>
-        <h3 className='text-md font-semibold'>
-          Please follow these steps to initiate your application process for the
-          Librarians' Registration Council of Nigeria (LRCN) through our new
-          automated system:
-        </h3>
-        <h3 className='text-md font-semibold'>A. Mode of Registration:</h3>
-        <ul className='list-inside list-disc'>
+      {/* Step A */}
+      <section>
+        <p className='text-active mb-2 text-sm font-semibold'>
+          A. Mode of Registration:
+        </p>
+        <ol className='list-inside list-decimal space-y-1 text-sm text-gray-700'>
           <li>
             Proceed to the designated LRCN website and navigate to the
             registration portal.
@@ -23,12 +27,15 @@ function Instructions() {
             Pay the non-refundable processing fee electronically using the
             provided payment gateway.
           </li>
-        </ul>
-      </div>
+        </ol>
+      </section>
 
-      <div className='mt-4'>
-        <h3 className='text-md font-semibold'>B. Required Documents:</h3>
-        <ul className='list-inside list-disc'>
+      {/* Step B */}
+      <section>
+        <p className='text-active mb-2 text-sm font-semibold'>
+          B. Required Documents:
+        </p>
+        <ol className='list-inside list-decimal space-y-1 text-sm text-gray-700'>
           <li>
             Upload three passport-size photographs (ensure your name is clearly
             written behind each).
@@ -46,14 +53,19 @@ function Instructions() {
             Retain the original electronic payment confirmation as proof of
             payment.
           </li>
-        </ul>
-        <h3 className='text-md font-semibold'>
-          For any inquiries or assistance, please contact the Registrar at LRCN
-          Headquarters in Abuja or reach out to our support team via email or
-          phone. We're here to help you through the registration process
-          seamlessly
-        </h3>
-      </div>
+        </ol>
+      </section>
+
+      {/* Contact Info */}
+      <section className='rounded-md border bg-gray-50 p-4'>
+        <p className='text-active text-sm font-semibold'>
+          For any inquiries or assistance, please contact the{' '}
+          <strong>Registrar</strong> at LRCN Headquarters in Abuja or reach out
+          to our support team via <strong>email</strong> or{' '}
+          <strong>phone</strong>. We're here to help you through the
+          registration process seamlessly.
+        </p>
+      </section>
     </div>
   )
 }
