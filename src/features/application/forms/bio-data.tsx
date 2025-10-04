@@ -1,78 +1,198 @@
 function BioData() {
   return (
-    <div className='space-y-4'>
-      <h2 className='text-xl font-semibold'>Academic History</h2>
-      <h4 className='text-md font-medium'>Please fill out all fields.</h4>
+    <div className='space-y-6'>
+      {/* Header */}
+      <header>
+        <h2 className='font-montserrat mb-1 text-xl font-semibold text-gray-800'>
+          Bio-Data
+        </h2>
+        <h4 className='font-montserrat text-md text-active font-normal'>
+          Please fill out all fields.
+        </h4>
+      </header>
 
+      {/* Names */}
       <div>
-        <label className='block text-sm'>First Name</label>
+        <label
+          htmlFor='first-name'
+          className='block text-sm font-medium text-gray-700'
+        >
+          First Name
+        </label>
         <input
+          id='first-name'
           type='text'
           placeholder='Enter first name'
-          className='w-full rounded border px-2 py-1'
+          className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
         />
       </div>
+
       <div>
-        <label className='block text-sm'>Last Name</label>
+        <label
+          htmlFor='last-name'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Last Name
+        </label>
         <input
+          id='last-name'
           type='text'
           placeholder='Enter last name'
-          className='w-full rounded border px-2 py-1'
+          className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
         />
       </div>
+
       <div>
-        <label className='block text-sm'>Others Names</label>
+        <label
+          htmlFor='other-names'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Other Names
+        </label>
         <input
+          id='other-names'
           type='text'
           placeholder='Enter other names'
-          className='w-full rounded border px-2 py-1'
+          className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
         />
       </div>
+
       <div>
-        <label className='block text-sm'>Previous Names</label>
+        <label
+          htmlFor='previous-names'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Previous Names (if name has changed) with Date
+        </label>
         <input
+          id='previous-names'
           type='text'
           placeholder='Enter previous names'
-          className='w-full rounded border px-2 py-1'
+          className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
         />
       </div>
 
-      <div className='flex flex-wrap space-x-4'>
+      {/* Contact Info */}
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         <div>
-          <label className='block text-sm'>Email </label>
+          <label
+            htmlFor='email'
+            className='block text-sm font-medium text-gray-700'
+          >
+            Email
+          </label>
           <input
+            id='email'
             type='email'
             placeholder='Enter your email'
-            className='w-full rounded border px-2 py-1'
+            className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
           />
         </div>
         <div>
-          <label className='block text-sm'>Phone Number</label>
+          <label
+            htmlFor='phone'
+            className='block text-sm font-medium text-gray-700'
+          >
+            Phone Number
+          </label>
           <input
+            id='phone'
             type='tel'
             placeholder='Enter your phone number'
-            className='w-full rounded border px-2 py-1'
+            className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
           />
         </div>
       </div>
 
+      {/* Nationality & State */}
       <div>
-        <label className='block text-sm'>Nationality</label>
-        <select className='w-full rounded border px-2 py-1'>
-          <option>Nigerian</option>
-          <option>American</option>
-          <option>British</option>
+        <label
+          htmlFor='nationality'
+          className='block text-sm font-medium text-gray-700'
+        >
+          Nationality
+        </label>
+        <select
+          id='nationality'
+          className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+        >
+          <option value='nigerian'>Nigerian</option>
+          <option value='american'>American</option>
+          <option value='british'>British</option>
         </select>
       </div>
 
-      <div className='flex space-x-4'>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         <div>
-          <label className='block text-sm'>D.O.B</label>
-          <input type='date' className='rounded border px-2 py-1' />
+          <label
+            htmlFor='state'
+            className='block text-sm font-medium text-gray-700'
+          >
+            State
+          </label>
+          <select
+            id='state'
+            className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+          >
+            <option>Abia</option>
+            <option>Adamawa</option>
+            <option>Akwa Ibom</option>
+            <option>Enugu</option>
+            <option>FCT</option>
+            <option>Imo</option>
+            <option>Jigawa</option>
+            <option>Kano</option>
+            <option>Ogun</option>
+            <option>Ondo</option>
+            <option>Osun</option>
+            <option>Yobe</option>
+          </select>
         </div>
+
         <div>
-          <label className='block text-sm'>Gender</label>
-          <select className='w-full rounded border px-2 py-1'>
+          <label
+            htmlFor='lga'
+            className='block text-sm font-medium text-gray-700'
+          >
+            LGA
+          </label>
+          <select
+            id='lga'
+            className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+          >
+            <option>Yola</option>
+            <option>Jimeta</option>
+          </select>
+        </div>
+      </div>
+
+      {/* DOB & Gender */}
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+        <div>
+          <label
+            htmlFor='dob'
+            className='block text-sm font-medium text-gray-700'
+          >
+            Date of Birth
+          </label>
+          <input
+            id='dob'
+            type='date'
+            className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+          />
+        </div>
+
+        <div>
+          <label
+            htmlFor='gender'
+            className='block text-sm font-medium text-gray-700'
+          >
+            Gender
+          </label>
+          <select
+            id='gender'
+            className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+          >
             <option>Male</option>
             <option>Female</option>
           </select>
