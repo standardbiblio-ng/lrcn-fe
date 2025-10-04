@@ -15,6 +15,7 @@
   }
   body {
     @apply bg-background text-foreground has-[div[data-variant='inset']]:bg-sidebar min-h-svh w-full;
+    font-family: 'Montserrat', sans-serif; /* Add this line */
   }
 
   /* Override Radix scroll locking for sticky headers */
@@ -84,4 +85,16 @@
   to {
     height: 0;
   }
+}
+
+@theme {
+  /* Add your single colors */
+  --color-hover: #f0e8f4;
+  --color-active: #6f767e;
+  --color-mainGreen: #2c5f94;
+  --color-test3: #4b0f46ff;
+  --color-neutral2: #f4f4f4;
+
+  /* Add custom fonts */
+  --font-montserrat: 'Montserrat', sans-serif;
 }
