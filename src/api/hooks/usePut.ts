@@ -6,7 +6,6 @@ import {
   UseMutationOptions,
 } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/auth-store'
-// import { useAuthStore } from 'src/store/auth.store'
 import { axiosInstance } from '../config'
 
 interface CreatePutMutationHookArgs<
