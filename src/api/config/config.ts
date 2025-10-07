@@ -1,4 +1,4 @@
-import { AuthCache } from 'src/types'
+import { AuthCache } from '@/types'
 
 // Create auth cache
 export const authCache: AuthCache = {
