@@ -54,7 +54,7 @@ export function Dashboard() {
                     </h1>
                   </div>
                   <div>
-                    <p className='text-muted-foreground lg:text[13.08px] text-[11.28px]'>
+                    <p className='text-muted-foreground lg:text-[13.08px] text-[11.28px]'>
                       Welcome to the LCRN Dashboard! Your hub for community
                       insights and progress tracking
                     </p>
