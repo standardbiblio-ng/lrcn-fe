@@ -87,7 +87,7 @@ export function Dashboard() {
                       className='flex-shrink-0'
                     />
 
-                    <div className='justifycenter flex flex-col items-center space-y-2'>
+                    <div className='justify-center flex flex-col items-center space-y-2'>
                       <p className='text-muted-foreground text-sm'>
                         Take the first step to join LCRN
                       </p>
