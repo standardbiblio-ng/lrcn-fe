@@ -12,7 +12,7 @@ function SubmitApplication() {
           Your application has been submitted successfully
         </p>
         <p className='text-active text-sm font-semibold'>
-          Please check your email in the next 24 hours while you await Approvala
+          Please check your email in the next 24 hours while you await Approval
         </p>
       </div>
     </div>
