@@ -1,13 +1,14 @@
 import { create } from 'zustand'
-import { getCookie, setCookie, removeCookie } from '@/lib/cookies'
+import { authCache } from '@/api/config/query-client'
 
-const ACCESS_TOKEN = 'thisisjustarandomstring'
+// import { authCache } from './auth-cache' // Import your authCache
 
 interface AuthUser {
-  accountNo: string
+  id: string
   email: string
-  role: string[]
-  exp: number
+  role: string
+  phoneNumber?: string
+  isEmailVerified?: boolean
 }
 
 interface AuthState {
@@ -17,42 +18,150 @@ interface AuthState {
     refreshToken: string | null
     expiresAt: number | null
     isAuthenticated: boolean
+    // Methods
     setUser: (user: AuthUser | null) => void
     setAccessToken: (accessToken: string) => void
+    setAuthData: (data: {
+      access_token: string
+      user: AuthUser
+      refresh_token?: string
+      expires_in?: number
+    }) => void
+    setTokens: (
+      accessToken: string,
+      refreshToken: string,
+      expiresAt: number
+    ) => void
+    logout: () => void
     resetAccessToken: () => void
     reset: () => void
   }
 }
 
 export const useAuthStore = create<AuthState>()((set) => {
-  const cookieState = getCookie(ACCESS_TOKEN)
-  const initToken = cookieState ? JSON.parse(cookieState) : ''
+  console.log('Initializing auth store')
+  // Initialize from cache
+  const initialToken = authCache.getToken() || ''
+  const initialRefreshToken = authCache.getRefreshToken()
+  const initialExpiresAt = authCache.getExpiresAt()
+  const initialUser = authCache.getUser()
+  const initialIsAuthenticated = !!(initialToken && initialToken.length > 0)
+
   return {
     auth: {
-      user: null,
-      accessToken: initToken,
-      refreshToken: null,
-      expiresAt: null,
-      isAuthenticated: true,
+      user: initialUser,
+      accessToken: initialToken,
+      refreshToken: initialRefreshToken,
+      expiresAt: initialExpiresAt,
+      isAuthenticated: initialIsAuthenticated,
+
       setUser: (user) =>
-        set((state) => ({ ...state, auth: { ...state.auth, user } })),
+        set((state) => {
+          authCache.setUser(user)
+          return { ...state, auth: { ...state.auth, user } }
+        }),
 
       setAccessToken: (accessToken) =>
         set((state) => {
-          setCookie(ACCESS_TOKEN, JSON.stringify(accessToken))
-          return { ...state, auth: { ...state.auth, accessToken } }
-        }),
-      resetAccessToken: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
-          return { ...state, auth: { ...state.auth, accessToken: '' } }
-        }),
-      reset: () =>
-        set((state) => {
-          removeCookie(ACCESS_TOKEN)
+          authCache.setToken(accessToken)
           return {
             ...state,
-            auth: { ...state.auth, user: null, accessToken: '' },
+            auth: {
+              ...state.auth,
+              accessToken,
+              isAuthenticated: !!accessToken,
+            },
+          }
+        }),
+
+      // New method to handle login response
+      setAuthData: (data) =>
+        set((state) => {
+          const { access_token, user, refresh_token, expires_in } = data
+
+          // Calculate expiration if expires_in is provided
+          let expiresAt = null
+          if (expires_in) {
+            expiresAt = Date.now() + expires_in * 1000
+          }
+
+          // Update cache
+          authCache.setAuthData(data)
+
+          return {
+            ...state,
+            auth: {
+              ...state.auth,
+              user,
+              accessToken: access_token,
+              refreshToken: refresh_token || state.auth.refreshToken,
+              expiresAt: expiresAt || state.auth.expiresAt,
+              isAuthenticated: true,
+            },
+          }
+        }),
+
+      // For token refresh scenarios
+      setTokens: (accessToken, refreshToken, expiresAt) =>
+        set((state) => {
+          authCache.setToken(accessToken)
+          authCache.setRefreshToken(refreshToken)
+          authCache.setExpiresAt(expiresAt)
+
+          return {
+            ...state,
+            auth: {
+              ...state.auth,
+              accessToken,
+              refreshToken,
+              expiresAt,
+              isAuthenticated: true,
+            },
+          }
+        }),
+
+      logout: () =>
+        set((state) => {
+          authCache.clearAuth()
+          return {
+            ...state,
+            auth: {
+              ...state.auth,
+              user: null,
+              accessToken: '',
+              refreshToken: null,
+              expiresAt: null,
+              isAuthenticated: false,
+            },
+          }
+        }),
+
+      resetAccessToken: () =>
+        set((state) => {
+          authCache.setToken('')
+          return {
+            ...state,
+            auth: {
+              ...state.auth,
+              accessToken: '',
+              isAuthenticated: false,
+            },
+          }
+        }),
+
+      reset: () =>
+        set((state) => {
+          authCache.clearAuth()
+          return {
+            ...state,
+            auth: {
+              ...state.auth,
+              user: null,
+              accessToken: '',
+              refreshToken: null,
+              expiresAt: null,
+              isAuthenticated: false,
+            },
           }
         }),
     },
