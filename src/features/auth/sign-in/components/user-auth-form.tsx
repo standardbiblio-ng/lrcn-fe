@@ -2,9 +2,15 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  loginRequestSchema,
+  loginResponseSchema,
+  userRequestSchema,
+} from '@/schemas/userSchema'
 import { Loader2, LogIn } from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
+import { createPostMutationHook } from '@/api/hooks/usePost'
 import { useAuthStore } from '@/stores/auth-store'
 import { sleep, cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -19,19 +25,16 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
-const formSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
-  }),
-  password: z
-    .string()
-    .min(1, 'Please enter your password')
-    .min(7, 'Password must be at least 7 characters long'),
-})
-
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLFormElement> {
   redirectTo?: string
 }
+
+const useLogin = createPostMutationHook({
+  endpoint: '/auth/login',
+  requestSchema: loginRequestSchema,
+  responseSchema: loginResponseSchema,
+  requiresAuth: false,
+})
 
 export function UserAuthForm({
   className,
@@ -42,41 +45,46 @@ export function UserAuthForm({
   const navigate = useNavigate()
   const { auth } = useAuthStore()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const loginMutation = useLogin()
+
+  const form = useForm<z.infer<typeof userRequestSchema>>({
+    resolver: zodResolver(userRequestSchema),
     defaultValues: {
       email: '',
       password: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
+  function onSubmit(data: z.infer<typeof userRequestSchema>) {
+    // console.log('Submitting', { data })
+
     setIsLoading(true)
 
-    // Mock successful authentication
-    const mockUser = {
-      accountNo: 'ACC001',
-      email: data.email,
-      role: ['user'],
-      exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
-    }
-
-    toast.promise(sleep(2000), {
-      loading: 'Signing in...',
-      success: () => {
+    loginMutation.mutate(data, {
+      onSuccess: (responseData) => {
         setIsLoading(false)
 
-        // Set user and access token
-        auth.setUser(mockUser)
-        auth.setAccessToken('mock-access-token')
+        // ✅ Use setAuthData with actual API response
+        auth.setAuthData({
+          access_token: responseData.access_token,
+          user: responseData.user,
+
+          // Add these when your API returns them:
+          // refresh_token: responseData.refresh_token,
+          // expires_in: responseData.expires_in
+        })
 
         // Redirect to the stored location or default to dashboard
-        const targetPath = redirectTo || '/'
+        const targetPath = redirectTo || '/dashboard'
         navigate(targetPath, { replace: true })
 
-        return `Welcome back, ${data.email}!`
+        toast.success(`Welcome back, ${data.email}!`)
       },
-      error: 'Error',
+      onError: (error) => {
+        console.error('Login error:', error)
+        setIsLoading(false)
+        toast.error('Login failed. Please check your credentials.')
+      },
     })
   }
 
@@ -119,7 +127,7 @@ export function UserAuthForm({
             </FormItem>
           )}
         />
-        <Button className='mt-2' disabled={isLoading}>
+        <Button className='mt-2' disabled={isLoading} type='submit'>
           {isLoading ? <Loader2 className='animate-spin' /> : <LogIn />}
           Sign in
         </Button>
