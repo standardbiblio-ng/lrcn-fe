@@ -8,7 +8,6 @@ import {
 import { useAuthStore } from '@/stores/auth-store'
 import { axiosInstance } from '../config'
 
-// import { useAuthStore } from 'src/store/auth.store'
 
 interface CreatePatchMutationHookArgs<
   RequestSchema extends z.ZodType,
