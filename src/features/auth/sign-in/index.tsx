@@ -13,6 +13,7 @@ import { UserAuthForm } from './components/user-auth-form'
 export function SignIn() {
   const [searchParams] = useSearchParams()
   const redirect = searchParams.get('redirect') || '/dashboard'
+
   // const { redirect } = useSearch({ from: '/(auth)/sign-in' })
 
   return (
