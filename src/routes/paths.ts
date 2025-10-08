@@ -31,12 +31,6 @@ export const paths = {
     /**
      * Dashboard home, overview, new entry, and get started.
      */
-    home: {
-      root: '/dashboard/home',
-      overview: '/dashboard/home/overview',
-      newEntry: '/dashboard/home/new-entry',
-      getStarted: '/dashboard/home/get-started',
-    },
 
     // -------- Profile & Settings --------
     /**
@@ -49,6 +43,19 @@ export const paths = {
     notifications: '/dashboard/notifications',
     privacyPolicy: '/dashboard/privacy-policy',
     newPassword: '/dashboard/new-password',
+  },
+  home: {
+    root: '/dashboard',
+    overview: '/dashboard/home/overview',
+    newEntry: '/dashboard/home/new-entry',
+    getStarted: '/dashboard/home/get-started',
+  },
+
+  application: {
+    root: '/application',
+    // overview: '/dashboard/home/overview',
+    // newEntry: '/dashboard/home/new-entry',
+    // getStarted: '/dashboard/home/get-started',
   },
 
   // ---------------- Error Pages Section ----------------

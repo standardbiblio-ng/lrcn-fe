@@ -100,13 +100,13 @@ export function Dashboard() {
               </Card>
               <Card className='col-span-1 col-end-6 pt-0 lg:col-start-1'>
                 <CardHeader className='px-0 pt-2'>
-                  <CardTitle className='rounded-[10px] border-2 border-x-white border-t-white border-b-[#6F767E] px-[22px] py-[10px] text-[#2C5F94]'>
+                  <CardTitle className='border-b-active rounded-[10px] border-2 border-x-white border-t-white px-[22px] py-[10px] text-[#2C5F94]'>
                     Notifications
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className='flex justify-center px-[11px] py-[25px]'>
-                    <p className='text-[20px] text-[#6F767E]'>No Messages</p>
+                    <p className='text-active text-[20px]'>No Messages</p>
                   </div>
                 </CardContent>
               </Card>

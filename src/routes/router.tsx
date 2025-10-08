@@ -6,9 +6,11 @@ import {
 } from 'react-router-dom'
 import { ErrorBoundary } from '@/components/global/error-boundary'
 import { AuthenticatedLayout } from '@/components/layout/authenticated-layout'
+import { Application } from '@/features/application'
 import { AuthLayout } from '@/features/auth/auth-layout'
 import { SignIn } from '@/features/auth/sign-in'
 import { SignUp } from '@/features/auth/sign-up'
+import { Dashboard } from '@/features/dashboard'
 import { AuthGuard } from './guards/auth-guard'
 import { GuestGuard } from './guards/guest-guard'
 import { LazyPage } from './lazy-page'
@@ -26,7 +28,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     // element: <div>Home Page - Basic test</div>,
-    element: <Navigate to={paths.dashboard.home.root} replace />,
+    element: <Navigate to={paths.home.root} replace />,
 
     errorElement: <ErrorBoundary />,
   },
@@ -95,7 +97,7 @@ export const router = createBrowserRouter([
    */
 
   {
-    path: paths.dashboard.home.root,
+    path: paths.home.root,
     element: (
       <AuthGuard>
         <AuthenticatedLayout>
@@ -104,14 +106,15 @@ export const router = createBrowserRouter([
       </AuthGuard>
     ),
     children: [
+      // {
+      //   path: 'test',
+      //   element: <div>test Page</div>,
+      // },
       {
-        path: 'test',
-        element: <div>test Page</div>,
+        index: true,
+        // element: <Navigate to={paths.dashboard.home.root} replace />,
+        element: <Dashboard />,
       },
-      //   {
-      //     index: true,
-      //     element: <Navigate to={paths.dashboard.home.root} replace />,
-      //   },
 
       //   // Home Section
       //   {
@@ -136,29 +139,6 @@ export const router = createBrowserRouter([
       //     ],
       //   },
 
-      // Applications Section
-      //   {
-      //     path: paths.dashboard.applications.root,
-      //     children: [
-      //       {
-      //         index: true,
-      //         element: <Navigate to={paths.dashboard.applications.myApplication} replace />,
-      //       },
-      //       {
-      //         path: paths.dashboard.applications.myApplication.split('/').pop(),
-      //         element: LazyPage(() => import('@/features/dashboard/applications/my-application')),
-      //       },
-      //       {
-      //         path: paths.dashboard.applications.newApplication.split('/').pop(),
-      //         element: LazyPage(() => import('@/features/dashboard/applications/new-application')),
-      //       },
-      //       {
-      //         path: paths.dashboard.applications.status.split('/').pop(),
-      //         element: LazyPage(() => import('@/features/dashboard/applications/status')),
-      //       },
-      //     ],
-      //   },
-
       // Notifications Section
       //   {
       //     path: paths.dashboard.notifications.root,
@@ -177,6 +157,36 @@ export const router = createBrowserRouter([
       //       },
       //     ],
       //   },
+    ],
+  },
+
+  // Applications Section
+  {
+    path: paths.application.root,
+    element: (
+      <AuthGuard>
+        <AuthenticatedLayout>
+          <Outlet />
+        </AuthenticatedLayout>
+      </AuthGuard>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Application />,
+      },
+      // {
+      //   path: paths.dashboard.applications.myApplication.split('/').pop(),
+      //   element: LazyPage(() => import('@/features/dashboard/applications/my-application')),
+      // },
+      // {
+      //   path: paths.dashboard.applications.newApplication.split('/').pop(),
+      //   element: LazyPage(() => import('@/features/dashboard/applications/new-application')),
+      // },
+      // {
+      //   path: paths.dashboard.applications.status.split('/').pop(),
+      //   element: LazyPage(() => import('@/features/dashboard/applications/status')),
+      // },
     ],
   },
 
