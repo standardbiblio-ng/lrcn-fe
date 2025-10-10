@@ -2,7 +2,16 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import {
+  registerUserApiSchema,
+  registerUserRequestSchema,
+  registerUserResponseSchema,
+} from '@/schemas/userSchema'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
+import { createPostMutationHook } from '@/api/hooks/usePost'
 import { cn } from '@/lib/utils'
+import { formatNigerianPhoneNumber } from '@/utils/phoneFormatter'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -15,46 +24,68 @@ import {
 import { Input } from '@/components/ui/input'
 import { PasswordInput } from '@/components/password-input'
 
-const formSchema = z
-  .object({
-    email: z.email({
-      error: (iss) =>
-        iss.input === '' ? 'Please enter your email' : undefined,
-    }),
-    password: z
-      .string()
-      .min(1, 'Please enter your password')
-      .min(7, 'Password must be at least 7 characters long'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match.",
-    path: ['confirmPassword'],
-  })
+interface SignUpFormProps extends React.HTMLAttributes<HTMLFormElement> {
+  redirectTo?: string
+}
+
+const useRegister = createPostMutationHook({
+  endpoint: '/auth/register',
+  requestSchema: registerUserApiSchema,
+  responseSchema: registerUserResponseSchema,
+  requiresAuth: false,
+})
 
 export function SignUpForm({
   className,
+  redirectTo,
   ...props
-}: React.HTMLAttributes<HTMLFormElement>) {
+}: SignUpFormProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate()
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const registerMutation = useRegister()
+
+  const form = useForm<z.infer<typeof registerUserRequestSchema>>({
+    resolver: zodResolver(registerUserRequestSchema),
     defaultValues: {
       email: '',
       password: '',
       confirmPassword: '',
+      phoneNumber: '',
     },
   })
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    // eslint-disable-next-line no-console
-    console.log(data)
+  function onSubmit(data: z.infer<typeof registerUserRequestSchema>) {
+    // console.log('Submitting', { data })
 
-    setTimeout(() => {
-      setIsLoading(false)
-    }, 3000)
+    setIsLoading(true)
+    const formattedData = {
+      email: data.email,
+      password: data.password,
+      phoneNumber: formatNigerianPhoneNumber(data.phoneNumber),
+    }
+    // eslint-disable-next-line no-console
+    // console.log('Submitting', { formattedData })
+
+    // Validate against API schema (optional extra validation)
+    const validatedApiData = registerUserApiSchema.parse(formattedData)
+
+    registerMutation.mutate(validatedApiData, {
+      onSuccess: (responseData) => {
+        setIsLoading(false)
+
+        // Redirect to the stored location or default to login
+        const targetPath = redirectTo || '/auth/login'
+        navigate(targetPath, { replace: true })
+
+        toast.success(`Successful Registration! Please log in.`)
+      },
+      onError: (error) => {
+        console.error('Registration error:', error)
+        setIsLoading(false)
+        toast.error('Registration failed. Please try again.')
+      },
+    })
   }
 
   return (
@@ -98,6 +129,20 @@ export function SignUpForm({
               <FormLabel>Confirm Password</FormLabel>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name='phoneNumber'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone Number</FormLabel>
+              <FormControl>
+                <Input placeholder='07**********' {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
