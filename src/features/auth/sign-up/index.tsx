@@ -1,5 +1,5 @@
 import { paths } from '@/routes'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import {
   Card,
   CardContent,
@@ -11,6 +11,8 @@ import { AuthLayout } from '../auth-layout'
 import { SignUpForm } from './components/sign-up-form'
 
 export function SignUp() {
+  const [searchParams] = useSearchParams()
+  const redirect = searchParams.get('redirect') || '/auth/login'
   return (
     <AuthLayout>
       <Card className='gap-4'>
@@ -30,7 +32,7 @@ export function SignUp() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SignUpForm />
+          <SignUpForm redirectTo={redirect} />
         </CardContent>
       </Card>
     </AuthLayout>

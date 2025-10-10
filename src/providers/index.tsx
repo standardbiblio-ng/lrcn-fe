@@ -13,6 +13,7 @@ import { handleServerError } from '@/lib/handle-server-error'
 import { DirectionProvider } from '@/context/direction-provider'
 import { FontProvider } from '@/context/font-provider'
 import { ThemeProvider } from '@/context/theme-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 // const queryClient = new QueryClient({
 //   defaultOptions: {
@@ -65,7 +66,15 @@ export default function Providers({ children }: ProvidersProps) {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider>
           <FontProvider>
-            <DirectionProvider>{children}</DirectionProvider>
+            <DirectionProvider>
+              {children}
+              <Toaster
+                position='top-right'
+                duration={5000}
+                closeButton
+                richColors
+              />
+            </DirectionProvider>
           </FontProvider>
         </ThemeProvider>
       </QueryClientProvider>
