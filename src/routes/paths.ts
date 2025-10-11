@@ -1,3 +1,5 @@
+import { set } from 'zod'
+
 /**
  * ------------------------------------------------------------------------
  * Application Route Paths
@@ -53,6 +55,13 @@ export const paths = {
 
   application: {
     root: '/application',
+    // overview: '/dashboard/home/overview',
+    // newEntry: '/dashboard/home/new-entry',
+    // getStarted: '/dashboard/home/get-started',
+  },
+
+  settings: {
+    root: '/settings',
     // overview: '/dashboard/home/overview',
     // newEntry: '/dashboard/home/new-entry',
     // getStarted: '/dashboard/home/get-started',
