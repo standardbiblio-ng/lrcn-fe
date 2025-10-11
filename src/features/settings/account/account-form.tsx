@@ -92,7 +92,7 @@ export function AccountForm() {
               <FormLabel>Email</FormLabel>
               <FormControl>
                 <Input
-                  placeholder='Your email name'
+                  placeholder='Your email address'
                   {...field}
                   className='flex-1'
                 />
