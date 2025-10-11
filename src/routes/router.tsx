@@ -11,10 +11,13 @@ import { AuthLayout } from '@/features/auth/auth-layout'
 import { SignIn } from '@/features/auth/sign-in'
 import { SignUp } from '@/features/auth/sign-up'
 import { Dashboard } from '@/features/dashboard'
+import { Settings } from '@/features/settings'
 import { AuthGuard } from './guards/auth-guard'
 import { GuestGuard } from './guards/guest-guard'
 import { LazyPage } from './lazy-page'
 import { paths } from './paths'
+
+// import { Settings } from '@/features/settings'
 
 // Updated LazyPage utility function that handles both default and named exports
 
@@ -174,6 +177,36 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <Application />,
+      },
+      // {
+      //   path: paths.dashboard.applications.myApplication.split('/').pop(),
+      //   element: LazyPage(() => import('@/features/dashboard/applications/my-application')),
+      // },
+      // {
+      //   path: paths.dashboard.applications.newApplication.split('/').pop(),
+      //   element: LazyPage(() => import('@/features/dashboard/applications/new-application')),
+      // },
+      // {
+      //   path: paths.dashboard.applications.status.split('/').pop(),
+      //   element: LazyPage(() => import('@/features/dashboard/applications/status')),
+      // },
+    ],
+  },
+
+  // settings Section
+  {
+    path: paths.settings.root,
+    element: (
+      <AuthGuard>
+        <AuthenticatedLayout>
+          <Outlet />
+        </AuthenticatedLayout>
+      </AuthGuard>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Settings />,
       },
       // {
       //   path: paths.dashboard.applications.myApplication.split('/').pop(),
