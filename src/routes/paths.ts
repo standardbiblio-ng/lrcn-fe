@@ -58,6 +58,13 @@ export const paths = {
     // getStarted: '/dashboard/home/get-started',
   },
 
+  settings: {
+    root: '/settings',
+    // overview: '/dashboard/home/overview',
+    // newEntry: '/dashboard/home/new-entry',
+    // getStarted: '/dashboard/home/get-started',
+  },
+
   // ---------------- Error Pages Section ----------------
   /**
    * Error and status code pages.
