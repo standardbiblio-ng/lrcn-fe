@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import z from 'zod'
 import {
   ScrollText,
   Fingerprint,
@@ -9,6 +10,7 @@ import {
   CreditCard,
   FileCheck,
 } from 'lucide-react'
+import { createGetQueryHook } from '@/api/hooks/useGet'
 import AcademicHistory from '../forms/academic-history'
 import Attestation from '../forms/attestation'
 import BioData from '../forms/bio-data'
@@ -16,7 +18,7 @@ import EmploymentHistory from '../forms/employment-history'
 import Instructions from '../forms/instructions'
 import Payment from '../forms/payment'
 import Recommendations from '../forms/recommendations'
-import SubmitApplication from '../forms/submit-application'
+import Upload from '../forms/upload'
 
 const steps = [
   {
@@ -45,32 +47,41 @@ const steps = [
   },
   {
     id: 5,
-    title: 'Recommendations & Upload',
-    description: 'Confirm Legitimacy of Application',
+    title: 'Recommendations',
+    description: 'Upload your recommendations',
     icon: FileUp,
   },
   {
     id: 6,
+    title: 'Upload',
+    description: 'Confirm Legitimacy of Application',
+    icon: FileCheck,
+  },
+  {
+    id: 7,
     title: 'Applicant Attestation',
     description: 'Confirm Legitimacy of Application',
     icon: Stamp,
   },
   {
-    id: 7,
+    id: 8,
     title: 'Payment',
     description: 'Complete Application Fee',
     icon: CreditCard,
   },
-  {
-    id: 8,
-    title: 'Submit Application',
-    description: 'Await Approval',
-    icon: FileCheck,
-  },
 ]
+
+// const useGetApplication = createGetQueryHook({
+//   endpoint: '/applications/my-application',
+//   responseSchema: z.any(),
+//   queryKey: ['my-application'],
+// })
 
 export default function StepperForm() {
   const [currentStep, setCurrentStep] = useState(1)
+  // const { data, isPending } = useGetApplication()
+
+  // console.log('data: ', data)
 
   const handleNext = () => {
     if (currentStep < steps.length) {
@@ -104,11 +115,11 @@ export default function StepperForm() {
       case 5:
         return <Recommendations />
       case 6:
-        return <Attestation />
+        return <Upload />
       case 7:
-        return <Payment />
+        return <Attestation />
       case 8:
-        return <SubmitApplication />
+        return <Payment />
     }
   }
 
