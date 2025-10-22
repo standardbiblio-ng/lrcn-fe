@@ -78,29 +78,6 @@ export const registerUserRequestSchema = userRequestSchema
             '0706',
             '0707',
             '0708', // MTN
-            '0802',
-            '0803',
-            '0804',
-            '0805',
-            '0806',
-            '0807',
-            '0808',
-            '0809', // Airtel
-            '0812',
-            '0813',
-            '0814',
-            '0815',
-            '0816',
-            '0817',
-            '0818', // MTN
-            '0902',
-            '0903',
-            '0904',
-            '0905',
-            '0906',
-            '0907',
-            '0908',
-            '0909', // 9mobile
           ]
 
           // Check if the number starts with any valid Nigerian prefix

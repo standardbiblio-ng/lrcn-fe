@@ -55,7 +55,7 @@ export function Dashboard() {
                     </h1>
                   </div>
                   <div>
-                    <p className='text-muted-foreground lg:text[13.08px] text-[11.28px]'>
+                    <p className='text-muted-foreground lg:text-[13.08px] text-[11.28px]'>
                       Welcome to the LCRN Dashboard! Your hub for community
                       insights and progress tracking
                     </p>
@@ -88,7 +88,7 @@ export function Dashboard() {
                       className='flex-shrink-0'
                     />
 
-                    <div className='justifycenter flex flex-col items-center space-y-2'>
+                    <div className='justify-center flex flex-col items-center space-y-2'>
                       <p className='text-muted-foreground text-sm'>
                         Take the first step to join LCRN
                       </p>

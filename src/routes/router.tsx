@@ -17,8 +17,6 @@ import { GuestGuard } from './guards/guest-guard'
 import { LazyPage } from './lazy-page'
 import { paths } from './paths'
 
-// import { Settings } from '@/features/settings'
-
 // Updated LazyPage utility function that handles both default and named exports
 
 /**
