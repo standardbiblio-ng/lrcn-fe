@@ -1,4 +1,5 @@
 import { Bell } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import applyImg from '@/assets/images/Group.png'
 import cloud from '@/assets/images/dashboard-cloud.png'
 import { Button } from '@/components/ui/button'
@@ -91,9 +92,11 @@ export function Dashboard() {
                       <p className='text-muted-foreground text-sm'>
                         Take the first step to join LCRN
                       </p>
-                      <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
-                        Start here
-                      </button>
+                      <Link to='/application'>
+                        <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
+                          Start here
+                        </button>
+                      </Link>
                     </div>
                   </div>
                 </CardContent>
