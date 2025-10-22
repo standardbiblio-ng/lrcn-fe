@@ -119,26 +119,6 @@ function EmploymentHistory() {
         </div>
       </div>
 
-      {/* Earning Category */}
-      <div>
-        <label className='mb-1 block text-sm'>
-          Select a Category in which you earn
-        </label>
-        <div className='flex flex-wrap gap-4'>
-          {['Salary', 'GL', 'HATTISS', 'CONRAISS'].map((cat) => (
-            <label key={cat} className='flex items-center space-x-1'>
-              <input
-                type='checkbox'
-                checked={employment.categories.includes(cat)}
-                onChange={() => handleCategoryToggle(cat)}
-                className='accent-mainGreen'
-              />
-              <span>{cat}</span>
-            </label>
-          ))}
-        </div>
-      </div>
-
       {/* Work Experience Section */}
       <p className='font-montserrat text-base font-bold'>Work Experience</p>
 
