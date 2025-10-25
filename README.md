@@ -121,3 +121,42 @@ Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
 "phoneNumber": "+2348123456789",
 "role": "applicant"
 }
+
+function onSubmit(data: z.infer<typeof acadHistoryRequestSchema>) {
+setIsLoading(true);
+
+const isUpdating = prevAcadHist?.length > 0;
+const shouldProceedWithoutUpdate = isUpdating && !isDirty;
+
+// If user is updating but hasn't changed anything → just move forward
+if (shouldProceedWithoutUpdate) {
+setIsLoading(false);
+handleNext();
+return;
+}
+
+// Choose which mutation to trigger
+const mutation = isUpdating ? updateAcadHistMutation : registerAcadHistMutation;
+
+mutation.mutate(data, {
+onSuccess: () => {
+setIsLoading(false);
+toast.success(
+`${isUpdating ? 'Updated' : 'Recorded'} Academic History Successfully!`
+);
+
+      // ✅ Move to the next step only for NEW registration OR if updating and not staying on this step
+      if (!isUpdating || shouldProceedWithoutUpdate) {
+        handleNext();
+      }
+    },
+    onError: (error) => {
+      setIsLoading(false);
+      console.error('Academic history error:', error);
+      toast.error(
+        `Failed to ${isUpdating ? 'update' : 'record'} Academic History. Please try again.`
+      );
+    },
+
+});
+}
