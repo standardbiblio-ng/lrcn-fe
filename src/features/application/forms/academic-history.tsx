@@ -2,12 +2,8 @@ import { useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import {
-  acadHistoryRequestSchema,
-  acadHistorySchema,
-} from '@/schemas/acadHistory'
+import { acadHistoryRequestSchema } from '@/schemas/acadHistory'
 import { StepperProps } from '@/types/stepper.type'
-import { start } from 'repl'
 import { toast } from 'sonner'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
@@ -54,7 +50,6 @@ function AcademicHistory({
   handleNext,
   step,
   lastCompletedStep,
-  totalSteps,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -132,7 +127,7 @@ function AcademicHistory({
         },
         onError: (error) => {
           setIsLoading(false)
-          console.error('bio data register error:', error)
+          console.error('academic history register error:', error)
 
           toast.error('Failed to record Academic History. Please try again.')
         },
