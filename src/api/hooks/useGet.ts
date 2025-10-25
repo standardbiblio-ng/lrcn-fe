@@ -69,8 +69,6 @@ export function createGetQueryHook<
       ) => void
     }
   ) => {
-    const queryClient = new QueryClient()
-
     const queryFn = async () => {
       // Handle route parameters
       let url = endpoint
@@ -92,16 +90,18 @@ export function createGetQueryHook<
           url += `?${query.toString()}`
         }
       }
-      const { auth } = useAuthStore()
+      // const { auth } = useAuthStore()
+      // Get token WITHOUT using a hook
+      const token = useAuthStore.getState().auth?.accessToken
+      // console.log('Using token:', token)
 
       // Include the token in the headers if required
-      const headers = requiresAuth
-        ? { Authorization: `Bearer ${auth.accessToken}` }
-        : {}
+      const headers = requiresAuth ? { Authorization: `Bearer ${token}` } : {}
 
       return axiosInstance
         .get<ApiResponse<unknown>>(url, { headers })
         .then((response) => {
+          // console.log('GET Response:', response.data)
           return responseSchema.parse(response.data)
         })
         .catch((error: unknown) => {
