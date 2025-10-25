@@ -67,12 +67,13 @@ export function createPutMutationHook<
           endpoint
         )
       }
+      const token = useAuthStore.getState().auth?.accessToken
+      // console.log('Using token:', token)
 
-      const { auth } = useAuthStore()
+      // Include the token in the headers if required
+      const headers = requiresAuth ? { Authorization: `Bearer ${token}` } : {}
+
       const validatedData = requestSchema.parse(data)
-      const headers = requiresAuth
-        ? { Authorization: `Bearer ${auth.accessToken}` }
-        : {}
 
       return axiosInstance
         .put(endpoint, validatedData, { headers })
