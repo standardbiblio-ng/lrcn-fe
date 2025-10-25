@@ -11,7 +11,7 @@ import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { cn } from '@/lib/utils'
-import { formatNigerianPhoneNumber } from '@/utils/phoneFormatter'
+import { formatNigerianPhoneNumberWithCode } from '@/utils/phoneFormatter'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -62,7 +62,7 @@ export function SignUpForm({
     const formattedData = {
       email: data.email,
       password: data.password,
-      phoneNumber: formatNigerianPhoneNumber(data.phoneNumber),
+      phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
     }
     // eslint-disable-next-line no-console
     // console.log('Submitting', { formattedData })
