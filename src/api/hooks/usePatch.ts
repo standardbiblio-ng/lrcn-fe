@@ -8,7 +8,6 @@ import {
 import { useAuthStore } from '@/stores/auth-store'
 import { axiosInstance } from '../config'
 
-
 interface CreatePatchMutationHookArgs<
   RequestSchema extends z.ZodType,
   ResponseSchema extends z.ZodType,
@@ -88,13 +87,14 @@ export function createPatchMutationHook<
           endpoint
         )
       }
+      const token = useAuthStore.getState().auth?.accessToken
+      // console.log('Using token:', token)
 
-      // const { accessToken } = useAuthStore.getState()
-      const { auth } = useAuthStore()
+      // Include the token in the headers if required
+      const headers = requiresAuth ? { Authorization: `Bearer ${token}` } : {}
+
       const validatedData = requestSchema.parse(data)
-      const headers = requiresAuth
-        ? { Authorization: `Bearer ${auth.accessToken}` }
-        : {}
+
       return axiosInstance
         .patch(url, validatedData, { headers })
         .then((response: { data: unknown }) => {
