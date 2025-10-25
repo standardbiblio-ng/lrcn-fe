@@ -48,7 +48,6 @@ function BioData({
   handleNext,
   step,
   lastCompletedStep,
-  totalSteps,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
@@ -171,7 +170,7 @@ function BioData({
             </h4>
           </header>
 
-          {/* Names */}
+          {/* First Name */}
 
           <FormField
             control={form.control}
@@ -193,6 +192,7 @@ function BioData({
             )}
           />
 
+          {/* Last Name */}
           <FormField
             control={form.control}
             name='lastName'
