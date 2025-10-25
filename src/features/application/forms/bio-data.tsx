@@ -3,13 +3,16 @@ import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { bioDataSchema, submitBioDataApiSchema } from '@/schemas/bioData'
-import { tr } from 'date-fns/locale'
+import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import nigeriaData from '@/assets/statesAndLGA/nigeria-state-and-lgas.json'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
-import { formatNigerianPhoneNumber } from '@/utils/phoneFormatter'
+import {
+  formatNigerianPhoneNumberWithCode,
+  formatNigerianPhoneNumberWithoutCode,
+} from '@/utils/phoneFormatter'
 import {
   Form,
   FormControl,
@@ -19,12 +22,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
-const useGetBioData = createGetQueryHook({
-  endpoint: '/applications/my/bio-data',
-  responseSchema: z.any(),
-  queryKey: ['my-application'],
-})
 
 const useCreateBioData = createPostMutationHook({
   endpoint: '/applications/my/bio-data',
@@ -40,29 +37,50 @@ const useUpdateBioData = createPutMutationHook({
   requiresAuth: true,
 })
 
-function BioData() {
+const useGetBioData = createGetQueryHook({
+  endpoint: '/applications/my/bio-data',
+  responseSchema: z.any(),
+  queryKey: ['my-bio-data'],
+})
+
+function BioData({
+  handleBack,
+  handleNext,
+  step,
+  lastCompletedStep,
+  totalSteps,
+}: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevBioData } = useGetBioData()
+  const { data: prevBioData, error, status } = useGetBioData()
+
+  // console.log('Status:', status)
+  // console.log('Error:', error)
+  // console.log('Data:', prevBioData)
   const registerBioDataMutation = useCreateBioData()
   const updateBioDataMutation = useUpdateBioData()
 
   const form = useForm<z.infer<typeof bioDataSchema>>({
     resolver: zodResolver(bioDataSchema),
+    mode: 'onChange',
     defaultValues: {
       firstName: prevBioData?.firstName || '',
       lastName: prevBioData?.lastName || '',
       otherNames: prevBioData?.otherNames || '',
       previousNames: prevBioData?.previousNames || '',
       email: prevBioData?.email || '',
-      phoneNumber: prevBioData?.phoneNumber || '',
+      phoneNumber: prevBioData?.phoneNumber
+        ? formatNigerianPhoneNumberWithoutCode(prevBioData.phoneNumber)
+        : '',
       nationality: prevBioData?.nationality || '',
       state: prevBioData?.state || '',
       lga: prevBioData?.lga || '',
-      dob: prevBioData?.dob || '',
+      dob: prevBioData?.dob?.split('T')[0] || '',
       gender: prevBioData?.gender || '',
     },
   })
+
+  const { isValid, isDirty } = form.formState
 
   function onSubmit(data: z.infer<typeof bioDataSchema>) {
     // console.log('Submitting', { data })
@@ -70,7 +88,7 @@ function BioData() {
     setIsLoading(true)
     const formattedData = {
       ...data,
-      phoneNumber: formatNigerianPhoneNumber(data.phoneNumber),
+      phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
     }
     // eslint-disable-next-line no-console
     // console.log('Submitting', { formattedData })
@@ -79,11 +97,21 @@ function BioData() {
     const validatedApiData = submitBioDataApiSchema.parse(formattedData)
 
     if (prevBioData) {
+      // console.log('Submitting for Updating', { formattedData })
+      console.log('updating bio-data....')
+
+      if (!isDirty) {
+        // when i want to move to next step without changes
+        setIsLoading(false)
+        handleNext()
+        return
+      }
+
       updateBioDataMutation.mutate(validatedApiData, {
         onSuccess: (responseData) => {
           setIsLoading(false)
 
-          toast.success(`Updated Bio-Data Successfully! Please proceed.`)
+          toast.success(`Updated Bio-Data Successfully!`)
         },
         onError: (error) => {
           console.error('bio data update error:', error)
@@ -99,6 +127,7 @@ function BioData() {
           toast.success(`Recorded Bio-Data Successfully! Please proceed.`)
 
           // move to the next step in the application process
+          handleNext()
         },
         onError: (error) => {
           console.error('bio data register error:', error)
@@ -108,9 +137,29 @@ function BioData() {
       })
     }
   }
+
+  if (status === 'pending')
+    return (
+      <div
+        style={{
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        Loading...
+      </div>
+    )
+  // if (status === 'error') return <div>Could not load bio data.</div>;
+
   return (
     <Form {...form}>
-      <form>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
+        <p className='font-montserrat text-active font-normal italic'>
+          Step {step}
+        </p>
+
         <div className='space-y-6'>
           {/* Header */}
           <header>
@@ -123,138 +172,128 @@ function BioData() {
           </header>
 
           {/* Names */}
-          <div>
-            <FormField
-              control={form.control}
-              name='firstName'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='block text-sm font-medium text-gray-700'>
-                    First Name
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Enter first name'
-                      {...field}
-                      className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
-          <div>
-            <FormField
-              control={form.control}
-              name='lastName'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Last Name
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Enter last name'
-                      {...field}
-                      className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name='firstName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='block text-sm font-medium text-gray-700'>
+                  First Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Enter first name'
+                    {...field}
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          <div>
-            <FormField
-              control={form.control}
-              name='otherNames'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Other Names
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Enter other names'
-                      {...field}
-                      className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name='lastName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='block text-sm font-medium text-gray-700'>
+                  Last Name
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Enter last name'
+                    {...field}
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-          <div>
-            <FormField
-              control={form.control}
-              name='previousNames'
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Previous Names (if name has changed) with Date
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder='Enter previous names'
-                      {...field}
-                      className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name='otherNames'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='block text-sm font-medium text-gray-700'>
+                  Other Names
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Enter other names'
+                    {...field}
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name='previousNames'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='block text-sm font-medium text-gray-700'>
+                  Previous Names (if name has changed) with Date
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder='Enter previous names'
+                    {...field}
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           {/* Contact Info */}
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-            <div>
-              <FormField
-                control={form.control}
-                name='email'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='block text-sm font-medium text-gray-700'>
-                      Email
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Enter email'
-                        {...field}
-                        className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div>
-              <FormField
-                control={form.control}
-                name='phoneNumber'
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className='block text-sm font-medium text-gray-700'>
-                      Phone Number
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder='Enter phone number'
-                        {...field}
-                        className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name='email'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='block text-sm font-medium text-gray-700'>
+                    Email
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='Enter email'
+                      {...field}
+                      className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='phoneNumber'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className='block text-sm font-medium text-gray-700'>
+                    Phone Number
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder='Enter phone number'
+                      {...field}
+                      className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
 
           {/* Nationality */}
@@ -404,6 +443,39 @@ function BioData() {
               />
             </div>
           </div>
+        </div>
+
+        {/* Navigation */}
+        <div className='mt-6 flex justify-between'>
+          <button
+            onClick={handleBack}
+            disabled={isLoading}
+            className={`rounded border px-4 py-2 ${
+              step === 1
+                ? 'bg-gray-200 text-gray-400'
+                : 'bg-white hover:bg-gray-50'
+            }`}
+          >
+            Back
+          </button>
+          <button
+            type='submit'
+            disabled={
+              isLoading ||
+              (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
+                (prevBioData
+                  ? !isDirty // Update: Only enable when form has changed
+                  : !isValid)) // Next: Only enable when form is valid
+            }
+            className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
+              (isLoading ||
+                (step !== lastCompletedStep &&
+                  (prevBioData ? !isDirty : !isValid))) &&
+              'cursor-not-allowed opacity-50'
+            }`}
+          >
+            {prevBioData && lastCompletedStep !== step ? 'Update' : 'Next'}
+          </button>
         </div>
       </form>
     </Form>
