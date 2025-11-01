@@ -52,7 +52,7 @@ function Upload({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevDocuments, error, status } = useGetDocuments()
+  const { data: prevDocuments } = useGetDocuments()
   const registerDocumentMutation = useCreateDocument()
   const updateDocumentMutation = useUpdateDocument()
 
