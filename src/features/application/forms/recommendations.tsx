@@ -46,7 +46,7 @@ function Recommendations({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevRecommendations, error, status } = useGetRecommendations()
+  const { data: prevRecommendations } = useGetRecommendations()
   const registerRecommendationsMutation = useCreateRecommendations()
   const updateRecommendationsMutation = useUpdateRecommendations()
 
