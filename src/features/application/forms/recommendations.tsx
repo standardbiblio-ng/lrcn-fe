@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
+import { useRecommendationStore } from '@/stores/recommendation-store'
 import {
   Form,
   FormControl,
@@ -50,20 +51,27 @@ function Recommendations({
   const registerRecommendationsMutation = useCreateRecommendations()
   const updateRecommendationsMutation = useUpdateRecommendations()
 
+  const { formData, setFormData } = useRecommendationStore()
+
   console.log('prevRecommendations:', prevRecommendations)
 
   const form = useForm<z.infer<typeof recommendationSchema>>({
     resolver: zodResolver(recommendationSchema),
     mode: 'onChange',
-    defaultValues:
-      prevRecommendations?.length > 0
-        ? prevRecommendations[0]
-        : {
-            name: '',
-            phoneNumber: '',
-            email: '',
-          },
+    defaultValues: formData,
   })
+
+  // ✅ Initialize store once from API
+  useEffect(() => {
+    if (prevRecommendations?.length > 0) {
+      console.log('Fire the useEffect to set previous bio data in store')
+      const formattedData = prevRecommendations[0]
+
+      console.log('Setting previous employment history in store + form')
+      setFormData(formattedData)
+      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+    }
+  }, [prevRecommendations])
 
   const { isValid, isDirty } = form.formState
 
@@ -73,9 +81,6 @@ function Recommendations({
     setIsLoading(true)
 
     if (prevRecommendations?.length > 0) {
-      // console.log('Submitting for Updating', { formattedData })
-      // console.log('updating employment history....')
-      // console.log('isDirty:', isDirty)
       if (!isDirty) {
         // when i want to move to next step without changes
         setIsLoading(false)
@@ -87,6 +92,7 @@ function Recommendations({
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Updated Recommendations Successfully!`)
+          setFormData(responseData)
         },
         onError: (error) => {
           setIsLoading(false)
@@ -101,7 +107,7 @@ function Recommendations({
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Recorded Recommendations Successfully!`)
-
+          setFormData(responseData)
           // move to the next step in the application process
           handleNext()
         },

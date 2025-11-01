@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import z from 'zod'
+import { useEffect, useState } from 'react'
+import z, { set } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { bioDataSchema, submitBioDataApiSchema } from '@/schemas/bioData'
@@ -9,6 +9,7 @@ import nigeriaData from '@/assets/statesAndLGA/nigeria-state-and-lgas.json'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
+import { BioDataFormData, useBioDataStore } from '@/stores/bio-data-store'
 import {
   formatNigerianPhoneNumberWithCode,
   formatNigerianPhoneNumberWithoutCode,
@@ -50,6 +51,7 @@ function BioData({
   lastCompletedStep,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { formData, setFormData, reset } = useBioDataStore()
 
   const { data: prevBioData, error, status } = useGetBioData()
 
@@ -62,22 +64,24 @@ function BioData({
   const form = useForm<z.infer<typeof bioDataSchema>>({
     resolver: zodResolver(bioDataSchema),
     mode: 'onChange',
-    defaultValues: {
-      firstName: prevBioData?.firstName || '',
-      lastName: prevBioData?.lastName || '',
-      otherNames: prevBioData?.otherNames || '',
-      previousNames: prevBioData?.previousNames || '',
-      email: prevBioData?.email || '',
-      phoneNumber: prevBioData?.phoneNumber
-        ? formatNigerianPhoneNumberWithoutCode(prevBioData.phoneNumber)
-        : '',
-      nationality: prevBioData?.nationality || '',
-      state: prevBioData?.state || '',
-      lga: prevBioData?.lga || '',
-      dob: prevBioData?.dob?.split('T')[0] || '',
-      gender: prevBioData?.gender || '',
-    },
+    defaultValues: formData,
   })
+
+  // ✅ Initialize store once from API
+  useEffect(() => {
+    if (prevBioData) {
+      console.log('Fire the useEffect to set previous bio data in store')
+      setFormData(prevBioData)
+      form.reset(prevBioData) // 👈 this re-syncs React Hook Form with the updated store values
+      // setFormData((current: BioDataFormData) => {
+      //   const isInitial = Object.keys(current).every(
+      //     (key) => current[key as keyof typeof current] === initialValues[key as keyof typeof initialValues]
+      //   );
+      //   if (isInitial) return prevBioData;
+      //   return current;
+      // });
+    }
+  }, [prevBioData])
 
   const { isValid, isDirty } = form.formState
 
@@ -97,7 +101,7 @@ function BioData({
 
     if (prevBioData) {
       // console.log('Submitting for Updating', { formattedData })
-      console.log('updating bio-data....')
+      // console.log('updating bio-data....')
 
       if (!isDirty) {
         // when i want to move to next step without changes
@@ -107,10 +111,11 @@ function BioData({
       }
 
       updateBioDataMutation.mutate(validatedApiData, {
-        onSuccess: (responseData) => {
+        onSuccess: (responseData: any) => {
           setIsLoading(false)
 
           toast.success(`Updated Bio-Data Successfully!`)
+          setFormData(responseData)
         },
         onError: (error) => {
           console.error('bio data update error:', error)
@@ -120,8 +125,10 @@ function BioData({
       })
     } else {
       registerBioDataMutation.mutate(validatedApiData, {
-        onSuccess: (responseData) => {
+        onSuccess: (responseData: any) => {
           setIsLoading(false)
+
+          setFormData(responseData)
 
           toast.success(`Recorded Bio-Data Successfully! Please proceed.`)
 

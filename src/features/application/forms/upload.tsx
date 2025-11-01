@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import z from 'zod'
+import { useEffect, useState } from 'react'
+import z, { set } from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uploadSchema } from '@/schemas/uploadSchema'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
+import { useUploadDocumentStore } from '@/stores/upload-store'
 import {
   Form,
   FormControl,
@@ -56,33 +57,36 @@ function Upload({
   const registerDocumentMutation = useCreateDocument()
   const updateDocumentMutation = useUpdateDocument()
 
+  const { formData, setFormData } = useUploadDocumentStore()
+
   // console.log('prevDocuments:', prevDocuments)
 
   const form = useForm<z.infer<typeof uploadSchema>>({
     resolver: zodResolver(uploadSchema),
     mode: 'onChange',
-    defaultValues:
-      prevDocuments?.length > 0
-        ? {
-            documents: prevDocuments.map((doc: any) => ({
-              name: doc.name || '',
-              fileUrl: doc.fileUrl || '',
-              fileType: doc.fileType || '',
-              uploadedAt:
-                doc.uploadedAt?.split('T')[0] || '2025-10-28T12:00:00Z',
-            })),
-          }
-        : {
-            documents: [
-              {
-                name: '',
-                fileUrl: '',
-                fileType: '',
-                uploadedAt: '2025-10-28T12:00:00Z',
-              },
-            ],
-          },
+    defaultValues: formData,
   })
+
+  // ✅ Initialize store once from API
+  useEffect(() => {
+    if (prevDocuments?.length > 0) {
+      console.log(
+        'Fire the useEffect to set previous documents upload in store'
+      )
+      const formattedData = {
+        documents: prevDocuments.map((doc: any) => ({
+          name: doc.name || '',
+          fileUrl: doc.fileUrl || '',
+          fileType: doc.fileType || '',
+          uploadedAt: doc.uploadedAt?.split('T')[0] || '2025-10-28T12:00:00Z',
+        })),
+      }
+
+      console.log('Setting previous documents upload in store + form')
+      setFormData(formattedData)
+      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+    }
+  }, [prevDocuments])
 
   const { control, handleSubmit, formState, setValue, watch } = form
   const { isValid, isDirty } = formState
@@ -92,8 +96,6 @@ function Upload({
     name: 'documents',
   })
 
-  console.log('form states: ', form.getValues())
-  console.log('form states: ', isValid)
   // Watch all docs for dynamic rendering
   const documents = watch('documents')
 
@@ -150,6 +152,18 @@ function Upload({
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Updated documents upload Successfully!`)
+
+          const formattedData = {
+            documents: responseData.map((doc: any) => ({
+              name: doc.name || '',
+              fileUrl: doc.fileUrl || '',
+              fileType: doc.fileType || '',
+              uploadedAt:
+                doc.uploadedAt?.split('T')[0] || '2025-10-28T12:00:00Z',
+            })),
+          }
+
+          setFormData(formattedData)
         },
         onError: (error) => {
           setIsLoading(false)
@@ -164,6 +178,18 @@ function Upload({
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Recorded documents upload Successfully!`)
+
+          const formattedData = {
+            documents: responseData.map((doc: any) => ({
+              name: doc.name || '',
+              fileUrl: doc.fileUrl || '',
+              fileType: doc.fileType || '',
+              uploadedAt:
+                doc.uploadedAt?.split('T')[0] || '2025-10-28T12:00:00Z',
+            })),
+          }
+
+          setFormData(formattedData)
 
           // move to the next step in the application process
           handleNext()

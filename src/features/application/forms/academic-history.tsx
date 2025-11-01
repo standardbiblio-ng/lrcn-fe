@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
+import { useAcademicHistoryStore } from '@/stores/academic-history-store'
 import {
   Form,
   FormControl,
@@ -60,27 +61,32 @@ function AcademicHistory({
   const registerAcadHistMutation = useCreateAcadHist()
   const updateAcadHistMutation = useUpdateAcadHist()
 
+  const { formData, setFormData } = useAcademicHistoryStore()
+
   const form = useForm<z.infer<typeof acadHistoryRequestSchema>>({
     resolver: zodResolver(acadHistoryRequestSchema),
     mode: 'onChange',
-    defaultValues: {
-      items:
-        prevAcadHist?.length > 0
-          ? prevAcadHist.map((record: Institution) => ({
-              ...record,
-              startDate: record.startDate.split('T')[0],
-              endDate: record.endDate.split('T')[0],
-            }))
-          : [
-              {
-                institution: '',
-                qualification: '',
-                startDate: '',
-                endDate: '',
-              },
-            ],
-    },
+    defaultValues: formData,
   })
+
+  // ✅ Initialize store once from API
+  useEffect(() => {
+    if (prevAcadHist?.length > 0) {
+      console.log('Fire the useEffect to set previous bio data in store')
+      const formattedData = {
+        items: prevAcadHist.map((record: Institution) => ({
+          ...record,
+          startDate: record.startDate.split('T')[0],
+          endDate: record.endDate.split('T')[0],
+        })),
+      }
+
+      console.log('Setting previous academic history in store + form')
+      setFormData(formattedData)
+      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+    }
+  }, [prevAcadHist])
+
   const { isValid, isDirty } = form.formState
 
   const { fields, append, remove } = useFieldArray({
@@ -104,8 +110,9 @@ function AcademicHistory({
         return
       }
       updateAcadHistMutation.mutate(data, {
-        onSuccess: (responseData) => {
+        onSuccess: (responseData: any) => {
           setIsLoading(false)
+          setFormData(responseData)
           toast.success(`Updated Academic History Successfully!`)
         },
         onError: (error) => {
@@ -118,8 +125,10 @@ function AcademicHistory({
     } else {
       // console.log('registering academic history....')
       registerAcadHistMutation.mutate(data, {
-        onSuccess: (responseData) => {
+        onSuccess: (responseData: any) => {
           setIsLoading(false)
+
+          setFormData(responseData)
           toast.success(`Recorded Academic History Successfully!`)
 
           // move to the next step in the application process
