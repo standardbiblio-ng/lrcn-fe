@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import z from 'zod'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { recommendationSchema } from '@/schemas/recommendation'
 import { StepperProps } from '@/types/stepper.type'
