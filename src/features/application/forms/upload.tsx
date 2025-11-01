@@ -84,7 +84,7 @@ function Upload({
           },
   })
 
-  const { control, handleSubmit, formState, setValue, watch } = form
+  const { control, formState, setValue, watch } = form
   const { isValid, isDirty } = formState
 
   const { fields, append, remove } = useFieldArray({
