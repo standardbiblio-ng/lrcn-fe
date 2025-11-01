@@ -2,14 +2,13 @@ import { z } from 'zod'
 import { bioDataSchema } from '@/schemas/bioData'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { formatNigerianPhoneNumberWithoutCode } from '@/utils/phoneFormatter'
 
-type BioDataFormData = z.infer<typeof bioDataSchema>
+export type BioDataFormData = z.infer<typeof bioDataSchema>
 
 interface BioDataStore {
   formData: BioDataFormData
-  activeInputs: Record<string, boolean>
   setFormData: (data: Partial<BioDataFormData>) => void
-  setActiveInput: (fieldName: string, isActive: boolean) => void
   reset: () => void
 }
 
@@ -24,24 +23,32 @@ const initialValues: BioDataFormData = {
   state: '',
   lga: '',
   dob: '',
-  gender: 'Male',
+  gender: '',
 }
 
 export const useBioDataStore = create<BioDataStore>()(
   persist(
     (set) => ({
       formData: initialValues,
-
-      activeInputs: {},
       setFormData: (data) =>
-        set((state) => ({
-          formData: { ...state.formData, ...data },
-        })),
-      setActiveInput: (fieldName, isActive) =>
-        set((state) => ({
-          activeInputs: { ...state.activeInputs, [fieldName]: isActive },
-        })),
-      reset: () => set({ formData: initialValues, activeInputs: {} }),
+        set((state) => {
+          const updated = { ...state.formData, ...data }
+
+          // ✅ Safely format phone number if present
+          if (data.phoneNumber !== undefined && data.phoneNumber !== null) {
+            updated.phoneNumber = formatNigerianPhoneNumberWithoutCode(
+              data.phoneNumber
+            )
+          }
+
+          // ✅ Safely handle dob if it includes a timestamp (e.g., "2025-10-28T12:00:00Z")
+          if (data.dob && data.dob.includes('T')) {
+            updated.dob = data.dob.split('T')[0]
+          }
+
+          return { formData: updated }
+        }),
+      reset: () => set({ formData: initialValues }),
     }),
     {
       name: 'bio-data-storage',

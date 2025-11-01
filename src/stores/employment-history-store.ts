@@ -1,43 +1,54 @@
 import { z } from 'zod'
-import { acadHistorySchema } from '@/schemas/acadHistory'
+import { employmentHistorySchema } from '@/schemas/employHistory'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type AcademicHistoryFormData = z.infer<typeof acadHistorySchema>
+type EmploymentHistoryFormData = z.infer<typeof employmentHistorySchema>
 
-interface AcademicHistoryStore {
-  formData: AcademicHistoryFormData
-  activeInputs: Record<string, boolean>
-  setFormData: (data: Partial<AcademicHistoryFormData>) => void
-  setActiveInput: (fieldName: string, isActive: boolean) => void
+interface EmploymentHistoryStore {
+  formData: EmploymentHistoryFormData
+
+  setFormData: (data: Partial<EmploymentHistoryFormData>) => void
   reset: () => void
 }
 
-const initialValues: AcademicHistoryFormData = {
-  institution: '',
-  qualification: '',
+const initialValues: EmploymentHistoryFormData = {
+  employer: '',
+  address: '',
+  status: '',
   startDate: '',
-  endDate: '',
+  workExperience: [
+    {
+      organisation: '',
+      positionHeld: '',
+      startDate: '',
+    },
+  ],
 }
 
-export const useAcademicHistoryStore = create<AcademicHistoryStore>()(
+export const useEmploymentHistoryStore = create<EmploymentHistoryStore>()(
   persist(
     (set) => ({
       formData: initialValues,
 
-      activeInputs: {},
       setFormData: (data) =>
         set((state) => ({
-          formData: { ...state.formData, ...data },
+          formData: {
+            ...state.formData,
+            ...data,
+            startDate:
+              data.startDate?.split('T')[0] || state.formData.startDate,
+            workExperience:
+              data.workExperience?.map((exp) => ({
+                ...exp,
+                startDate: exp.startDate?.split('T')[0] || '',
+              })) || state.formData.workExperience,
+          },
         })),
-      setActiveInput: (fieldName, isActive) =>
-        set((state) => ({
-          activeInputs: { ...state.activeInputs, [fieldName]: isActive },
-        })),
-      reset: () => set({ formData: initialValues, activeInputs: {} }),
+      reset: () => set({ formData: initialValues }),
     }),
     {
-      name: 'academic-history-storage',
+      name: 'employment-history-storage',
     }
   )
 )

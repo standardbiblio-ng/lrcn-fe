@@ -1,23 +1,25 @@
 import { z } from 'zod'
-import { acadHistorySchema } from '@/schemas/acadHistory'
+import { acadHistoryRequestSchema } from '@/schemas/acadHistory'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type AcademicHistoryFormData = z.infer<typeof acadHistorySchema>
+type AcademicHistoryFormData = z.infer<typeof acadHistoryRequestSchema>
 
 interface AcademicHistoryStore {
   formData: AcademicHistoryFormData
-  activeInputs: Record<string, boolean>
   setFormData: (data: Partial<AcademicHistoryFormData>) => void
-  setActiveInput: (fieldName: string, isActive: boolean) => void
   reset: () => void
 }
 
 const initialValues: AcademicHistoryFormData = {
-  institution: '',
-  qualification: '',
-  startDate: '',
-  endDate: '',
+  items: [
+    {
+      institution: '',
+      qualification: '',
+      startDate: '',
+      endDate: '',
+    },
+  ],
 }
 
 export const useAcademicHistoryStore = create<AcademicHistoryStore>()(
@@ -25,16 +27,21 @@ export const useAcademicHistoryStore = create<AcademicHistoryStore>()(
     (set) => ({
       formData: initialValues,
 
-      activeInputs: {},
       setFormData: (data) =>
         set((state) => ({
-          formData: { ...state.formData, ...data },
+          formData: {
+            ...state.formData,
+            ...data,
+            items:
+              data?.items?.map((item) => ({
+                ...item,
+                startDate: item.startDate?.split('T')[0],
+                endDate: item.endDate?.split('T')[0],
+              })) || state.formData.items,
+          },
         })),
-      setActiveInput: (fieldName, isActive) =>
-        set((state) => ({
-          activeInputs: { ...state.activeInputs, [fieldName]: isActive },
-        })),
-      reset: () => set({ formData: initialValues, activeInputs: {} }),
+
+      reset: () => set({ formData: initialValues }),
     }),
     {
       name: 'academic-history-storage',
