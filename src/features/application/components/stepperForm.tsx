@@ -180,15 +180,7 @@ export default function StepperForm() {
           />
         )
       case 7:
-        return (
-          <Attestation
-          // handleBack={handleBack}
-          // handleNext={handleNext}
-          // step={step}
-          // lastCompletedStep={maxStep}
-          // totalSteps={totalSteps}
-          />
-        )
+        return <Attestation handleBack={handleBack} handleNext={handleNext} />
       case 8:
         return (
           <Payment
