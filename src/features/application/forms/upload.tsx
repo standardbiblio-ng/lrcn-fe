@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import z, { set } from 'zod'
+import axios from 'axios'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { uploadSchema } from '@/schemas/uploadSchema'
@@ -8,6 +9,7 @@ import { toast } from 'sonner'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
+import { useAuthStore } from '@/stores/auth-store'
 import { useUploadDocumentStore } from '@/stores/upload-store'
 import {
   Form,
@@ -54,6 +56,7 @@ function Upload({
   const [isLoading, setIsLoading] = useState(false)
 
   const { data: prevDocuments } = useGetDocuments()
+  // console.log('prevDocuments data from api:', prevDocuments)
   const registerDocumentMutation = useCreateDocument()
   const updateDocumentMutation = useUpdateDocument()
 
@@ -131,14 +134,78 @@ function Upload({
     setValue(`documents.${index}.fileUrl`, '', { shouldDirty: true })
     setValue(`documents.${index}.fileType`, '', { shouldDirty: true })
   }
+  const { auth } = useAuthStore()
 
   // Filter out already selected document types
   // const usedTypes = documents.map((doc) => doc.type)
+
+  const makePostRequest = async (data: any) => {
+    try {
+      const fileDataUrl = data?.documents[0].fileUrl
+      const name = data?.documents[0].name
+      // const fileType = data?.documents[0].fileType
+
+      // ✅ Convert base64 Data URL → Blob
+      const base64ToBlob = (dataUrl: string) => {
+        const arr = dataUrl.split(',')
+        const mime = arr[0].match(/:(.*?);/)![1]
+        const bstr = atob(arr[1])
+        let n = bstr.length
+        const u8arr = new Uint8Array(n)
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n)
+        }
+        return new Blob([u8arr], { type: mime })
+      }
+
+      const blob = base64ToBlob(fileDataUrl)
+
+      // ✅ Create FormData and append Blob as file
+      const formData = new FormData()
+      formData.append('file', blob, name) // 👈 this is the actual file now
+      formData.append('name', name)
+
+      // ✅ Log FormData entries for debugging
+      // for (const [key, value] of formData.entries()) {
+      //   console.log(`${key}:`, value)
+      // }
+
+      const response = await axios.post(
+        'https://api.bibliodev.com.ng/api/applications/my/documents/upload',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${auth.accessToken}`,
+          },
+        }
+      )
+
+      const responseData = response.data
+      // console.log('recorded documents upload responseData:', responseData)
+      toast.success('Recorded documents upload successfully!')
+
+      const formattedData = {
+        documents: [...responseData],
+      }
+
+      setFormData(formattedData)
+      handleNext()
+    } catch (error) {
+      console.error('documents upload register error:', error)
+      toast.error('Failed to record documents upload. Please try again.')
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   function onSubmit(data: z.infer<typeof uploadSchema>) {
     // console.log('Submitting', { data })
 
     setIsLoading(true)
+    const formattedData = {
+      items: data?.documents,
+    }
 
     //  const validatedApiData = submitBioDataApiSchema.parse(formattedData)
 
@@ -152,10 +219,11 @@ function Upload({
         handleNext()
         return
       }
-      updateDocumentMutation.mutate(data?.documents, {
+      updateDocumentMutation.mutate(formattedData, {
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Updated documents upload Successfully!`)
+          console.log('updated documents upload responseData:', responseData)
 
           const formattedData = {
             documents: responseData.map((doc: any) => ({
@@ -168,6 +236,7 @@ function Upload({
           }
 
           setFormData(formattedData)
+          // handleNext()
         },
         onError: (error) => {
           setIsLoading(false)
@@ -178,33 +247,7 @@ function Upload({
       })
     } else {
       // console.log('registering academic history....')
-      registerDocumentMutation.mutate(data?.documents, {
-        onSuccess: (responseData) => {
-          setIsLoading(false)
-          toast.success(`Recorded documents upload Successfully!`)
-          console.log('recorded documents upload responseData:', responseData)
-          const formattedData = {
-            documents: responseData.map((doc: any) => ({
-              name: doc.name || '',
-              fileUrl: doc.fileUrl || '',
-              fileType: doc.fileType || '',
-              uploadedAt:
-                doc.uploadedAt?.split('T')[0] || '2025-10-28T12:00:00Z',
-            })),
-          }
-
-          setFormData(formattedData)
-
-          // move to the next step in the application process
-          handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error('documents upload register error:', error)
-
-          toast.error('Failed to record documents upload. Please try again.')
-        },
-      })
+      makePostRequest(data)
     }
   }
 
