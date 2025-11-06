@@ -18,14 +18,14 @@ import { Form } from '@/components/ui/form'
 
 const useGetAttestation = createGetQueryHook({
   endpoint: '/applications/my/attestation',
-  responseSchema: z.any(),
+  responseSchema: attestationSchema,
   queryKey: ['my-attestation'],
 })
 
 const usePostAttestation = createPostMutationHook({
   endpoint: '/applications/my/attestation',
-  requestSchema: z.any(),
-  responseSchema: z.any(),
+  requestSchema: attestationSchema,
+  responseSchema: attestationSchema,
   requiresAuth: true,
 })
 function Attestation({ handleBack, handleNext }: StepperProps) {
