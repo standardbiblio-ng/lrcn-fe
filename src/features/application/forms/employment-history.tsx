@@ -90,7 +90,7 @@ function EmploymentHistory({
       form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
       markInitialized()
     }
-  }, [prevEmploymentHistory])
+  }, [prevEmploymentHistory, initialized, setFormData, form.reset, markInitialized])
 
   const { isValid, isDirty } = form.formState
 
