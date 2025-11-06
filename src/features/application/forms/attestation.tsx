@@ -263,7 +263,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                   {/* Add spacing between records */}
                   {index < employmentData.workExperience.length - 1 && (
                     <tr>
-                      <td colSpan={2}>
+                      <td colSpan={3}>
                         <div className='my-3 border-b border-dashed border-gray-300'></div>
                       </td>
                     </tr>
