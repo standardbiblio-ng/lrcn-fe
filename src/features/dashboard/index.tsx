@@ -1,27 +1,25 @@
-import { Bell } from 'lucide-react'
+import z from 'zod'
 import { Link } from 'react-router-dom'
 import applyImg from '@/assets/images/Group.png'
 import cloud from '@/assets/images/dashboard-cloud.png'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { createGetQueryHook } from '@/api/hooks/useGet'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { ConfigDrawer } from '@/components/config-drawer'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
-import { TopNav } from '@/components/layout/top-nav'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { Overview } from './components/overview'
-import { RecentSales } from './components/recent-sales'
+
+const useGetBioData = createGetQueryHook({
+  endpoint: '/applications/my/bio-data',
+  responseSchema: z.any(),
+  queryKey: ['my-bio-data'],
+})
 
 export function Dashboard() {
+  const { data: bioData } = useGetBioData()
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -51,11 +49,18 @@ export function Dashboard() {
                 <div className='flex flex-col justify-center px-10'>
                   <div>
                     <h1 className='text-2xl font-bold text-[#004B50]'>
-                      Hi, John Doe
+                      Hi,{' '}
+                      {bioData
+                        ? bioData?.firstName?.charAt(0).toUpperCase() +
+                          bioData?.firstName?.slice(1) +
+                          ' ' +
+                          bioData?.lastName?.charAt(0).toUpperCase() +
+                          bioData?.lastName?.slice(1)
+                        : null}
                     </h1>
                   </div>
                   <div>
-                    <p className='text-muted-foreground lg:text-[13.08px] text-[11.28px]'>
+                    <p className='text-muted-foreground text-[11.28px] lg:text-[13.08px]'>
                       Welcome to the LCRN Dashboard! Your hub for community
                       insights and progress tracking
                     </p>
@@ -88,7 +93,7 @@ export function Dashboard() {
                       className='flex-shrink-0'
                     />
 
-                    <div className='justify-center flex flex-col items-center space-y-2'>
+                    <div className='flex flex-col items-center justify-center space-y-2'>
                       <p className='text-muted-foreground text-sm'>
                         Take the first step to join LCRN
                       </p>
