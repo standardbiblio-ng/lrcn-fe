@@ -47,14 +47,14 @@ function Recommendations({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevRecommendations } = useGetRecommendations()
+  const { data: prevRecommendations, status } = useGetRecommendations()
   const registerRecommendationsMutation = useCreateRecommendations()
   const updateRecommendationsMutation = useUpdateRecommendations()
 
   const { formData, setFormData, initialized, markInitialized } =
     useRecommendationStore()
 
-  console.log('prevRecommendations:', prevRecommendations)
+  // console.log('prevRecommendations:', prevRecommendations)
 
   const form = useForm<z.infer<typeof recommendationSchema>>({
     resolver: zodResolver(recommendationSchema),
