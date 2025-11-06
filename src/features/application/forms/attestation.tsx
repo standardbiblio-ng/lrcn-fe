@@ -18,14 +18,14 @@ import { Form } from '@/components/ui/form'
 
 const useGetAttestation = createGetQueryHook({
   endpoint: '/applications/my/attestation',
-  responseSchema: z.any(),
+  responseSchema: attestationSchema,
   queryKey: ['my-attestation'],
 })
 
 const usePostAttestation = createPostMutationHook({
   endpoint: '/applications/my/attestation',
-  requestSchema: z.any(),
-  responseSchema: z.any(),
+  requestSchema: attestationSchema,
+  responseSchema: attestationSchema,
   requiresAuth: true,
 })
 function Attestation({ handleBack, handleNext }: StepperProps) {
@@ -263,7 +263,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                   {/* Add spacing between records */}
                   {index < employmentData?.workExperience.length - 1 && (
                     <tr>
-                      <td colSpan={2}>
+                      <td colSpan={3}>
                         <div className='my-3 border-b border-dashed border-gray-300'></div>
                       </td>
                     </tr>
