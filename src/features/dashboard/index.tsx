@@ -1,8 +1,7 @@
-import z from 'zod'
 import { Link } from 'react-router-dom'
 import applyImg from '@/assets/images/Group.png'
 import cloud from '@/assets/images/dashboard-cloud.png'
-import { createGetQueryHook } from '@/api/hooks/useGet'
+import { useGetBioData } from '@/api/hooks/useBioData'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
 import { ConfigDrawer } from '@/components/config-drawer'
@@ -11,12 +10,6 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-
-const useGetBioData = createGetQueryHook({
-  endpoint: '/applications/my/bio-data',
-  responseSchema: z.any(),
-  queryKey: ['my-bio-data'],
-})
 
 export function Dashboard() {
   const { data: bioData } = useGetBioData()
