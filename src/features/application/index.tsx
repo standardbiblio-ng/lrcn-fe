@@ -20,7 +20,7 @@ export function Application() {
       </Header>
 
       {/* ===== Content ===== */}
-      <Main fixed>
+      <Main>
         <StepperForm />
       </Main>
     </>

@@ -114,3 +114,10 @@ Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
 ## License
 
 Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
+
+{
+"email": "test@gmail.com",
+"password": "password123",
+"phoneNumber": "+2348123456789",
+"role": "applicant"
+}
