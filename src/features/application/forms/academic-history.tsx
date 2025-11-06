@@ -229,6 +229,7 @@ function AcademicHistory({
                         className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
                       >
                         <option value=''>Select qualification</option>
+                        <option value='BLIS'>BLIS</option>
                         <option value='BSc'>BSc</option>
                         <option value='MSc'>MSc</option>
                         <option value='PhD'>PhD</option>
