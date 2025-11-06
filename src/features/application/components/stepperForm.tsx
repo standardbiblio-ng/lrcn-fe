@@ -127,7 +127,7 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            totalSteps={totalSteps}
+            // totalSteps={totalSteps}
           />
         )
       case 2:
@@ -137,7 +137,7 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            totalSteps={totalSteps}
+            // totalSteps={totalSteps}
           />
         )
       case 3:
@@ -147,37 +147,36 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            totalSteps={totalSteps}
+            // totalSteps={totalSteps}
           />
         )
       case 4:
         return (
           <EmploymentHistory
-          // handleBack={handleBack}
-          // handleNext={handleNext}
-          // step={step}
-          // lastCompletedStep={maxStep}
-          // totalSteps={totalSteps}
+            handleBack={handleBack}
+            handleNext={handleNext}
+            step={step}
+            lastCompletedStep={maxStep}
+            // totalSteps={totalSteps}
           />
         )
       case 5:
         return (
           <Recommendations
-          // handleBack={handleBack}
-          // handleNext={handleNext}
-          // step={step}
-          // lastCompletedStep={maxStep}
-          // totalSteps={totalSteps}
+            handleBack={handleBack}
+            handleNext={handleNext}
+            step={step}
+            lastCompletedStep={maxStep}
+            // totalSteps={totalSteps}
           />
         )
       case 6:
         return (
           <Upload
-          // handleBack={handleBack}
-          // handleNext={handleNext}
-          // step={step}
-          // lastCompletedStep={maxStep}
-          // totalSteps={totalSteps}
+            handleBack={handleBack}
+            handleNext={handleNext}
+            step={step}
+            lastCompletedStep={maxStep}
           />
         )
       case 7:

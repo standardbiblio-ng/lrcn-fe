@@ -18,20 +18,6 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-interface WorkExperience {
-  organization: string
-  position: string
-  startDate: string
-}
-
-interface EmploymentInfo {
-  employer: string
-  address: string
-  status: string
-  categories: string[]
-  workExperiences: WorkExperience[]
-}
-
 const useGetEmploymentHistory = createGetQueryHook({
   endpoint: '/applications/my/employment-history',
   responseSchema: z.any(),
@@ -68,7 +54,7 @@ function EmploymentHistory({
   const registerEmploymentHistoryMutation = useCreateEmploymentHistory()
   const updateEmploymentHistoryMutation = useUpdateEmploymentHistory()
 
-  // console.log('prevEmploymentHistory:', prevEmploymentHistory)
+  // console.log('prevEmploymentHistory:', lastCompletedStep, step)
 
   const form = useForm<z.infer<typeof employmentHistoryRequestSchema>>({
     resolver: zodResolver(employmentHistoryRequestSchema),
@@ -117,10 +103,12 @@ function EmploymentHistory({
         handleNext()
         return
       }
-      updateEmploymentHistoryMutation.mutate(data, {
+      // updateEmploymentHistoryMutation.mutate(data, {
+      registerEmploymentHistoryMutation.mutate(data, {
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Updated Employment History Successfully!`)
+          // handleNext()
         },
         onError: (error) => {
           setIsLoading(false)

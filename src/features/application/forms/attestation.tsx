@@ -2,84 +2,305 @@ import React, { useState } from 'react'
 import { StepperProps } from '@/types/stepper.type'
 
 function Attestation() {
-  const [signature, setSignature] = useState<string | null>(null)
-
-  const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = () => setSignature(reader.result as string)
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const removeSignature = () => setSignature(null)
-
   return (
     <div className='space-y-4'>
       <h2 className='font-montserrat mb-1 text-xl font-semibold'>
         Applicant Attestation
       </h2>
-      <h4 className='font-montserrat text-md text-active font-normal'>
-        Please fill out all fields.
-      </h4>
 
-      <div className='flex flex-wrap items-center space-x-2'>
-        <p className='text-base'>I</p>
-        <div className='min-w-[120px] flex-1'>
-          <input
-            type='text'
-            placeholder='Name'
-            className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-          />
+      <div className='dashboard-body-content'>
+        {/* Bio Data */}
+        <div className='ethical-preveiw-table'>
+          <span className='table-head-title'>Bio Data Information</span>
+          <table>
+            <tbody>
+              <tr>
+                <td width='40%'>First Name</td>
+                <td>TEST</td>
+              </tr>
+              <tr>
+                <td width='40%'>Last Name</td>
+                <td>TEST</td>
+              </tr>
+
+              <tr>
+                <td width='40%'>Other Name</td>
+                <td>TEST</td>
+              </tr>
+              <tr>
+                <td width='40%'>Previous Name</td>
+                <td>TEST</td>
+              </tr>
+
+              <tr>
+                <td>Email</td>
+                <td>test@gmail.com</td>
+              </tr>
+              <tr>
+                <td>Phone Number</td>
+                <td>0102</td>
+              </tr>
+              <tr>
+                <td>Nationality</td>
+                <td>0102</td>
+              </tr>
+              <tr>
+                <td>State</td>
+                <td>0102</td>
+              </tr>
+
+              <tr>
+                <td>LGA</td>
+                <td>0102</td>
+              </tr>
+              <tr>
+                <td>Date of birth</td>
+                <td>0122</td>
+              </tr>
+              <tr>
+                <td>Gender</td>
+                <td>0102</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
-        <p className='text-base'>
-          attest that all information provided in the previous pages is true.
-        </p>
-      </div>
+        <br />
+        <br />
 
-      <div className='flex flex-wrap space-x-4'>
-        <div className='flex-1'>
-          <label className='ml-4 inline text-sm'>Signature</label>
-          <div
-            className={`bg-neutral2 relative mt-[12px] flex h-[100px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[12px] border`}
-            style={{
-              backgroundImage: signature ? `url(${signature})` : 'none',
-              backgroundSize: 'contain',
-              backgroundRepeat: 'no-repeat',
-              backgroundPosition: 'center',
-            }}
-          >
-            {!signature && (
-              <span className='text-sm text-gray-500'>
-                Click to upload signature
-              </span>
-            )}
-            <input
-              type='file'
-              accept='image/*'
-              onChange={handleSignatureChange}
-              className='absolute inset-0 cursor-pointer opacity-0'
-            />
-            {signature && (
-              <button
-                type='button'
-                onClick={removeSignature}
-                className='absolute top-2 right-2 rounded-md bg-black/50 px-2 py-1 text-xs text-white'
-              >
-                Remove
-              </button>
-            )}
+        {/* Academic History */}
+        <div className='ethical-preveiw-table'>
+          <span className='table-head-title'>Academic History</span>
+          <table>
+            <tbody>
+              <tr>
+                <th>Institution 1</th>
+              </tr>
+              <tr>
+                <td width='40%'>Name</td>
+                <td>TEST</td>
+              </tr>
+              <tr>
+                <td>Qualification</td>
+                <td>test</td>
+              </tr>
+              <tr>
+                <td>Start and End Date </td>
+                <td>2020 - 2022</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <br />
+        <br />
+
+        {/* Employment History */}
+        <div className='ethical-preveiw-table'>
+          <span className='table-head-title'>Employment History</span>
+          <table>
+            <tbody>
+              <tr>
+                <td width='40%'>Employer Name</td>
+                <td>test</td>
+              </tr>
+              <tr>
+                <td>Address</td>
+                <td>test</td>
+              </tr>
+              <tr>
+                <td>Status</td>
+                <td>full-time</td>
+              </tr>
+              <tr>
+                <td>startDate</td>
+                <td>345349</td>
+              </tr>
+              <th>
+                <td>Work Experience</td>
+              </th>
+              {/* <tr>
+                  <td>Is the project sponsored?</td>
+                  <td>{data.hasProjectSponsored ? "Yes" : "No"}</td>
+                </tr>
+                <tr>
+                  <td>
+                    Will materials or tissue specimens be shipped out of the
+                    country?
+                  </td>
+                  <td>{data.specimenWillBeShippedOut ? "Yes" : "No"}</td>
+                </tr>
+                <tr>
+                  <td>Completed training:</td>
+                  <td>{data.completedEthicsTraining ? "Yes" : "No"}</td>
+                </tr> */}
+            </tbody>
+          </table>
+        </div>
+        <br />
+        <br />
+
+        {/* Recommendations */}
+        {/* <div className="ethical-preveiw-table">
+            <span className="table-head-title">Research information</span>
+            <table>
+              <tbody>
+                <tr>
+                  <td width="40%">Title of research</td>
+                  <td>{data.researchTitle}</td>
+                </tr>
+                <tr>
+                  <td>Objectives of the study</td>
+                  <td>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: data.objectivesOfTheStudy,
+                      }}
+                    ></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Are You Principal Investigator</td>
+                  <td>
+                    {data.areYouInvestigatorOrLocalPrincipalInvestigator
+                      ? "Yes"
+                      : "No"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Has Co-Principal investigator(s)</td>
+                  <td>
+                    {principals.length !== 0 ? (
+                      <p
+                        style={{
+                          fontStyle: "italic",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        List of co-principal investigators
+                      </p>
+                    ) : (
+                      ""
+                    )}
+                    {principals && principals.length !== 0
+                      ? principals?.map((e, index) => {
+                          return (
+                            <div key={index}>
+                              <span
+                                style={{
+                                  border: "none",
+                                }}
+                              >
+                                {e.firstName} {e.lastName}
+                                <br />
+                                {e.email}
+                              </span>
+                            </div>
+                          );
+                        })
+                      : "No"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Is the project sponsored?</td>
+                  <td>{data.hasProjectSponsored ? "Yes" : "No"}</td>
+                </tr>
+                <tr>
+                  <td>
+                    Will materials or tissue specimens be shipped out of the
+                    country?
+                  </td>
+                  <td>{data.specimenWillBeShippedOut ? "Yes" : "No"}</td>
+                </tr>
+                <tr>
+                  <td>Completed training:</td>
+                  <td>{data.completedEthicsTraining ? "Yes" : "No"}</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-        </div>
+          <br />
+          <br /> */}
 
-        <div className='flex-1'>
-          <label className='ml-4 inline text-sm'>Date</label>
-          <input
-            type='date'
-            className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-          />
-        </div>
+        {/* Upload */}
+        {/* <div className="ethical-preveiw-table">
+            <span className="table-head-title">Research information</span>
+            <table>
+              <tbody>
+                <tr>
+                  <td width="40%">Title of research</td>
+                  <td>{data.researchTitle}</td>
+                </tr>
+                <tr>
+                  <td>Objectives of the study</td>
+                  <td>
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: data.objectivesOfTheStudy,
+                      }}
+                    ></div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Are You Principal Investigator</td>
+                  <td>
+                    {data.areYouInvestigatorOrLocalPrincipalInvestigator
+                      ? "Yes"
+                      : "No"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Has Co-Principal investigator(s)</td>
+                  <td>
+                    {principals.length !== 0 ? (
+                      <p
+                        style={{
+                          fontStyle: "italic",
+                          fontSize: "0.8rem",
+                        }}
+                      >
+                        List of co-principal investigators
+                      </p>
+                    ) : (
+                      ""
+                    )}
+                    {principals && principals.length !== 0
+                      ? principals?.map((e, index) => {
+                          return (
+                            <div key={index}>
+                              <span
+                                style={{
+                                  border: "none",
+                                }}
+                              >
+                                {e.firstName} {e.lastName}
+                                <br />
+                                {e.email}
+                              </span>
+                            </div>
+                          );
+                        })
+                      : "No"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Is the project sponsored?</td>
+                  <td>{data.hasProjectSponsored ? "Yes" : "No"}</td>
+                </tr>
+                <tr>
+                  <td>
+                    Will materials or tissue specimens be shipped out of the
+                    country?
+                  </td>
+                  <td>{data.specimenWillBeShippedOut ? "Yes" : "No"}</td>
+                </tr>
+                <tr>
+                  <td>Completed training:</td>
+                  <td>{data.completedEthicsTraining ? "Yes" : "No"}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <br />
+          <br /> */}
       </div>
     </div>
   )
