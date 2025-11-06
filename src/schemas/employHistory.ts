@@ -1,6 +1,6 @@
 import z from 'zod'
 
-const acadHistorySchema = z.object({
+export const employmentHistorySchema = z.object({
   employer: z.string(),
   address: z.string(),
   status: z.string(),
@@ -13,3 +13,5 @@ const acadHistorySchema = z.object({
     })
   ),
 })
+
+export const employmentHistoryRequestSchema = employmentHistorySchema

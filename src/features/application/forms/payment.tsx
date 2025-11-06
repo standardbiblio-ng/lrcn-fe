@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { StepperProps } from '@/types/stepper.type'
 
 function Payment() {
   const [selectedMethod, setSelectedMethod] = useState('')

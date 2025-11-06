@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { StepperProps } from '@/types/stepper.type'
 
 interface DocumentType {
   type: string

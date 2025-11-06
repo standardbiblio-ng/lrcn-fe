@@ -11,6 +11,7 @@ import {
   FileCheck,
 } from 'lucide-react'
 import { createGetQueryHook } from '@/api/hooks/useGet'
+import { useStepperStore } from '@/stores/application-stepper-store'
 import AcademicHistory from '../forms/academic-history'
 import Attestation from '../forms/attestation'
 import BioData from '../forms/bio-data'
@@ -78,48 +79,127 @@ const steps = [
 // })
 
 export default function StepperForm() {
-  const [currentStep, setCurrentStep] = useState(1)
+  const { step, maxStep, setStep, next, previous, markComplete } =
+    useStepperStore()
+  const totalSteps = steps.length
+
+  const handleNext = () => {
+    markComplete(step)
+    next(totalSteps)
+  }
+
+  const handleBack = () => {
+    previous()
+  }
+
+  const handleStepClick = (stepId: number) => {
+    if (stepId <= maxStep) setStep(stepId)
+  }
   // const { data, isPending } = useGetApplication()
 
   // console.log('data: ', data)
 
-  const handleNext = () => {
-    if (currentStep < steps.length) {
-      setCurrentStep(currentStep + 1)
-    }
-  }
+  // const handleNext = () => {
+  //   if (currentStep < steps.length) {
+  //     setCurrentStep(currentStep + 1)
+  //   }
+  // }
 
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(currentStep - 1)
-    }
-  }
+  // const handleBack = () => {
+  //   if (currentStep > 1) {
+  //     setCurrentStep(currentStep - 1)
+  //   }
+  // }
 
-  const handleStepClick = (stepId: number) => {
-    if (stepId < currentStep) {
-      setCurrentStep(stepId)
-    }
-  }
+  // const handleStepClick = (stepId: number) => {
+  //   if (stepId < currentStep) {
+  //     setCurrentStep(stepId)
+  //   }
+  // }
 
   // Example content renderer for each step
   const renderStepContent = () => {
-    switch (currentStep) {
+    switch (step) {
       case 1:
-        return <Instructions />
+        return (
+          <Instructions
+            handleBack={handleBack}
+            handleNext={handleNext}
+            step={step}
+            lastCompletedStep={maxStep}
+            totalSteps={totalSteps}
+          />
+        )
       case 2:
-        return <BioData />
+        return (
+          <BioData
+            handleBack={handleBack}
+            handleNext={handleNext}
+            step={step}
+            lastCompletedStep={maxStep}
+            totalSteps={totalSteps}
+          />
+        )
       case 3:
-        return <AcademicHistory />
+        return (
+          <AcademicHistory
+            handleBack={handleBack}
+            handleNext={handleNext}
+            step={step}
+            lastCompletedStep={maxStep}
+            totalSteps={totalSteps}
+          />
+        )
       case 4:
-        return <EmploymentHistory />
+        return (
+          <EmploymentHistory
+          // handleBack={handleBack}
+          // handleNext={handleNext}
+          // step={step}
+          // lastCompletedStep={maxStep}
+          // totalSteps={totalSteps}
+          />
+        )
       case 5:
-        return <Recommendations />
+        return (
+          <Recommendations
+          // handleBack={handleBack}
+          // handleNext={handleNext}
+          // step={step}
+          // lastCompletedStep={maxStep}
+          // totalSteps={totalSteps}
+          />
+        )
       case 6:
-        return <Upload />
+        return (
+          <Upload
+          // handleBack={handleBack}
+          // handleNext={handleNext}
+          // step={step}
+          // lastCompletedStep={maxStep}
+          // totalSteps={totalSteps}
+          />
+        )
       case 7:
-        return <Attestation />
+        return (
+          <Attestation
+          // handleBack={handleBack}
+          // handleNext={handleNext}
+          // step={step}
+          // lastCompletedStep={maxStep}
+          // totalSteps={totalSteps}
+          />
+        )
       case 8:
-        return <Payment />
+        return (
+          <Payment
+          // handleBack={handleBack}
+          // handleNext={handleNext}
+          // step={step}
+          // lastCompletedStep={maxStep}
+          // totalSteps={totalSteps}
+          />
+        )
     }
   }
 
@@ -128,24 +208,24 @@ export default function StepperForm() {
       {/* Sidebar Steps */}
       <aside className='w-1/3 border-r bg-gray-50 p-6'>
         <ul className='space-y-4'>
-          {steps.map((step) => (
+          {steps.map((stepItem) => (
             <li
-              key={step.id}
-              onClick={() => handleStepClick(step.id)}
+              key={stepItem.id}
+              onClick={() => handleStepClick(stepItem.id)}
               className={`flex cursor-pointer flex-row justify-between space-x-2 rounded-lg p-3 ${
-                currentStep === step.id
+                step === stepItem.id
                   ? 'bg-blue-100 text-blue-700'
-                  : step.id < currentStep
+                  : stepItem.id <= maxStep
                     ? 'text-gray-700 hover:bg-gray-100'
-                    : 'text-gray-400'
+                    : 'cursor-not-allowed text-gray-400'
               }`}
             >
               <div className='flex flex-col'>
-                <span className='font-bold'>{step.title}</span>
-                <span className='text-xs'>{step.description}</span>
+                <span className='font-bold'>{stepItem.title}</span>
+                <span className='text-xs'>{stepItem.description}</span>
               </div>
               <div className='flex size-10 items-center justify-center rounded-full bg-[#C1C1C1]'>
-                <step.icon className='' />
+                <stepItem.icon />
               </div>
             </li>
           ))}
@@ -154,32 +234,7 @@ export default function StepperForm() {
 
       {/* Main Content */}
       <main className='mb-40 flex-1 overflow-y-auto p-8'>
-        <p className='font-montserrat text-active font-normal italic'>
-          Step {currentStep}
-        </p>
         {renderStepContent()}
-
-        {/* Navigation */}
-        <div className='mt-6 flex justify-between'>
-          <button
-            onClick={handleBack}
-            disabled={currentStep === 1}
-            className={`rounded border px-4 py-2 ${
-              currentStep === 1
-                ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
-            }`}
-          >
-            Back
-          </button>
-          <button
-            onClick={handleNext}
-            disabled={currentStep === steps.length}
-            className='bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700'
-          >
-            {currentStep === steps.length ? 'Finish' : 'Next'}
-          </button>
-        </div>
       </main>
     </div>
   )
