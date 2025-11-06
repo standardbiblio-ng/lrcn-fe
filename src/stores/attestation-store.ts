@@ -28,7 +28,7 @@ export const useAttestationStore = create<AttestationStore>()(
           formData: { ...state.formData, ...data },
         })),
 
-      reset: () => set({ formData: initialValues }),
+      reset: () => set({ formData: initialValues, initialized: false }),
     }),
     {
       name: 'attestation-storage',
