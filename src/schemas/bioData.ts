@@ -3,8 +3,8 @@ import z from 'zod'
 export const bioDataSchema = z.object({
   firstName: z.string().min(2).max(100),
   lastName: z.string().min(2).max(100),
-  otherNames: z.string().min(2).max(100).optional(),
-  previousNames: z.string().min(2).max(100).optional(),
+  otherNames: z.string().optional(),
+  previousNames: z.string().optional(),
   email: z.email({
     error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
   }),
