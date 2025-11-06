@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
+import { useEmploymentHistoryStore } from '@/stores/employment-history-store'
 import {
   Form,
   FormControl,
@@ -54,32 +55,38 @@ function EmploymentHistory({
   const registerEmploymentHistoryMutation = useCreateEmploymentHistory()
   const updateEmploymentHistoryMutation = useUpdateEmploymentHistory()
 
+  const { formData, setFormData } = useEmploymentHistoryStore()
+
   // console.log('prevEmploymentHistory:', lastCompletedStep, step)
 
   const form = useForm<z.infer<typeof employmentHistoryRequestSchema>>({
     resolver: zodResolver(employmentHistoryRequestSchema),
     mode: 'onChange',
-    defaultValues:
-      prevEmploymentHistory?.length > 0
-        ? {
-            ...prevEmploymentHistory[0],
-            startDate: prevEmploymentHistory[0].startDate?.split('T')[0] || '',
-            workExperience: (prevEmploymentHistory[0].workExperience || []).map(
-              (exp: any) => ({
-                ...exp,
-                startDate: exp.startDate?.split('T')[0] || '',
-              })
-            ),
-          }
-        : {
-            employer: '',
-            address: '',
-            status: '',
-            workExperience: [
-              { organisation: '', positionHeld: '', startDate: '' },
-            ],
-          },
+    defaultValues: formData,
   })
+
+  // ✅ Initialize store once from API
+  useEffect(() => {
+    if (prevEmploymentHistory?.length > 0) {
+      console.log('Fire the useEffect to set previous employment history in store')
+      const emp = prevEmploymentHistory[0]
+      const formattedData = {
+        employer: emp.employer || '',
+        address: emp.address || '',
+        status: emp.status || '',
+        startDate: emp.startDate?.split('T')[0] || '',
+        workExperience:
+          emp.workExperience?.map((exp: any) => ({
+            organisation: exp.organisation || '',
+            positionHeld: exp.positionHeld || '',
+            startDate: exp.startDate?.split('T')[0] || '',
+          })) || [],
+      }
+      console.log('Setting previous employment history in store + form')
+      setFormData(formattedData)
+      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+    }
+  }, [prevEmploymentHistory])
 
   const { isValid, isDirty } = form.formState
 
@@ -103,27 +110,34 @@ function EmploymentHistory({
         handleNext()
         return
       }
-      // updateEmploymentHistoryMutation.mutate(data, {
-      registerEmploymentHistoryMutation.mutate(data, {
-        onSuccess: (responseData) => {
-          setIsLoading(false)
-          toast.success(`Updated Employment History Successfully!`)
-          // handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error(' employment history update error:', error)
+      updateEmploymentHistoryMutation.mutate(
+        { items: [data] },
+        {
+          // registerEmploymentHistoryMutation.mutate(data, {
+          onSuccess: (responseData) => {
+            setIsLoading(false)
 
-          toast.error('Failed to update Employment History. Please try again.')
-        },
-      })
+            toast.success(`Updated Employment History Successfully!`)
+            setFormData(responseData)
+            // handleNext()
+          },
+          onError: (error) => {
+            setIsLoading(false)
+            console.error(' employment history update error:', error)
+
+            toast.error(
+              'Failed to update Employment History. Please try again.'
+            )
+          },
+        }
+      )
     } else {
       // console.log('registering employment history....')
       registerEmploymentHistoryMutation.mutate(data, {
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Recorded Employment History Successfully!`)
-
+          setFormData(responseData)
           // move to the next step in the application process
           handleNext()
         },

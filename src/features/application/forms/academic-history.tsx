@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
+import { useAcademicHistoryStore } from '@/stores/academic-history-store'
 import {
   Form,
   FormControl,
@@ -60,27 +61,34 @@ function AcademicHistory({
   const registerAcadHistMutation = useCreateAcadHist()
   const updateAcadHistMutation = useUpdateAcadHist()
 
+  const { formData, setFormData, initialized, markInitialized } =
+    useAcademicHistoryStore()
+  // console.log('formData from store:', formData)
   const form = useForm<z.infer<typeof acadHistoryRequestSchema>>({
     resolver: zodResolver(acadHistoryRequestSchema),
     mode: 'onChange',
-    defaultValues: {
-      items:
-        prevAcadHist?.length > 0
-          ? prevAcadHist.map((record: Institution) => ({
-              ...record,
-              startDate: record.startDate.split('T')[0],
-              endDate: record.endDate.split('T')[0],
-            }))
-          : [
-              {
-                institution: '',
-                qualification: '',
-                startDate: '',
-                endDate: '',
-              },
-            ],
-    },
+    defaultValues: formData,
   })
+
+  // ✅ Initialize store once from API
+  useEffect(() => {
+    if (prevAcadHist?.length > 0 && !initialized) {
+      // console.log('Initializing academic history store from API...')
+      const formattedData = {
+        items: prevAcadHist.map((record: Institution) => ({
+          ...record,
+          startDate: record.startDate.split('T')[0],
+          endDate: record.endDate.split('T')[0],
+        })),
+      }
+
+      // console.log('Setting previous academic history in store + form')
+      setFormData(formattedData)
+      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+      markInitialized()
+    }
+  }, [prevAcadHist])
+
   const { isValid, isDirty } = form.formState
 
   const { fields, append, remove } = useFieldArray({
@@ -104,9 +112,11 @@ function AcademicHistory({
         return
       }
       updateAcadHistMutation.mutate(data, {
-        onSuccess: (responseData) => {
+        onSuccess: (responseData: any) => {
           setIsLoading(false)
           toast.success(`Updated Academic History Successfully!`)
+          // console.log('update responseData:', responseData)
+          setFormData({ items: responseData })
         },
         onError: (error) => {
           setIsLoading(false)
@@ -118,8 +128,10 @@ function AcademicHistory({
     } else {
       // console.log('registering academic history....')
       registerAcadHistMutation.mutate(data, {
-        onSuccess: (responseData) => {
+        onSuccess: (responseData: any) => {
           setIsLoading(false)
+
+          setFormData({ items: responseData })
           toast.success(`Recorded Academic History Successfully!`)
 
           // move to the next step in the application process
@@ -217,6 +229,7 @@ function AcademicHistory({
                         className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
                       >
                         <option value=''>Select qualification</option>
+                        <option value='BLIS'>BLIS</option>
                         <option value='BSc'>BSc</option>
                         <option value='MSc'>MSc</option>
                         <option value='PhD'>PhD</option>

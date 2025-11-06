@@ -1,40 +1,51 @@
 import { z } from 'zod'
-import { acadHistorySchema } from '@/schemas/acadHistory'
+import { acadHistoryRequestSchema } from '@/schemas/acadHistory'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type AcademicHistoryFormData = z.infer<typeof acadHistorySchema>
+type AcademicHistoryFormData = z.infer<typeof acadHistoryRequestSchema>
 
 interface AcademicHistoryStore {
   formData: AcademicHistoryFormData
-  activeInputs: Record<string, boolean>
   setFormData: (data: Partial<AcademicHistoryFormData>) => void
-  setActiveInput: (fieldName: string, isActive: boolean) => void
+  markInitialized: () => void
+  initialized: boolean
   reset: () => void
 }
 
 const initialValues: AcademicHistoryFormData = {
-  institution: '',
-  qualification: '',
-  startDate: '',
-  endDate: '',
+  items: [
+    {
+      institution: '',
+      qualification: '',
+      startDate: '',
+      endDate: '',
+    },
+  ],
 }
 
 export const useAcademicHistoryStore = create<AcademicHistoryStore>()(
   persist(
     (set) => ({
       formData: initialValues,
-
-      activeInputs: {},
+      initialized: false,
+      markInitialized: () => set({ initialized: true }),
       setFormData: (data) =>
-        set((state) => ({
-          formData: { ...state.formData, ...data },
-        })),
-      setActiveInput: (fieldName, isActive) =>
-        set((state) => ({
-          activeInputs: { ...state.activeInputs, [fieldName]: isActive },
-        })),
-      reset: () => set({ formData: initialValues, activeInputs: {} }),
+        set((state) => {
+          // console.log('Updating academic history store with data:', data)
+
+          const updated = {
+            items:
+              data?.items?.map((item) => ({
+                ...item,
+                startDate: item.startDate?.split('T')[0],
+                endDate: item.endDate?.split('T')[0],
+              })) || state.formData.items,
+          }
+          return { formData: updated }
+        }),
+
+      reset: () => set({ formData: initialValues }),
     }),
     {
       name: 'academic-history-storage',

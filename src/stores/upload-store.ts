@@ -1,51 +1,44 @@
 // src/stores/upload-store.ts
 import { z } from 'zod'
-import { bioDataSchema } from '@/schemas/bioData'
+import { uploadSchema } from '@/schemas/uploadSchema'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type BioDataFormData = z.infer<typeof bioDataSchema>
+type UploadedDocumentFormData = z.infer<typeof uploadSchema>
 
-interface BioDataStore {
-  formData: BioDataFormData
-  activeInputs: Record<string, boolean>
-  setFormData: (data: Partial<BioDataFormData>) => void
-  setActiveInput: (fieldName: string, isActive: boolean) => void
+interface UploadedDocumentStore {
+  formData: UploadedDocumentFormData
+  markInitialized: () => void
+  initialized: boolean
+  setFormData: (data: Partial<UploadedDocumentFormData>) => void
   reset: () => void
 }
 
-const initialValues: BioDataFormData = {
-  firstName: '',
-  lastName: '',
-  otherNames: '',
-  previousNames: '',
-  email: '',
-  phoneNumber: '',
-  nationality: '',
-  state: '',
-  lga: '',
-  dob: '',
-  gender: 'Male',
+const initialValues: UploadedDocumentFormData = {
+  documents: [
+    {
+      name: '',
+      fileUrl: '',
+      fileType: '',
+      uploadedAt: '2025-10-28T12:00:00Z',
+    },
+  ],
 }
 
-export const useBioDataStore = create<BioDataStore>()(
+export const useUploadDocumentStore = create<UploadedDocumentStore>()(
   persist(
     (set) => ({
       formData: initialValues,
-
-      activeInputs: {},
+      initialized: false,
+      markInitialized: () => set({ initialized: true }),
       setFormData: (data) =>
         set((state) => ({
           formData: { ...state.formData, ...data },
         })),
-      setActiveInput: (fieldName, isActive) =>
-        set((state) => ({
-          activeInputs: { ...state.activeInputs, [fieldName]: isActive },
-        })),
-      reset: () => set({ formData: initialValues, activeInputs: {} }),
+      reset: () => set({ formData: initialValues }),
     }),
     {
-      name: 'bio-data-storage',
+      name: 'uploaded-document-storage',
     }
   )
 )

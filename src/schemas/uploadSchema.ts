@@ -5,7 +5,7 @@ export const uploadResquestSchema = z.array(
     name: z.string().min(2).max(100),
     fileUrl: z.string(),
     fileType: z.string(),
-    uploadedAt: z.string(),
+    uploadedAt: z.string().optional(),
   })
 )
 

@@ -1,11 +1,12 @@
-import { Link } from 'react-router-dom'
+import z from 'zod'
+import { createGetQueryHook } from '@/api/hooks/useGet'
+import { useAuthStore } from '@/stores/auth-store'
 import useDialogState from '@/hooks/use-dialog-state'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -14,8 +15,18 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
 
+const useGetBioData = createGetQueryHook({
+  endpoint: '/applications/my/bio-data',
+  responseSchema: z.any(),
+  queryKey: ['my-bio-data'],
+})
+
 export function ProfileDropdown() {
   const [open, setOpen] = useDialogState()
+
+  const { data: bioData } = useGetBioData()
+  const { auth } = useAuthStore()
+  const user = auth.user
 
   return (
     <>
@@ -23,42 +34,29 @@ export function ProfileDropdown() {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
             <Avatar className='h-8 w-8'>
-              <AvatarImage src='/avatars/01.png' alt='@shadcn' />
-              <AvatarFallback>SN</AvatarFallback>
+              {/* <AvatarImage src='/avatars/01.png' alt='@shadcn' /> */}
+              <AvatarFallback>
+                {bioData
+                  ? bioData?.firstName?.charAt(0).toUpperCase() +
+                    bioData?.lastName?.charAt(0).toUpperCase()
+                  : user?.email?.charAt(0).toUpperCase()}
+              </AvatarFallback>
             </Avatar>
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              <p className='text-sm leading-none font-medium'>satnaing</p>
+              {bioData && (
+                <p className='text-sm leading-none font-medium'>
+                  {bioData?.firstName}
+                </p>
+              )}
               <p className='text-muted-foreground text-xs leading-none'>
-                satnaingdev@gmail.com
+                {user?.email}
               </p>
             </div>
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuGroup>
-            <DropdownMenuItem asChild>
-              <Link to='/settings'>
-                Profile
-                <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to='/settings'>
-                Billing
-                <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to='/settings'>
-                Settings
-                <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>New Team</DropdownMenuItem>
-          </DropdownMenuGroup>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={() => setOpen(true)}>
             Sign out

@@ -3,8 +3,8 @@ import z from 'zod'
 export const bioDataSchema = z.object({
   firstName: z.string().min(2).max(100),
   lastName: z.string().min(2).max(100),
-  otherNames: z.string().min(2).max(100).optional(),
-  previousNames: z.string().min(2).max(100).optional(),
+  otherNames: z.string().optional(),
+  previousNames: z.string().optional(),
   email: z.email({
     error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
   }),
@@ -13,7 +13,7 @@ export const bioDataSchema = z.object({
   state: z.string(),
   lga: z.string(),
   dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
-  gender: z.enum(['Male', 'Female', 'Other']),
+  gender: z.enum(['Male', 'Female']).optional(),
 })
 
 // API schema (for data sent to backend)
