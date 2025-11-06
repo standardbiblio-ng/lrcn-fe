@@ -1,5 +1,4 @@
-import z from 'zod'
-import { createGetQueryHook } from '@/api/hooks/useGet'
+import { useGetBioData } from '@/api/hooks/useBioData'
 import { useAuthStore } from '@/stores/auth-store'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -14,12 +13,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
-
-const useGetBioData = createGetQueryHook({
-  endpoint: '/applications/my/bio-data',
-  responseSchema: z.any(),
-  queryKey: ['my-bio-data'],
-})
 
 export function ProfileDropdown() {
   const [open, setOpen] = useDialogState()
