@@ -68,7 +68,7 @@ function EmploymentHistory({
   // ✅ Initialize store once from API
   useEffect(() => {
     if (prevEmploymentHistory?.length > 0) {
-      console.log('Fire the useEffect to set previous bio data in store')
+      console.log('Fire the useEffect to set previous employment history in store')
       const emp = prevEmploymentHistory[0]
       const formattedData = {
         employer: emp.employer || '',
