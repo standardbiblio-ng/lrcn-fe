@@ -49,13 +49,14 @@ function EmploymentHistory({
 
   const {
     data: prevEmploymentHistory,
-    error,
+
     status,
   } = useGetEmploymentHistory()
   const registerEmploymentHistoryMutation = useCreateEmploymentHistory()
   const updateEmploymentHistoryMutation = useUpdateEmploymentHistory()
 
-  const { formData, setFormData } = useEmploymentHistoryStore()
+  const { formData, setFormData, initialized, markInitialized } =
+    useEmploymentHistoryStore()
 
   // console.log('prevEmploymentHistory:', lastCompletedStep, step)
 
@@ -67,8 +68,10 @@ function EmploymentHistory({
 
   // ✅ Initialize store once from API
   useEffect(() => {
-    if (prevEmploymentHistory?.length > 0) {
-      console.log('Fire the useEffect to set previous employment history in store')
+    if (prevEmploymentHistory?.length > 0 && !initialized) {
+      console.log(
+        'Fire the useEffect to set previous employment history in store'
+      )
       const emp = prevEmploymentHistory[0]
       const formattedData = {
         employer: emp.employer || '',
@@ -85,8 +88,9 @@ function EmploymentHistory({
       console.log('Setting previous employment history in store + form')
       setFormData(formattedData)
       form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+      markInitialized()
     }
-  }, [prevEmploymentHistory])
+  }, [prevEmploymentHistory, initialized, setFormData, form.reset, markInitialized])
 
   const { isValid, isDirty } = form.formState
 

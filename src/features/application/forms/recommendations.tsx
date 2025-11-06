@@ -54,7 +54,7 @@ function Recommendations({
   const { formData, setFormData, initialized, markInitialized } =
     useRecommendationStore()
 
-  console.log('prevRecommendations:', prevRecommendations)
+  // console.log('prevRecommendations:', prevRecommendations)
 
   const form = useForm<z.infer<typeof recommendationSchema>>({
     resolver: zodResolver(recommendationSchema),
