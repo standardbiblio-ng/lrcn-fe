@@ -147,7 +147,7 @@ function Recommendations({
         </p>
         <div className='space-y-4'>
           <h2 className='font-montserrat mb-1 text-xl font-semibold'>
-            Document Upload
+            Recommendations Information
           </h2>
           <h4 className='font-montserrat text-md text-active font-normal'>
             Please fill out all fields.
