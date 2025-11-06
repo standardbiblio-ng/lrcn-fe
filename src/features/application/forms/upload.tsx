@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import z, { set } from 'zod'
+import z from 'zod'
 import axios from 'axios'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -19,7 +19,6 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
 
 interface DocumentType {
   type: string
@@ -93,7 +92,7 @@ function Upload({
     }
   }, [prevDocuments])
 
-  const { control, handleSubmit, formState, setValue, watch } = form
+  const { control, formState, setValue, watch } = form
   const { isValid, isDirty } = formState
 
   const { fields, append, remove } = useFieldArray({
