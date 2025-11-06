@@ -7,7 +7,8 @@ type EmploymentHistoryFormData = z.infer<typeof employmentHistorySchema>
 
 interface EmploymentHistoryStore {
   formData: EmploymentHistoryFormData
-
+  markInitialized: () => void
+  initialized: boolean
   setFormData: (data: Partial<EmploymentHistoryFormData>) => void
   reset: () => void
 }
@@ -30,7 +31,8 @@ export const useEmploymentHistoryStore = create<EmploymentHistoryStore>()(
   persist(
     (set) => ({
       formData: initialValues,
-
+      initialized: false,
+      markInitialized: () => set({ initialized: true }),
       setFormData: (data) =>
         set((state) => ({
           formData: {

@@ -8,6 +8,8 @@ type UploadedDocumentFormData = z.infer<typeof uploadSchema>
 
 interface UploadedDocumentStore {
   formData: UploadedDocumentFormData
+  markInitialized: () => void
+  initialized: boolean
   setFormData: (data: Partial<UploadedDocumentFormData>) => void
   reset: () => void
 }
@@ -27,7 +29,8 @@ export const useUploadDocumentStore = create<UploadedDocumentStore>()(
   persist(
     (set) => ({
       formData: initialValues,
-
+      initialized: false,
+      markInitialized: () => set({ initialized: true }),
       setFormData: (data) =>
         set((state) => ({
           formData: { ...state.formData, ...data },

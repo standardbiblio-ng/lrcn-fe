@@ -10,6 +10,8 @@ interface BioDataStore {
   formData: BioDataFormData
   setFormData: (data: Partial<BioDataFormData>) => void
   reset: () => void
+  markInitialized: () => void
+  initialized: boolean
 }
 
 const initialValues: BioDataFormData = {
@@ -30,6 +32,8 @@ export const useBioDataStore = create<BioDataStore>()(
   persist(
     (set) => ({
       formData: initialValues,
+      initialized: false,
+      markInitialized: () => set({ initialized: true }),
       setFormData: (data) =>
         set((state) => {
           const updated = { ...state.formData, ...data }
