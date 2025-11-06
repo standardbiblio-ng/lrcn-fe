@@ -185,7 +185,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
           </h3>
           <table className='w-full border-collapse text-left'>
             <tbody>
-              {academicData.items.map((item, index) => (
+              {academicData?.items?.map((item, index) => (
                 <React.Fragment key={index}>
                   <tr className='border-b'>
                     <td className='w-1/2 font-medium'>Institution</td>
@@ -201,7 +201,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                   </tr>
 
                   {/* Add spacing between records */}
-                  {index < academicData.items.length - 1 && (
+                  {index < academicData?.items.length - 1 && (
                     <tr>
                       <td colSpan={2}>
                         <div className='my-3 border-b border-dashed border-gray-300'></div>
@@ -252,7 +252,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
               </tr>
             </thead>
             <tbody>
-              {employmentData.workExperience.map((item, index) => (
+              {employmentData?.workExperience?.map((item, index) => (
                 <React.Fragment key={index}>
                   <tr className='border-b'>
                     <td>{item.organisation}</td>
@@ -261,7 +261,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                   </tr>
 
                   {/* Add spacing between records */}
-                  {index < employmentData.workExperience.length - 1 && (
+                  {index < employmentData?.workExperience.length - 1 && (
                     <tr>
                       <td colSpan={2}>
                         <div className='my-3 border-b border-dashed border-gray-300'></div>
@@ -304,7 +304,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
           </h3>
           <table className='w-full border-collapse text-left'>
             <tbody>
-              {uploadData.documents.map((item, index) => (
+              {uploadData?.documents?.map((item, index) => (
                 <React.Fragment key={index}>
                   <tr className='border-b'>
                     <td className='w-1/2 font-medium'>Document Type</td>
@@ -316,7 +316,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                   </tr>
 
                   {/* Add spacing between records */}
-                  {index < uploadData.documents.length - 1 && (
+                  {index < uploadData?.documents.length - 1 && (
                     <tr>
                       <td colSpan={2}>
                         <div className='my-3 border-b border-dashed border-gray-300'></div>
