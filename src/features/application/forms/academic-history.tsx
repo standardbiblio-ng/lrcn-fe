@@ -61,8 +61,9 @@ function AcademicHistory({
   const registerAcadHistMutation = useCreateAcadHist()
   const updateAcadHistMutation = useUpdateAcadHist()
 
-  const { formData, setFormData } = useAcademicHistoryStore()
-
+  const { formData, setFormData, initialized, markInitialized } =
+    useAcademicHistoryStore()
+  // console.log('formData from store:', formData)
   const form = useForm<z.infer<typeof acadHistoryRequestSchema>>({
     resolver: zodResolver(acadHistoryRequestSchema),
     mode: 'onChange',
@@ -71,8 +72,8 @@ function AcademicHistory({
 
   // ✅ Initialize store once from API
   useEffect(() => {
-    if (prevAcadHist?.length > 0) {
-      console.log('Fire the useEffect to set previous bio data in store')
+    if (prevAcadHist?.length > 0 && !initialized) {
+      // console.log('Initializing academic history store from API...')
       const formattedData = {
         items: prevAcadHist.map((record: Institution) => ({
           ...record,
@@ -81,9 +82,10 @@ function AcademicHistory({
         })),
       }
 
-      console.log('Setting previous academic history in store + form')
+      // console.log('Setting previous academic history in store + form')
       setFormData(formattedData)
       form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+      markInitialized()
     }
   }, [prevAcadHist])
 
@@ -112,8 +114,9 @@ function AcademicHistory({
       updateAcadHistMutation.mutate(data, {
         onSuccess: (responseData: any) => {
           setIsLoading(false)
-          setFormData(responseData)
           toast.success(`Updated Academic History Successfully!`)
+          // console.log('update responseData:', responseData)
+          setFormData({ items: responseData })
         },
         onError: (error) => {
           setIsLoading(false)
@@ -128,7 +131,7 @@ function AcademicHistory({
         onSuccess: (responseData: any) => {
           setIsLoading(false)
 
-          setFormData(responseData)
+          setFormData({ items: responseData })
           toast.success(`Recorded Academic History Successfully!`)
 
           // move to the next step in the application process

@@ -1,11 +1,6 @@
 import { StepperProps } from '@/types/stepper.type'
 
-function Instructions({
-  handleBack,
-  handleNext,
-  step,
-  totalSteps,
-}: StepperProps) {
+function Instructions({ handleBack, handleNext, step }: StepperProps) {
   return (
     <>
       <p className='font-montserrat text-active font-normal italic'>

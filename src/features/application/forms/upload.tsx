@@ -57,7 +57,8 @@ function Upload({
   const registerDocumentMutation = useCreateDocument()
   const updateDocumentMutation = useUpdateDocument()
 
-  const { formData, setFormData } = useUploadDocumentStore()
+  const { formData, setFormData, initialized, markInitialized } =
+    useUploadDocumentStore()
 
   // console.log('prevDocuments:', prevDocuments)
 
@@ -69,7 +70,7 @@ function Upload({
 
   // ✅ Initialize store once from API
   useEffect(() => {
-    if (prevDocuments?.length > 0) {
+    if (prevDocuments?.length > 0 && !initialized) {
       console.log(
         'Fire the useEffect to set previous documents upload in store'
       )
@@ -85,6 +86,7 @@ function Upload({
       console.log('Setting previous documents upload in store + form')
       setFormData(formattedData)
       form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+      markInitialized()
     }
   }, [prevDocuments])
 
@@ -138,6 +140,8 @@ function Upload({
 
     setIsLoading(true)
 
+    //  const validatedApiData = submitBioDataApiSchema.parse(formattedData)
+
     if (prevDocuments?.length > 0) {
       // console.log('Submitting for Updating', { formattedData })
       console.log('updating documents upload....')
@@ -148,7 +152,7 @@ function Upload({
         handleNext()
         return
       }
-      updateDocumentMutation.mutate(data, {
+      updateDocumentMutation.mutate(data?.documents, {
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Updated documents upload Successfully!`)
@@ -174,11 +178,11 @@ function Upload({
       })
     } else {
       // console.log('registering academic history....')
-      registerDocumentMutation.mutate(data, {
+      registerDocumentMutation.mutate(data?.documents, {
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Recorded documents upload Successfully!`)
-
+          console.log('recorded documents upload responseData:', responseData)
           const formattedData = {
             documents: responseData.map((doc: any) => ({
               name: doc.name || '',

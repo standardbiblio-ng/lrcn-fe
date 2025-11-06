@@ -51,7 +51,8 @@ function BioData({
   lastCompletedStep,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const { formData, setFormData, reset } = useBioDataStore()
+  const { formData, setFormData, initialized, markInitialized } =
+    useBioDataStore()
 
   const { data: prevBioData, error, status } = useGetBioData()
 
@@ -69,10 +70,11 @@ function BioData({
 
   // ✅ Initialize store once from API
   useEffect(() => {
-    if (prevBioData) {
+    if (prevBioData && !initialized) {
       console.log('Fire the useEffect to set previous bio data in store')
       setFormData(prevBioData)
-      form.reset(prevBioData) // 👈 this re-syncs React Hook Form with the updated store values
+      form.reset({ ...prevBioData, dob: prevBioData.dob.split('T')[0] }) // 👈 this re-syncs React Hook Form with the updated store values
+      markInitialized()
       // setFormData((current: BioDataFormData) => {
       //   const isInitial = Object.keys(current).every(
       //     (key) => current[key as keyof typeof current] === initialValues[key as keyof typeof initialValues]
@@ -113,7 +115,7 @@ function BioData({
       updateBioDataMutation.mutate(validatedApiData, {
         onSuccess: (responseData: any) => {
           setIsLoading(false)
-
+          // console.log('update responseData:', responseData)
           toast.success(`Updated Bio-Data Successfully!`)
           setFormData(responseData)
         },

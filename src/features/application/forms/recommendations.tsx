@@ -51,7 +51,8 @@ function Recommendations({
   const registerRecommendationsMutation = useCreateRecommendations()
   const updateRecommendationsMutation = useUpdateRecommendations()
 
-  const { formData, setFormData } = useRecommendationStore()
+  const { formData, setFormData, initialized, markInitialized } =
+    useRecommendationStore()
 
   console.log('prevRecommendations:', prevRecommendations)
 
@@ -63,13 +64,14 @@ function Recommendations({
 
   // ✅ Initialize store once from API
   useEffect(() => {
-    if (prevRecommendations?.length > 0) {
+    if (prevRecommendations?.length > 0 && !initialized) {
       console.log('Fire the useEffect to set previous bio data in store')
       const formattedData = prevRecommendations[0]
 
       console.log('Setting previous employment history in store + form')
       setFormData(formattedData)
       form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+      markInitialized()
     }
   }, [prevRecommendations])
 
@@ -82,6 +84,7 @@ function Recommendations({
 
     if (prevRecommendations?.length > 0) {
       if (!isDirty) {
+        console.log('No changes detected, moving to next step')
         // when i want to move to next step without changes
         setIsLoading(false)
         handleNext()
@@ -92,7 +95,8 @@ function Recommendations({
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Updated Recommendations Successfully!`)
-          setFormData(responseData)
+          // console.log('Updated recommendations responseData:', responseData)
+          setFormData(responseData[0])
         },
         onError: (error) => {
           setIsLoading(false)
@@ -107,7 +111,7 @@ function Recommendations({
         onSuccess: (responseData) => {
           setIsLoading(false)
           toast.success(`Recorded Recommendations Successfully!`)
-          setFormData(responseData)
+          setFormData(responseData[0])
           // move to the next step in the application process
           handleNext()
         },
