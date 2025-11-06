@@ -1,6 +1,6 @@
 import z from 'zod'
 
-export const uploadResquestSchema = z.array(
+export const uploadRequestSchema = z.array(
   z.object({
     name: z.string().min(2).max(100),
     fileUrl: z.string(),
@@ -10,10 +10,10 @@ export const uploadResquestSchema = z.array(
 )
 
 export const uploadSchema = z.object({
-  documents: uploadResquestSchema,
+  documents: uploadRequestSchema,
 })
 
-// export const uploadResquestSchema = z.array(
+// export const uploadRequestSchema = z.array(
 //   z.object({
 //     name: z.string().min(2).max(100),
 //     fileUrl: z
@@ -29,5 +29,5 @@ export const uploadSchema = z.object({
 // );
 
 // export const uploadSchema = z.object({
-//   documents: uploadResquestSchema,
+//   documents: uploadRequestSchema,
 // });
