@@ -1,4 +1,4 @@
-// src/store/daily-feeding.store.ts
+// src/stores/upload-store.ts
 import { z } from 'zod'
 import { uploadSchema } from '@/schemas/uploadSchema'
 import { create } from 'zustand'

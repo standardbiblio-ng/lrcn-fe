@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import z from 'zod'
-import { useFieldArray, useForm } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { recommendationSchema } from '@/schemas/recommendation'
 import { StepperProps } from '@/types/stepper.type'
@@ -47,7 +47,7 @@ function Recommendations({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevRecommendations, error, status } = useGetRecommendations()
+  const { data: prevRecommendations } = useGetRecommendations()
   const registerRecommendationsMutation = useCreateRecommendations()
   const updateRecommendationsMutation = useUpdateRecommendations()
 
