@@ -110,22 +110,27 @@ function EmploymentHistory({
         handleNext()
         return
       }
-      // updateEmploymentHistoryMutation.mutate(data, {
-      registerEmploymentHistoryMutation.mutate(data, {
-        onSuccess: (responseData) => {
-          setIsLoading(false)
+      updateEmploymentHistoryMutation.mutate(
+        { items: [data] },
+        {
+          // registerEmploymentHistoryMutation.mutate(data, {
+          onSuccess: (responseData) => {
+            setIsLoading(false)
 
-          toast.success(`Updated Employment History Successfully!`)
-          setFormData(responseData)
-          // handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error(' employment history update error:', error)
+            toast.success(`Updated Employment History Successfully!`)
+            setFormData(responseData)
+            // handleNext()
+          },
+          onError: (error) => {
+            setIsLoading(false)
+            console.error(' employment history update error:', error)
 
-          toast.error('Failed to update Employment History. Please try again.')
-        },
-      })
+            toast.error(
+              'Failed to update Employment History. Please try again.'
+            )
+          },
+        }
+      )
     } else {
       // console.log('registering employment history....')
       registerEmploymentHistoryMutation.mutate(data, {
