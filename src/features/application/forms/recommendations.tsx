@@ -68,7 +68,7 @@ function Recommendations({
       console.log('Fire the useEffect to set previous bio data in store')
       const formattedData = prevRecommendations[0]
 
-      console.log('Setting previous employment history in store + form')
+      console.log('Setting previous recommendations in store + form')
       setFormData(formattedData)
       form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
       markInitialized()

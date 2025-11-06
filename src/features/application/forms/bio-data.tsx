@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import z, { set } from 'zod'
+import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { bioDataSchema, submitBioDataApiSchema } from '@/schemas/bioData'
@@ -9,7 +9,7 @@ import nigeriaData from '@/assets/statesAndLGA/nigeria-state-and-lgas.json'
 import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
-import { BioDataFormData, useBioDataStore } from '@/stores/bio-data-store'
+import { useBioDataStore } from '@/stores/bio-data-store'
 import {
   formatNigerianPhoneNumberWithCode,
   formatNigerianPhoneNumberWithoutCode,
