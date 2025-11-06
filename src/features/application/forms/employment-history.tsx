@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import z, { set } from 'zod'
+import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { employmentHistoryRequestSchema } from '@/schemas/employHistory'
@@ -49,13 +49,14 @@ function EmploymentHistory({
 
   const {
     data: prevEmploymentHistory,
-    error,
+
     status,
   } = useGetEmploymentHistory()
   const registerEmploymentHistoryMutation = useCreateEmploymentHistory()
   const updateEmploymentHistoryMutation = useUpdateEmploymentHistory()
 
-  const { formData, setFormData } = useEmploymentHistoryStore()
+  const { formData, setFormData, initialized, markInitialized } =
+    useEmploymentHistoryStore()
 
   // console.log('prevEmploymentHistory:', lastCompletedStep, step)
 
@@ -67,7 +68,7 @@ function EmploymentHistory({
 
   // ✅ Initialize store once from API
   useEffect(() => {
-    if (prevEmploymentHistory?.length > 0) {
+    if (prevEmploymentHistory?.length > 0 && !initialized) {
       console.log('Fire the useEffect to set previous bio data in store')
       const emp = prevEmploymentHistory[0]
       const formattedData = {
@@ -85,6 +86,7 @@ function EmploymentHistory({
       console.log('Setting previous employment history in store + form')
       setFormData(formattedData)
       form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
+      markInitialized()
     }
   }, [prevEmploymentHistory])
 
