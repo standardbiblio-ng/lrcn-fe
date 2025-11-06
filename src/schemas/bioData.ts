@@ -13,7 +13,7 @@ export const bioDataSchema = z.object({
   state: z.string(),
   lga: z.string(),
   dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
-  gender: z.enum(['Male', 'Female', '']),
+  gender: z.enum(['Male', 'Female']).optional(),
 })
 
 // API schema (for data sent to backend)
