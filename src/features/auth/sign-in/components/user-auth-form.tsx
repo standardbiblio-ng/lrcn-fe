@@ -61,7 +61,7 @@ export function UserAuthForm({
     setIsLoading(true)
 
     loginMutation.mutate(data, {
-      onSuccess: (responseData) => {
+      onSuccess: async (responseData) => {
         setIsLoading(false)
 
         // ✅ Use setAuthData with actual API response
@@ -73,6 +73,9 @@ export function UserAuthForm({
           // refresh_token: responseData.refresh_token,
           // expires_in: responseData.expires_in
         })
+
+        // ⏳ Wait for React state update (auth context)
+        await new Promise((resolve) => setTimeout(resolve, 100))
 
         // Redirect to the stored location or default to dashboard
         const targetPath = redirectTo || '/dashboard'
