@@ -136,7 +136,6 @@ export function useInitializeApplicationData() {
     let anyFormProcessed = false;
     forms.forEach((form) => {
       if (form.data) {
-        console.log('call....')
         form.set(form.data)
         form.mark()
         markComplete(form.step)
