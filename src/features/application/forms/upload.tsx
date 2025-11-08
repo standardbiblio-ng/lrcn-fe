@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import z from 'zod'
 import axios from 'axios'
 import { useFieldArray, useForm } from 'react-hook-form'
@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { uploadSchema } from '@/schemas/uploadSchema'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
 import { useAuthStore } from '@/stores/auth-store'
@@ -20,24 +19,18 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 
-interface DocumentType {
-  type: string
-  file: File | null
-  preview: string | null
-}
+// interface DocumentType {
+//   type: string
+//   file: File | null
+//   preview: string | null
+// }
 
-const useGetDocuments = createGetQueryHook({
-  endpoint: '/applications/my/documents',
-  responseSchema: z.any(),
-  queryKey: ['my-documents'],
-})
-
-const useCreateDocument = createPostMutationHook({
-  endpoint: '/applications/my/documents',
-  requestSchema: z.any(),
-  responseSchema: z.any(),
-  requiresAuth: true,
-})
+// const useCreateDocument = createPostMutationHook({
+//   endpoint: '/applications/my/documents',
+//   requestSchema: z.any(),
+//   responseSchema: z.any(),
+//   requiresAuth: true,
+// })
 
 const useUpdateDocument = createPutMutationHook({
   endpoint: '/applications/my/documents',
@@ -54,13 +47,10 @@ function Upload({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevDocuments } = useGetDocuments()
-  // console.log('prevDocuments data from api:', prevDocuments)
-  const registerDocumentMutation = useCreateDocument()
+  // const registerDocumentMutation = useCreateDocument()
   const updateDocumentMutation = useUpdateDocument()
 
-  const { formData, setFormData, initialized, markInitialized } =
-    useUploadDocumentStore()
+  const { formData, setFormData } = useUploadDocumentStore()
 
   // console.log('prevDocuments:', prevDocuments)
 
@@ -69,28 +59,6 @@ function Upload({
     mode: 'onChange',
     defaultValues: formData,
   })
-
-  // ✅ Initialize store once from API
-  useEffect(() => {
-    if (prevDocuments?.length > 0 && !initialized) {
-      console.log(
-        'Fire the useEffect to set previous documents upload in store'
-      )
-      const formattedData = {
-        documents: prevDocuments.map((doc: any) => ({
-          name: doc.name || '',
-          fileUrl: doc.fileUrl || '',
-          fileType: doc.fileType || '',
-          uploadedAt: doc.uploadedAt?.split('T')[0] || '2025-10-28T12:00:00Z',
-        })),
-      }
-
-      console.log('Setting previous documents upload in store + form')
-      setFormData(formattedData)
-      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
-      markInitialized()
-    }
-  }, [prevDocuments])
 
   const { control, formState, setValue, watch } = form
   const { isValid, isDirty } = formState
@@ -102,7 +70,7 @@ function Upload({
 
   // Watch all docs for dynamic rendering
   const documents = watch('documents')
-
+  const isFormEmpty = formData?.documents.length > 0
   const documentTypes = {
     1: 'NYSC',
     2: 'BLIS',
@@ -208,7 +176,7 @@ function Upload({
 
     //  const validatedApiData = submitBioDataApiSchema.parse(formattedData)
 
-    if (prevDocuments?.length > 0) {
+    if (isFormEmpty) {
       // console.log('Submitting for Updating', { formattedData })
       console.log('updating documents upload....')
       // console.log('isDirty:', isDirty)
@@ -401,20 +369,18 @@ function Upload({
             disabled={
               isLoading ||
               (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (prevDocuments?.length > 0
+                (isFormEmpty
                   ? !isDirty // Update: Only enable when form has changed
                   : !isValid)) // Next: Only enable when form is valid
             }
             className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
               (isLoading ||
                 (step !== lastCompletedStep &&
-                  (prevDocuments?.length > 0 ? !isDirty : !isValid))) &&
+                  (isFormEmpty ? !isDirty : !isValid))) &&
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {prevDocuments?.length > 0 && lastCompletedStep !== step
-              ? 'Update'
-              : 'Next'}
+            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
           </button>
         </div>
       </form>
