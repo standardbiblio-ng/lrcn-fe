@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { recommendationSchema } from '@/schemas/recommendation'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
 import { useRecommendationStore } from '@/stores/recommendation-store'
@@ -18,12 +17,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
-const useGetRecommendations = createGetQueryHook({
-  endpoint: '/applications/my/recommendations',
-  responseSchema: z.any(),
-  queryKey: ['my-recommendations'],
-})
 
 const useCreateRecommendations = createPostMutationHook({
   endpoint: '/applications/my/recommendations',
@@ -47,12 +40,10 @@ function Recommendations({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevRecommendations } = useGetRecommendations()
   const registerRecommendationsMutation = useCreateRecommendations()
   const updateRecommendationsMutation = useUpdateRecommendations()
 
-  const { formData, setFormData, initialized, markInitialized } =
-    useRecommendationStore()
+  const { formData, setFormData } = useRecommendationStore()
 
   // console.log('prevRecommendations:', prevRecommendations)
 
@@ -62,27 +53,16 @@ function Recommendations({
     defaultValues: formData,
   })
 
-  // ✅ Initialize store once from API
-  useEffect(() => {
-    if (prevRecommendations?.length > 0 && !initialized) {
-      console.log('Fire the useEffect to set previous bio data in store')
-      const formattedData = prevRecommendations[0]
-
-      console.log('Setting previous recommendations in store + form')
-      setFormData(formattedData)
-      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
-      markInitialized()
-    }
-  }, [prevRecommendations])
-
   const { isValid, isDirty } = form.formState
+
+  const isFormEmpty = formData?.name ? true : false
 
   function onSubmit(data: z.infer<typeof recommendationSchema>) {
     // console.log('Submitting', { data })
 
     setIsLoading(true)
 
-    if (prevRecommendations?.length > 0) {
+    if (isFormEmpty) {
       if (!isDirty) {
         console.log('No changes detected, moving to next step')
         // when i want to move to next step without changes
@@ -235,20 +215,18 @@ function Recommendations({
             disabled={
               isLoading ||
               (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (prevRecommendations?.length > 0
+                (isFormEmpty
                   ? !isDirty // Update: Only enable when form has changed
                   : !isValid)) // Next: Only enable when form is valid
             }
             className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
               (isLoading ||
                 (step !== lastCompletedStep &&
-                  (prevRecommendations?.length > 0 ? !isDirty : !isValid))) &&
+                  (isFormEmpty ? !isDirty : !isValid))) &&
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {prevRecommendations?.length > 0 && lastCompletedStep !== step
-              ? 'Update'
-              : 'Next'}
+            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
           </button>
         </div>
       </form>

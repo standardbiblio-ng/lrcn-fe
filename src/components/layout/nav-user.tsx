@@ -1,7 +1,6 @@
-import z from 'zod'
 import { ChevronsUpDown, LogOut } from 'lucide-react'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { useAuthStore } from '@/stores/auth-store'
+import { useBioDataStore } from '@/stores/bio-data-store'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
@@ -20,16 +19,10 @@ import {
 } from '@/components/ui/sidebar'
 import { SignOutDialog } from '@/components/sign-out-dialog'
 
-const useGetBioData = createGetQueryHook({
-  endpoint: '/applications/my/bio-data',
-  responseSchema: z.any(),
-  queryKey: ['my-bio-data'],
-})
-
 export function NavUser() {
   const { isMobile } = useSidebar()
   const [open, setOpen] = useDialogState()
-  const { data: bioData } = useGetBioData()
+  const { formData: bioData } = useBioDataStore()
   const { auth } = useAuthStore()
   const user = auth.user
 
@@ -45,14 +38,14 @@ export function NavUser() {
               >
                 <Avatar className='h-8 w-8 rounded-lg'>
                   <AvatarFallback className='rounded-lg'>
-                    {bioData
+                    {bioData?.firstName
                       ? bioData?.firstName?.charAt(0).toUpperCase() +
                         bioData?.lastName?.charAt(0).toUpperCase()
                       : user?.email?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-start text-sm leading-tight'>
-                  {bioData && (
+                  {bioData?.firstName && (
                     <span className='truncate font-semibold'>
                       {bioData?.firstName}
                     </span>
@@ -73,14 +66,14 @@ export function NavUser() {
                 <div className='flex items-center gap-2 px-1 py-1.5 text-start text-sm'>
                   <Avatar className='h-8 w-8 rounded-lg'>
                     <AvatarFallback className='rounded-lg'>
-                      {bioData
+                      {bioData?.firstName
                         ? bioData?.firstName?.charAt(0).toUpperCase() +
                           bioData?.lastName?.charAt(0).toUpperCase()
                         : user?.email?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-start text-sm leading-tight'>
-                    {bioData && (
+                    {bioData?.firstName && (
                       <span className='truncate font-semibold'>
                         {bioData?.firstName}
                       </span>

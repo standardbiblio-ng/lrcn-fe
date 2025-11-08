@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acadHistoryRequestSchema } from '@/schemas/acadHistory'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
 import { useAcademicHistoryStore } from '@/stores/academic-history-store'
@@ -19,18 +18,12 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 
-interface Institution {
+export interface Institution {
   institution: string
   qualification: string
   startDate: string
   endDate: string
 }
-
-const useGetAcadHist = createGetQueryHook({
-  endpoint: '/applications/my/academic-history',
-  responseSchema: z.any(),
-  queryKey: ['my-acad-history'],
-})
 
 const useCreateAcadHist = createPostMutationHook({
   endpoint: '/applications/my/academic-history',
@@ -54,40 +47,16 @@ function AcademicHistory({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevAcadHist, error, status } = useGetAcadHist()
-  // console.log('Status:', status)
-  // console.log('Error:', error)
-  // console.log('Data:', prevAcadHist)
   const registerAcadHistMutation = useCreateAcadHist()
   const updateAcadHistMutation = useUpdateAcadHist()
 
-  const { formData, setFormData, initialized, markInitialized } =
-    useAcademicHistoryStore()
+  const { formData, setFormData } = useAcademicHistoryStore()
   // console.log('formData from store:', formData)
   const form = useForm<z.infer<typeof acadHistoryRequestSchema>>({
     resolver: zodResolver(acadHistoryRequestSchema),
     mode: 'onChange',
     defaultValues: formData,
   })
-
-  // ✅ Initialize store once from API
-  useEffect(() => {
-    if (prevAcadHist?.length > 0 && !initialized) {
-      // console.log('Initializing academic history store from API...')
-      const formattedData = {
-        items: prevAcadHist.map((record: Institution) => ({
-          ...record,
-          startDate: record.startDate.split('T')[0],
-          endDate: record.endDate.split('T')[0],
-        })),
-      }
-
-      // console.log('Setting previous academic history in store + form')
-      setFormData(formattedData)
-      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
-      markInitialized()
-    }
-  }, [prevAcadHist])
 
   const { isValid, isDirty } = form.formState
 
@@ -96,12 +65,14 @@ function AcademicHistory({
     name: 'items',
   })
 
+  const isFormEmpty = formData?.items.length > 0
+
   function onSubmit(data: z.infer<typeof acadHistoryRequestSchema>) {
     // console.log('Submitting', { data })
 
     setIsLoading(true)
 
-    if (prevAcadHist?.length > 0) {
+    if (isFormEmpty) {
       // console.log('Submitting for Updating', { formattedData })
       console.log('updating academic history....')
       // console.log('isDirty:', isDirty)
@@ -321,20 +292,18 @@ function AcademicHistory({
             disabled={
               isLoading ||
               (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (prevAcadHist?.length > 0
+                (isFormEmpty
                   ? !isDirty // Update: Only enable when form has changed
                   : !isValid)) // Next: Only enable when form is valid
             }
             className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
               (isLoading ||
                 (step !== lastCompletedStep &&
-                  (prevAcadHist?.length > 0 ? !isDirty : !isValid))) &&
+                  (isFormEmpty ? !isDirty : !isValid))) &&
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {prevAcadHist?.length > 0 && lastCompletedStep !== step
-              ? 'Update'
-              : 'Next'}
+            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
           </button>
         </div>
       </form>

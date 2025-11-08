@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -6,7 +6,6 @@ import { attestationSchema } from '@/schemas/attestation'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import nigeriaCoat from '@/assets/images/Nigeria-Coat.jpg'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { useAcademicHistoryStore } from '@/stores/academic-history-store'
 import { useAttestationStore } from '@/stores/attestation-store'
@@ -15,12 +14,6 @@ import { useEmploymentHistoryStore } from '@/stores/employment-history-store'
 import { useRecommendationStore } from '@/stores/recommendation-store'
 import { useUploadDocumentStore } from '@/stores/upload-store'
 import { Form } from '@/components/ui/form'
-
-const useGetAttestation = createGetQueryHook({
-  endpoint: '/applications/my/attestation',
-  responseSchema: attestationSchema,
-  queryKey: ['my-attestation'],
-})
 
 const usePostAttestation = createPostMutationHook({
   endpoint: '/applications/my/attestation',
@@ -32,10 +25,8 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
   // const [attest, setAttest] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const { data: prevAttestation, status } = useGetAttestation()
   const attestationMutation = usePostAttestation()
-  const { formData, setFormData, initialized, markInitialized } =
-    useAttestationStore()
+  const { formData, setFormData } = useAttestationStore()
 
   const form = useForm<z.infer<typeof attestationSchema>>({
     resolver: zodResolver(attestationSchema),
@@ -43,15 +34,6 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
     defaultValues: formData,
   })
   const { register } = form
-
-  // ✅ Initialize store once from API
-  useEffect(() => {
-    if (prevAttestation && !initialized) {
-      setFormData(prevAttestation)
-      form.reset(prevAttestation)
-      markInitialized()
-    }
-  }, [prevAttestation])
 
   const onSubmit = (data: z.infer<typeof attestationSchema>) => {
     setIsLoading(true)

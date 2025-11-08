@@ -5,7 +5,7 @@ interface StepperStore {
   step: number // current step user is on
   maxStep: number // highest completed step
   setStep: (step: number) => void
-  next: (totalSteps: number) => void
+  next: (totalSteps?: number) => void
   previous: () => void
   markComplete: (step: number) => void
   reset: () => void
@@ -17,7 +17,7 @@ export const useStepperStore = create<StepperStore>()(
       step: 1,
       maxStep: 1,
       setStep: (step) => set({ step }),
-      next: (totalSteps) =>
+      next: (totalSteps = 8) =>
         set((state) => ({
           step: Math.min(state.step + 1, totalSteps),
         })),
