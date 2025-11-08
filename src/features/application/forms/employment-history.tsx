@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { employmentHistoryRequestSchema } from '@/schemas/employHistory'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
 import { useEmploymentHistoryStore } from '@/stores/employment-history-store'
@@ -18,12 +17,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-
-const useGetEmploymentHistory = createGetQueryHook({
-  endpoint: '/applications/my/employment-history',
-  responseSchema: z.any(),
-  queryKey: ['my-employment-history'],
-})
 
 const useCreateEmploymentHistory = createPostMutationHook({
   endpoint: '/applications/my/employment-history',
@@ -47,16 +40,10 @@ function EmploymentHistory({
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
-  const {
-    data: prevEmploymentHistory,
-
-    status,
-  } = useGetEmploymentHistory()
   const registerEmploymentHistoryMutation = useCreateEmploymentHistory()
   const updateEmploymentHistoryMutation = useUpdateEmploymentHistory()
 
-  const { formData, setFormData, initialized, markInitialized } =
-    useEmploymentHistoryStore()
+  const { formData, setFormData } = useEmploymentHistoryStore()
 
   // console.log('prevEmploymentHistory:', lastCompletedStep, step)
 
@@ -66,32 +53,6 @@ function EmploymentHistory({
     defaultValues: formData,
   })
 
-  // ✅ Initialize store once from API
-  useEffect(() => {
-    if (prevEmploymentHistory?.length > 0 && !initialized) {
-      console.log(
-        'Fire the useEffect to set previous employment history in store'
-      )
-      const emp = prevEmploymentHistory[0]
-      const formattedData = {
-        employer: emp.employer || '',
-        address: emp.address || '',
-        status: emp.status || '',
-        startDate: emp.startDate?.split('T')[0] || '',
-        workExperience:
-          emp.workExperience?.map((exp: any) => ({
-            organisation: exp.organisation || '',
-            positionHeld: exp.positionHeld || '',
-            startDate: exp.startDate?.split('T')[0] || '',
-          })) || [],
-      }
-      console.log('Setting previous employment history in store + form')
-      setFormData(formattedData)
-      form.reset(formattedData) // 👈 this re-syncs React Hook Form with the updated store values
-      markInitialized()
-    }
-  }, [prevEmploymentHistory, initialized, setFormData, form.reset, markInitialized])
-
   const { isValid, isDirty } = form.formState
 
   const { fields, append, remove } = useFieldArray({
@@ -99,12 +60,14 @@ function EmploymentHistory({
     name: 'workExperience', // ✅ corrected
   })
 
+  const isFormEmpty = formData?.employer ? true : false
+
   function onSubmit(data: z.infer<typeof employmentHistoryRequestSchema>) {
     // console.log('Submitting', { data })
 
     setIsLoading(true)
 
-    if (prevEmploymentHistory?.length > 0) {
+    if (isFormEmpty) {
       // console.log('Submitting for Updating', { formattedData })
       // console.log('updating employment history....')
       // console.log('isDirty:', isDirty)
@@ -391,20 +354,18 @@ function EmploymentHistory({
             disabled={
               isLoading ||
               (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (prevEmploymentHistory?.length > 0
+                (isFormEmpty
                   ? !isDirty // Update: Only enable when form has changed
                   : !isValid)) // Next: Only enable when form is valid
             }
             className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
               (isLoading ||
                 (step !== lastCompletedStep &&
-                  (prevEmploymentHistory?.length > 0 ? !isDirty : !isValid))) &&
+                  (isFormEmpty ? !isDirty : !isValid))) &&
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {prevEmploymentHistory?.length > 0 && lastCompletedStep !== step
-              ? 'Update'
-              : 'Next'}
+            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
           </button>
         </div>
       </form>
