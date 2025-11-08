@@ -74,8 +74,7 @@ export function UserAuthForm({
           // expires_in: responseData.expires_in
         })
 
-        // ⏳ Wait for React state update (auth context)
-        await new Promise((resolve) => setTimeout(resolve, 100))
+        // ⏳ Auth state is now updated; proceed to redirect
 
         // Redirect to the stored location or default to dashboard
         const targetPath = redirectTo || '/dashboard'
