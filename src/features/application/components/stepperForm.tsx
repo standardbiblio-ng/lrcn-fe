@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import z from 'zod'
 import {
   ScrollText,
   Fingerprint,
@@ -10,7 +8,6 @@ import {
   CreditCard,
   FileCheck,
 } from 'lucide-react'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { useStepperStore } from '@/stores/application-stepper-store'
 import AcademicHistory from '../forms/academic-history'
 import Attestation from '../forms/attestation'
@@ -72,12 +69,6 @@ const steps = [
   },
 ]
 
-// const useGetApplication = createGetQueryHook({
-//   endpoint: '/applications/my-application',
-//   responseSchema: z.any(),
-//   queryKey: ['my-application'],
-// })
-
 export default function StepperForm() {
   const { step, maxStep, setStep, next, previous, markComplete } =
     useStepperStore()
@@ -95,27 +86,8 @@ export default function StepperForm() {
   const handleStepClick = (stepId: number) => {
     if (stepId <= maxStep) setStep(stepId)
   }
-  // const { data, isPending } = useGetApplication()
 
-  // console.log('data: ', data)
-
-  // const handleNext = () => {
-  //   if (currentStep < steps.length) {
-  //     setCurrentStep(currentStep + 1)
-  //   }
-  // }
-
-  // const handleBack = () => {
-  //   if (currentStep > 1) {
-  //     setCurrentStep(currentStep - 1)
-  //   }
-  // }
-
-  // const handleStepClick = (stepId: number) => {
-  //   if (stepId < currentStep) {
-  //     setCurrentStep(stepId)
-  //   }
-  // }
+  console.log('step: ', step)
 
   // Example content renderer for each step
   const renderStepContent = () => {
