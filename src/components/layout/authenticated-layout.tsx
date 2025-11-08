@@ -1,5 +1,4 @@
 import { Outlet } from 'react-router-dom'
-import { useAuthStore } from '@/stores/auth-store'
 import { getCookie } from '@/lib/cookies'
 import { cn } from '@/lib/utils'
 import { useInitializeApplicationData } from '@/utils/useInitializeApplicationData'
