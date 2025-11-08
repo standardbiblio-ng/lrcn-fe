@@ -1,6 +1,5 @@
-import z from 'zod'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { useAuthStore } from '@/stores/auth-store'
+import { useBioDataStore } from '@/stores/bio-data-store'
 import useDialogState from '@/hooks/use-dialog-state'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -15,16 +14,10 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { SignOutDialog } from '@/components/sign-out-dialog'
 
-const useGetBioData = createGetQueryHook({
-  endpoint: '/applications/my/bio-data',
-  responseSchema: z.any(),
-  queryKey: ['my-bio-data'],
-})
-
 export function ProfileDropdown() {
   const [open, setOpen] = useDialogState()
 
-  const { data: bioData } = useGetBioData()
+  const { formData: bioData } = useBioDataStore()
   const { auth } = useAuthStore()
   const user = auth.user
 
@@ -36,7 +29,7 @@ export function ProfileDropdown() {
             <Avatar className='h-8 w-8'>
               {/* <AvatarImage src='/avatars/01.png' alt='@shadcn' /> */}
               <AvatarFallback>
-                {bioData
+                {bioData?.firstName
                   ? bioData?.firstName?.charAt(0).toUpperCase() +
                     bioData?.lastName?.charAt(0).toUpperCase()
                   : user?.email?.charAt(0).toUpperCase()}
@@ -47,7 +40,7 @@ export function ProfileDropdown() {
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              {bioData && (
+              {bioData?.firstName && (
                 <p className='text-sm leading-none font-medium'>
                   {bioData?.firstName}
                 </p>
