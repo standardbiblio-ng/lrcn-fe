@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -6,14 +6,10 @@ import { bioDataSchema, submitBioDataApiSchema } from '@/schemas/bioData'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import nigeriaData from '@/assets/statesAndLGA/nigeria-state-and-lgas.json'
-import { createGetQueryHook } from '@/api/hooks/useGet'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
 import { useBioDataStore } from '@/stores/bio-data-store'
-import {
-  formatNigerianPhoneNumberWithCode,
-  formatNigerianPhoneNumberWithoutCode,
-} from '@/utils/phoneFormatter'
+import { formatNigerianPhoneNumberWithCode } from '@/utils/phoneFormatter'
 import {
   Form,
   FormControl,
@@ -38,12 +34,6 @@ const useUpdateBioData = createPutMutationHook({
   requiresAuth: true,
 })
 
-const useGetBioData = createGetQueryHook({
-  endpoint: '/applications/my/bio-data',
-  responseSchema: z.any(),
-  queryKey: ['my-bio-data'],
-})
-
 function BioData({
   handleBack,
   handleNext,
@@ -51,39 +41,16 @@ function BioData({
   lastCompletedStep,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const { formData, setFormData, initialized, markInitialized } =
-    useBioDataStore()
+  const { formData: bioData, setFormData } = useBioDataStore()
 
-  const { data: prevBioData, error, status } = useGetBioData()
-
-  // console.log('Status:', status)
-  // console.log('Error:', error)
-  // console.log('Data:', prevBioData)
   const registerBioDataMutation = useCreateBioData()
   const updateBioDataMutation = useUpdateBioData()
 
   const form = useForm<z.infer<typeof bioDataSchema>>({
     resolver: zodResolver(bioDataSchema),
     mode: 'onChange',
-    defaultValues: formData,
+    defaultValues: bioData,
   })
-
-  // ✅ Initialize store once from API
-  useEffect(() => {
-    if (prevBioData && !initialized) {
-      console.log('Fire the useEffect to set previous bio data in store')
-      setFormData(prevBioData)
-      form.reset({ ...prevBioData, dob: prevBioData.dob.split('T')[0] }) // 👈 this re-syncs React Hook Form with the updated store values
-      markInitialized()
-      // setFormData((current: BioDataFormData) => {
-      //   const isInitial = Object.keys(current).every(
-      //     (key) => current[key as keyof typeof current] === initialValues[key as keyof typeof initialValues]
-      //   );
-      //   if (isInitial) return prevBioData;
-      //   return current;
-      // });
-    }
-  }, [prevBioData])
 
   const { isValid, isDirty } = form.formState
 
@@ -95,16 +62,11 @@ function BioData({
       ...data,
       phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
     }
-    // eslint-disable-next-line no-console
-    // console.log('Submitting', { formattedData })
 
     // Validate against API schema (optional extra validation)
     const validatedApiData = submitBioDataApiSchema.parse(formattedData)
 
-    if (prevBioData) {
-      // console.log('Submitting for Updating', { formattedData })
-      // console.log('updating bio-data....')
-
+    if (bioData) {
       if (!isDirty) {
         // when i want to move to next step without changes
         setIsLoading(false)
@@ -472,18 +434,18 @@ function BioData({
             disabled={
               isLoading ||
               (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (prevBioData
+                (bioData
                   ? !isDirty // Update: Only enable when form has changed
                   : !isValid)) // Next: Only enable when form is valid
             }
             className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
               (isLoading ||
                 (step !== lastCompletedStep &&
-                  (prevBioData ? !isDirty : !isValid))) &&
+                  (bioData ? !isDirty : !isValid))) &&
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {prevBioData && lastCompletedStep !== step ? 'Update' : 'Next'}
+            {bioData && lastCompletedStep !== step ? 'Update' : 'Next'}
           </button>
         </div>
       </form>
