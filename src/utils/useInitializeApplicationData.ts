@@ -133,16 +133,40 @@ export function useInitializeApplicationData() {
     }
     console.log('forms: ', forms)
     // Run all updates
+    let anyFormProcessed = false;
     forms.forEach((form) => {
       if (form.data) {
         console.log('call....')
         form.set(form.data)
         form.mark()
         markComplete(form.step)
-        next()
+        anyFormProcessed = true;
       }
     })
-
+    if (anyFormProcessed) {
+      next();
+    }
     // console.log('Application Data Initialized.')
-  }, [bio, academic, employment, rec, upload, attest])
+  }, [
+    bio,
+    academic,
+    employment,
+    rec,
+    upload,
+    attest,
+    markComplete,
+    next,
+    setBioData,
+    setAcademicData,
+    setEmploymentData,
+    setRecommendationData,
+    setUploadData,
+    setAttestationData,
+    markBioInit,
+    markAcadInit,
+    markEmpInit,
+    markRecInit,
+    markUploadInit,
+    markAttInit,
+  ])
 }
