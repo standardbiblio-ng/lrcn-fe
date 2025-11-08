@@ -63,8 +63,8 @@ export function useInitializeApplicationData() {
       const formattedData = {
         items: academic.map((record: any) => ({
           ...record,
-          startDate: record.startDate.split('T')[0],
-          endDate: record.endDate.split('T')[0],
+          startDate: record.startDate?.split('T')[0] || '',
+          endDate: record.endDate?.split('T')[0] || '',
         })),
       }
       forms.push({
