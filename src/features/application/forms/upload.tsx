@@ -332,7 +332,7 @@ function Upload({
             </div>
           ))}
 
-          <button
+          {/* <button
             type='button'
             onClick={() =>
               append({
@@ -348,7 +348,7 @@ function Upload({
               +
             </span>
             Add Another Document
-          </button>
+          </button> */}
         </div>
 
         {/* Navigation */}

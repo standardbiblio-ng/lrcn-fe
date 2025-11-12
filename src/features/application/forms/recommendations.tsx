@@ -147,7 +147,7 @@ function Recommendations({
                   <Input
                     placeholder='Name'
                     {...field}
-                    className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                    className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2 capitalize'
                   />
                 </FormControl>
                 <FormMessage />
