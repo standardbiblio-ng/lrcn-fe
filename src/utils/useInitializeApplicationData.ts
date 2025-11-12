@@ -50,6 +50,12 @@ export function useInitializeApplicationData() {
   const { data: rec } = useGetRecommendation()
   const { data: upload } = useGetUploadDocuments()
   const { data: attest } = useGetAttestation()
+  console.log('Fetched bio application data: ', bio)
+  console.log('Fetched academic application data: ', academic)
+  console.log('Fetched employment application data: ', employment)
+  console.log('Fetched recommendation application data: ', rec)
+  console.log('Fetched upload application data: ', upload)
+  console.log('Fetched attestation application data: ', attest)
 
   useEffect(() => {
     // console.log('Initialize Application Data........')
@@ -60,6 +66,7 @@ export function useInitializeApplicationData() {
     }
 
     if (academic?.length > 0) {
+      // console.log('Formatting academic data: ', academic)
       const formattedData = {
         items: academic.map((record: any) => ({
           ...record,
@@ -124,6 +131,7 @@ export function useInitializeApplicationData() {
     }
 
     if (attest) {
+      // console.log('Attestation data found: ', attest)
       forms.push({
         data: attest,
         set: setAttestationData,
@@ -131,19 +139,20 @@ export function useInitializeApplicationData() {
         step: 7, // ✅ FIXED
       })
     }
-    console.log('forms: ', forms)
+    // console.log('forms: ', forms)
     // Run all updates
-    let anyFormProcessed = false;
+    let anyFormProcessed = false
     forms.forEach((form) => {
       if (form.data) {
+        // console.log('Initializing data for form: ', form.data)
         form.set(form.data)
         form.mark()
         markComplete(form.step)
-        anyFormProcessed = true;
+        anyFormProcessed = true
       }
     })
     if (anyFormProcessed) {
-      next();
+      next()
     }
     // console.log('Application Data Initialized.')
   }, [
