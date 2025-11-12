@@ -18,19 +18,24 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
   const navigate = useNavigate()
   const location = useLocation()
   const { auth } = useAuthStore()
+  const { reset: resetBioData } = useBioDataStore()
+  const { reset: resetAcademicData } = useAcademicHistoryStore()
+  const { reset: resetEmploymentData } = useEmploymentHistoryStore()
+  const { reset: resetRecommendationData } = useRecommendationStore()
+  const { reset: resetUploadData } = useUploadDocumentStore()
+  const { reset: resetAttestationData } = useAttestationStore()
 
   const handleSignOut = () => {
     auth.reset()
     auth.resetAccessToken()
 
     // ✅ Clear persisted storage for all stores
-    useStepperStore.persist.clearStorage()
-    useBioDataStore.persist.clearStorage()
-    useAcademicHistoryStore.persist.clearStorage()
-    useEmploymentHistoryStore.persist.clearStorage()
-    useRecommendationStore.persist.clearStorage()
-    useUploadDocumentStore.persist.clearStorage()
-    useAttestationStore.persist.clearStorage()
+    resetBioData()
+    resetAcademicData()
+    resetEmploymentData()
+    resetRecommendationData()
+    resetUploadData()
+    resetAttestationData()
 
     // Preserve current location for redirect after sign-in
     const currentPath = location.pathname + location.search

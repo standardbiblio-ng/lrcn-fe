@@ -88,6 +88,7 @@ function AcademicHistory({
           toast.success(`Updated Academic History Successfully!`)
           // console.log('update responseData:', responseData)
           setFormData({ items: responseData })
+          handleNext()
         },
         onError: (error) => {
           setIsLoading(false)
@@ -303,7 +304,7 @@ function AcademicHistory({
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
+            {'Next'}
           </button>
         </div>
       </form>

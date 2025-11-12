@@ -203,7 +203,7 @@ function Upload({
           }
 
           setFormData(formattedData)
-          // handleNext()
+          handleNext()
         },
         onError: (error) => {
           setIsLoading(false)
@@ -380,7 +380,7 @@ function Upload({
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
+            {'Next'}
           </button>
         </div>
       </form>

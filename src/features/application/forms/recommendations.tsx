@@ -77,6 +77,7 @@ function Recommendations({
           toast.success(`Updated Recommendations Successfully!`)
           // console.log('Updated recommendations responseData:', responseData)
           setFormData(responseData[0])
+          handleNext()
         },
         onError: (error) => {
           setIsLoading(false)
@@ -226,7 +227,7 @@ function Recommendations({
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
+            {'Next'}
           </button>
         </div>
       </form>

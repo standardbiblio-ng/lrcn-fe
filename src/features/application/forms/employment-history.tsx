@@ -86,7 +86,7 @@ function EmploymentHistory({
 
             toast.success(`Updated Employment History Successfully!`)
             setFormData(responseData)
-            // handleNext()
+            handleNext()
           },
           onError: (error) => {
             setIsLoading(false)
@@ -365,7 +365,7 @@ function EmploymentHistory({
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {isFormEmpty && lastCompletedStep !== step ? 'Update' : 'Next'}
+            {'Next'}
           </button>
         </div>
       </form>
