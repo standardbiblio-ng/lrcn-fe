@@ -63,12 +63,16 @@ function BioData({
       phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
     }
 
+    console.log('outside isDirty: ', isDirty)
+
     // Validate against API schema (optional extra validation)
     const validatedApiData = submitBioDataApiSchema.parse(formattedData)
-
+    console.log('biodata: ', bioData)
     if (bioData) {
+      console.log('isDirty: ', isDirty)
       if (!isDirty) {
         // when i want to move to next step without changes
+        console.log('yes..............')
         setIsLoading(false)
         handleNext()
         return
@@ -80,6 +84,7 @@ function BioData({
           // console.log('update responseData:', responseData)
           toast.success(`Updated Bio-Data Successfully!`)
           setFormData(responseData)
+          handleNext()
         },
         onError: (error) => {
           console.error('bio data update error:', error)
@@ -445,7 +450,7 @@ function BioData({
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {bioData && lastCompletedStep !== step ? 'Update' : 'Next'}
+            {'Next'}
           </button>
         </div>
       </form>
