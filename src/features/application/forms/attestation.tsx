@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { attestationSchema } from '@/schemas/attestation'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
-import nigeriaCoat from '@/assets/images/Nigeria-Coat.jpg'
+import logo from '@/assets/images/LOGO.png'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { useAcademicHistoryStore } from '@/stores/academic-history-store'
 import { useAttestationStore } from '@/stores/attestation-store'
@@ -81,16 +81,19 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
         {/* === HEADER SECTION === */}
         <div className='text-center'>
           <img
-            src={nigeriaCoat}
+            src={logo}
             alt='Nigeria coat'
             className='mx-auto mb-4 h-24 w-24'
           />
           <h2 className='font-montserrat mb-1 text-2xl font-bold'>
             LIBRARIANS' REGISTRATION COUNCIL OF NIGERIA (LRCN)
           </h2>
-          <p>Veterinary Council of Nigeria Building,</p>
-          <p>No. 8, Zambezi Crescent Maitama, P.M.B 5555 Garki, Abuja</p>
-          <p>Tel: 08130000149 | Email: lrcn.info@yahoo.com</p>
+          {/* <p>Veterinary Council of Nigeria Building,</p> */}
+          <p>
+            LRCN, 2nd Floor, Stephen Oronsaya Building, Dusten Alhaj along Kubwa
+            Road, Abuja.
+          </p>
+          <p>Tel: +234 (666) 888 0000 | Email: lrcn.gov@gmail.com</p>
           <p>Website: www.lrcn.gov.ng</p>
         </div>
 
@@ -346,7 +349,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
               'cursor-not-allowed opacity-50'
             }`}
           >
-            {isLoading ? 'Saving...' : 'Next'}
+            {'Next'}
           </button>
         </div>
       </form>
