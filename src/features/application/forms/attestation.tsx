@@ -106,23 +106,23 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
             <tbody>
               <tr className='border-b'>
                 <td className='w-1/2 font-medium'>First Name</td>
-                <td>{bioData?.firstName}</td>
+                <td className='capitalize'>{bioData?.firstName}</td>
               </tr>
               <tr className='border-b'>
                 <td className='font-medium'>Last Name</td>
-                <td>{bioData?.lastName}</td>
+                <td className='capitalize'>{bioData?.lastName}</td>
               </tr>
               {bioData?.otherNames && (
                 <tr className='border-b'>
                   <td className='font-medium'>Other Name</td>
-                  <td>{bioData?.otherNames}</td>
+                  <td className='capitalize'>{bioData?.otherNames}</td>
                 </tr>
               )}
 
               {bioData?.previousNames && (
                 <tr className='border-b'>
                   <td className='font-medium'>Previous Name</td>
-                  <td>{bioData?.previousNames}</td>
+                  <td className='capitalize'>{bioData?.previousNames}</td>
                 </tr>
               )}
 
@@ -174,7 +174,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                 <React.Fragment key={index}>
                   <tr className='border-b'>
                     <td className='w-1/2 font-medium'>Institution</td>
-                    <td>{item.institution}</td>
+                    <td className='capitalize'>{item.institution}</td>
                   </tr>
                   <tr className='border-b'>
                     <td className='font-medium'>Qualification</td>
@@ -208,11 +208,11 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
             <tbody>
               <tr className='border-b'>
                 <td className='w-1/2 font-medium'>Employer</td>
-                <td>{employmentData?.employer}</td>
+                <td className='capitalize'>{employmentData?.employer}</td>
               </tr>
               <tr className='border-b'>
                 <td className='font-medium'>Address</td>
-                <td>{employmentData?.address}</td>
+                <td className='capitalize'>{employmentData?.address}</td>
               </tr>
               <tr className='border-b'>
                 <td className='font-medium'>Status</td>
@@ -240,9 +240,9 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
               {employmentData?.workExperience?.map((item, index) => (
                 <React.Fragment key={index}>
                   <tr className='border-b'>
-                    <td>{item.organisation}</td>
+                    <td className='capitalize'>{item.organisation}</td>
                     <td>{item.startDate}</td>
-                    <td>{item.positionHeld}</td>
+                    <td className='capitalize'>{item.positionHeld}</td>
                   </tr>
 
                   {/* Add spacing between records */}
@@ -274,7 +274,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
             </thead>
             <tbody>
               <tr>
-                <td>{recommendationData.name}</td>
+                <td className='capitalize'>{recommendationData.name}</td>
                 <td>{recommendationData.email}</td>
                 <td>{recommendationData.phoneNumber}</td>
               </tr>

@@ -1,7 +1,9 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useBioDataStore } from '@/stores/bio-data-store'
 import { showSubmittedData } from '@/lib/show-submitted-data'
+import { formatNigerianPhoneNumberWithCode } from '@/utils/phoneFormatter'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -41,9 +43,15 @@ const defaultValues: Partial<AccountFormValues> = {
 }
 
 export function AccountForm() {
+  const { formData: bioData } = useBioDataStore()
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
-    defaultValues,
+    defaultValues: {
+      firstName: bioData.firstName || '',
+      lastName: bioData.lastName || '',
+      email: bioData.email || '',
+      phoneNumber: formatNigerianPhoneNumberWithCode(bioData.phoneNumber) || '',
+    },
   })
 
   function onSubmit(data: AccountFormValues) {
@@ -61,7 +69,11 @@ export function AccountForm() {
               <FormItem>
                 <FormLabel>First Name</FormLabel>
                 <FormControl>
-                  <Input placeholder='Your first name' {...field} />
+                  <Input
+                    placeholder='Your first name'
+                    {...field}
+                    className='capitalize'
+                  />
                 </FormControl>
 
                 <FormMessage />
@@ -76,7 +88,11 @@ export function AccountForm() {
               <FormItem>
                 <FormLabel>Last Name</FormLabel>
                 <FormControl>
-                  <Input placeholder='Your last name' {...field} />
+                  <Input
+                    placeholder='Your last name'
+                    {...field}
+                    className='capitalize'
+                  />
                 </FormControl>
 
                 <FormMessage />

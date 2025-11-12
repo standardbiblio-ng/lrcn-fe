@@ -160,7 +160,7 @@ function BioData({
                   <Input
                     placeholder='Enter first name'
                     {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
                   />
                 </FormControl>
                 <FormMessage />
@@ -181,7 +181,7 @@ function BioData({
                   <Input
                     placeholder='Enter last name'
                     {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
                   />
                 </FormControl>
                 <FormMessage />
@@ -201,7 +201,7 @@ function BioData({
                   <Input
                     placeholder='Enter other names'
                     {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
                   />
                 </FormControl>
                 <FormMessage />
@@ -221,7 +221,7 @@ function BioData({
                   <Input
                     placeholder='Enter previous names'
                     {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
                   />
                 </FormControl>
                 <FormMessage />
