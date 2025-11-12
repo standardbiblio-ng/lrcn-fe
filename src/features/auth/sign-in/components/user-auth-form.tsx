@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQueryClient } from '@tanstack/react-query'
 import {
   loginRequestSchema,
   loginResponseSchema,
@@ -41,9 +42,12 @@ export function UserAuthForm({
   redirectTo,
   ...props
 }: UserAuthFormProps) {
+  const queryClient = useQueryClient()
   const [isLoading, setIsLoading] = useState(false)
   const navigate = useNavigate()
   const { auth } = useAuthStore()
+
+  // console.log('Auth store state:', auth)
 
   const loginMutation = useLogin()
 
@@ -74,6 +78,18 @@ export function UserAuthForm({
           // expires_in: responseData.expires_in
         })
 
+        // queryClient.invalidateQueries({
+        //   queryKey: [
+        //     'my-bio-data',
+        //     'my-acad-history',
+        //     'my-attestation',
+        //     'my-employment-history',
+        //     'my-recommendations',
+        //     'my-documents',
+        //   ],
+        // })
+        // refetch all queries:
+        await queryClient.refetchQueries()
         // ⏳ Auth state is now updated; proceed to redirect
 
         // Redirect to the stored location or default to dashboard
