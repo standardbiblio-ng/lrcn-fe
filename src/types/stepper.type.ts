@@ -1,5 +1,5 @@
 export type StepperProps = {
-  handleBack: () => void
+  handleBack?: () => void
   handleNext: () => void
   step?: number
   // totalSteps?: number
