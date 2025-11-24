@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { uploadSchema } from '@/schemas/uploadSchema'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
-import { createPostMutationHook } from '@/api/hooks/usePost'
 import { createPutMutationHook } from '@/api/hooks/usePut'
 import { useAuthStore } from '@/stores/auth-store'
 import { useUploadDocumentStore } from '@/stores/upload-store'
@@ -63,7 +62,7 @@ function Upload({
   const { control, formState, setValue, watch } = form
   const { isValid, isDirty } = formState
 
-  const { fields, append, remove } = useFieldArray({
+  const { fields, remove } = useFieldArray({
     control,
     name: 'documents',
   })

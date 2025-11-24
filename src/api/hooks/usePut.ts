@@ -61,6 +61,7 @@ export function createPutMutationHook<
 
     const mutationFn = async (data: z.infer<RequestSchema>) => {
       let url = endpoint
+
       if (routeParams) {
         url = Object.entries(routeParams).reduce(
           (acc, [key, value]) => acc.replaceAll(`:${key}`, String(value)),
@@ -76,7 +77,7 @@ export function createPutMutationHook<
       const validatedData = requestSchema.parse(data)
 
       return axiosInstance
-        .put(endpoint, validatedData, { headers })
+        .put(url, validatedData, { headers })
         .then((response: { data: unknown }) => {
           console.log('Raw response:', response)
           return responseSchema.parse(response.data)

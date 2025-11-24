@@ -71,7 +71,7 @@ export function SignUpForm({
     const validatedApiData = registerUserApiSchema.parse(formattedData)
 
     registerMutation.mutate(validatedApiData, {
-      onSuccess: (responseData) => {
+      onSuccess: () => {
         setIsLoading(false)
 
         // Redirect to the stored location or default to login

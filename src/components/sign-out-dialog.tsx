@@ -1,6 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAcademicHistoryStore } from '@/stores/academic-history-store'
-import { useStepperStore } from '@/stores/application-stepper-store'
 import { useAttestationStore } from '@/stores/attestation-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useBioDataStore } from '@/stores/bio-data-store'
