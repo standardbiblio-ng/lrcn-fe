@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { useBioDataStore } from '@/stores/bio-data-store'
 import { usePaymentStore } from '@/stores/payment-store'
+import { ConfirmApplicationDialog } from '../components/success-appl-dialog'
 
 // Generate unique transaction ID
 const generateTransactionId = () =>
@@ -19,6 +20,10 @@ const useCreatePayment = createPostMutationHook({
 })
 
 function Payment({ handleNext }: StepperProps) {
+  const [open, setOpen] = useState(false)
+
+  const onOpenChange = (value: boolean) => setOpen(value)
+
   const { formData: bioData } = useBioDataStore()
   const { formData, setFormData } = usePaymentStore()
   const [paymentData] = useState({
@@ -70,7 +75,8 @@ function Payment({ handleNext }: StepperProps) {
     onSuccess(response) {
       toast.success(`Payment Successful!`)
       console.log('Remita Success:', response)
-      completeApplication()
+      onOpenChange(true)
+      // completeApplication()
     },
   })
 
@@ -89,6 +95,12 @@ function Payment({ handleNext }: StepperProps) {
       >
         Pay Now
       </button>
+
+      <ConfirmApplicationDialog
+        open={open}
+        onOpenChange={onOpenChange}
+        className='sm:max-w-sm'
+      />
     </div>
   )
 }
