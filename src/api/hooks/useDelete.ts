@@ -1,28 +1,54 @@
-import { useMutation, UseMutationResult, QueryClient } from '@tanstack/react-query'
 import { z } from 'zod'
+import {
+  useMutation,
+  UseMutationResult,
+  QueryClient,
+} from '@tanstack/react-query'
 import { axiosInstance } from '../config'
 
-type QueryKey = [string] | [string, Record<string, string | number | undefined>]
+// type QueryKey = [string] | [string, Record<string, string | number | undefined>]
 
 interface CreateDeleteMutationHookArgs<ResponseSchema extends z.ZodType> {
   endpoint: string
   responseSchema: ResponseSchema
-  onSuccess?: (data: z.infer<ResponseSchema>, variables: void, context: unknown, queryClient: QueryClient) => void
-  onError?: (error: Error, variables: void, context: unknown, queryClient: QueryClient) => void
+  onSuccess?: (
+    data: z.infer<ResponseSchema>,
+    variables: void,
+    context: unknown,
+    queryClient: QueryClient
+  ) => void
+  onError?: (
+    error: Error,
+    variables: void,
+    context: unknown,
+    queryClient: QueryClient
+  ) => void
   onSettled?: (
     data: z.infer<ResponseSchema> | undefined,
     error: Error | null,
     variables: void,
     context: unknown,
-    queryClient: QueryClient,
+    queryClient: QueryClient
   ) => void
 }
 
 export function createDeleteMutationHook<
   ResponseSchema extends z.ZodType,
-  RouteParams extends Record<string, string | number | undefined> = Record<string, never>,
-  QueryParams extends Record<string, string | number | undefined> = Record<string, never>,
->({ endpoint, responseSchema, onSuccess, onError, onSettled }: CreateDeleteMutationHookArgs<ResponseSchema>) {
+  RouteParams extends Record<string, string | number | undefined> = Record<
+    string,
+    never
+  >,
+  QueryParams extends Record<string, string | number | undefined> = Record<
+    string,
+    never
+  >,
+>({
+  endpoint,
+  responseSchema,
+  onSuccess,
+  onError,
+  onSettled,
+}: CreateDeleteMutationHookArgs<ResponseSchema>) {
   return (params?: { query?: QueryParams; route?: RouteParams }) => {
     const queryClient = new QueryClient()
 
@@ -32,7 +58,7 @@ export function createDeleteMutationHook<
       if (params?.route) {
         url = Object.entries(params.route).reduce(
           (acc, [key, value]) => acc.replaceAll(`:${key}`, String(value)),
-          endpoint,
+          endpoint
         )
       }
 
@@ -61,9 +87,12 @@ export function createDeleteMutationHook<
 
     return useMutation({
       mutationFn,
-      onSuccess: (data, variables, context) => onSuccess?.(data, variables, context, queryClient),
-      onError: (error, variables, context) => onError?.(error, variables, context, queryClient),
-      onSettled: (data, error, variables, context) => onSettled?.(data, error, variables, context, queryClient),
+      onSuccess: (data, variables, context) =>
+        onSuccess?.(data, variables, context, queryClient),
+      onError: (error, variables, context) =>
+        onError?.(error, variables, context, queryClient),
+      onSettled: (data, error, variables, context) =>
+        onSettled?.(data, error, variables, context, queryClient),
     }) as UseMutationResult<z.infer<ResponseSchema>, Error, void>
   }
 }

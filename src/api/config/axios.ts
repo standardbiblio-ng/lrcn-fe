@@ -2,7 +2,6 @@ import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import { useAuthStore } from '@/stores/auth-store'
 import { authCache } from './query-client'
 
-
 const baseUrl = import.meta.env.VITE_API_BASE_URL
 const timeout = Number(import.meta.env.VITE_API_TIMEOUT) || 30000
 
@@ -47,7 +46,7 @@ axiosInstance.interceptors.response.use(
       console.log('401 error encountered, attempting to refresh token...')
 
       const authStore = useAuthStore.getState().auth
-      const { accessToken, refreshToken, expiresAt } = authStore
+      const { refreshToken, expiresAt } = authStore
 
       // ✅ Step 1 — Check if access token is expired
       const isExpired = isTokenExpired(expiresAt)

@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import z, { set } from 'zod'
+import { useCallback, useState } from 'react'
+import z from 'zod'
 import { StepperProps } from '@/types/stepper.type'
 import { useRemitaInline } from '@farayolaj/react-remita-inline'
 import { toast } from 'sonner'
@@ -42,23 +42,24 @@ function Payment({ handleNext }: StepperProps) {
 
   // Complete application flow
   const completeApplication = useCallback(() => {
-    registerPaymentMutation.mutate(
-      {
-        status: 'completed',
-        isPaymentVerified: true,
-      },
-      {
-        onSuccess: (responseData) => {
-          toast.success('Your application was submitted successfully!')
-          setFormData(responseData[0])
-          handleNext()
-        },
-        onError: (error) => {
-          console.error('Payment completion error:', error)
-          toast.error('Something went wrong. Please try again.')
-        },
-      }
-    )
+    return 0
+    // registerPaymentMutation.mutate(
+    //   {
+    //     status: 'completed',
+    //     isPaymentVerified: true,
+    //   },
+    //   {
+    //     onSuccess: (responseData) => {
+    //       toast.success('Your application was submitted successfully!')
+    //       setFormData(responseData[0])
+    //       handleNext()
+    //     },
+    //     onError: (error) => {
+    //       console.error('Payment completion error:', error)
+    //       toast.error('Something went wrong. Please try again.')
+    //     },
+    //   }
+    // )
   }, [registerPaymentMutation, setFormData, handleNext])
 
   // Remita init config
@@ -76,7 +77,7 @@ function Payment({ handleNext }: StepperProps) {
       toast.success(`Payment Successful!`)
       console.log('Remita Success:', response)
       onOpenChange(true)
-      // completeApplication()
+      completeApplication()
     },
   })
 

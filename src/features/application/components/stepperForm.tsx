@@ -156,11 +156,11 @@ export default function StepperForm() {
       case 8:
         return (
           <Payment
-          // handleBack={handleBack}
-          // handleNext={handleNext}
-          // step={step}
-          // lastCompletedStep={maxStep}
-          // totalSteps={totalSteps}
+            // handleBack={handleBack}
+            handleNext={handleNext}
+            // step={step}
+            // lastCompletedStep={maxStep}
+            // totalSteps={totalSteps}
           />
         )
     }

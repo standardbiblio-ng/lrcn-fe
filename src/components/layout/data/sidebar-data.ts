@@ -5,7 +5,6 @@ import {
   House,
   FilePenLine,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { Logo } from '@/assets/logo'
 import { type SidebarData } from '../types'
 

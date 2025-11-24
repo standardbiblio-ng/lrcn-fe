@@ -2,7 +2,7 @@ import { z } from 'zod'
 import {
   useQuery,
   type UseQueryResult,
-  QueryClient,
+  // QueryClient,
 } from '@tanstack/react-query'
 import { useAuthStore } from '@/stores/auth-store'
 import { axiosInstance } from '../config'
@@ -55,19 +55,19 @@ export function createGetQueryHook<
   options,
 }: CreateGetQueryHookArgs<ResponseSchema>) {
   return (
-    params?: { query?: QueryParams; route?: RouteParams },
-    callbacks?: {
-      onSuccess?: (
-        data: z.infer<ResponseSchema>,
-        queryClient: QueryClient
-      ) => void
-      onError?: (error: Error, queryClient: QueryClient) => void
-      onSettled?: (
-        data: z.infer<ResponseSchema> | undefined,
-        error: Error | null,
-        queryClient: QueryClient
-      ) => void
-    }
+    params?: { query?: QueryParams; route?: RouteParams }
+    // callbacks?: {
+    //   onSuccess?: (
+    //     data: z.infer<ResponseSchema>,
+    //     queryClient: QueryClient
+    //   ) => void
+    //   onError?: (error: Error, queryClient: QueryClient) => void
+    //   onSettled?: (
+    //     data: z.infer<ResponseSchema> | undefined,
+    //     error: Error | null,
+    //     queryClient: QueryClient
+    //   ) => void
+    // }
   ) => {
     const queryFn = async () => {
       // Handle route parameters

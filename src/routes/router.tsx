@@ -7,7 +7,6 @@ import {
 import { ErrorBoundary } from '@/components/global/error-boundary'
 import { AuthenticatedLayout } from '@/components/layout/authenticated-layout'
 import { Application } from '@/features/application'
-import { AuthLayout } from '@/features/auth/auth-layout'
 import { SignIn } from '@/features/auth/sign-in'
 import { SignUp } from '@/features/auth/sign-up'
 import { Dashboard } from '@/features/dashboard'
