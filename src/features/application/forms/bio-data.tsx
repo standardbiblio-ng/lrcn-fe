@@ -263,7 +263,7 @@ function BioData({
                     <Input
                       placeholder='Enter phone number'
                       {...field}
-                      className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                      className='bg-background mt-2 w-full rounded-[12px] border px-3 py-2'
                     />
                   </FormControl>
                   <FormMessage />
@@ -284,7 +284,7 @@ function BioData({
                 <FormControl>
                   <select
                     {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                    className='bg-background mt-2 w-full rounded-[12px] border px-3 py-2'
                   >
                     <option value=''>Select Nationality</option>
                     <option value='Nigerian'>Nigerian</option>
@@ -311,7 +311,7 @@ function BioData({
                     <FormControl>
                       <select
                         {...field}
-                        className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                        className='bg-background mt-2 w-full rounded-[12px] border px-3 py-2'
                       >
                         <option value=''>Select State</option>
                         {nigeriaData.map((item, index) => (
@@ -346,7 +346,7 @@ function BioData({
                         <select
                           {...field}
                           disabled={!selectedState}
-                          className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                          className='bg-background mt-2 w-full rounded-[12px] border px-3 py-2'
                         >
                           <option value=''>
                             {selectedState
@@ -384,7 +384,7 @@ function BioData({
                       <Input
                         type='date'
                         {...field}
-                        className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                        className='bg-background mt-2 w-full rounded-[12px] border px-3 py-2'
                       />
                     </FormControl>
                     <FormMessage />
@@ -406,7 +406,7 @@ function BioData({
                     <FormControl>
                       <select
                         {...field}
-                        className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                        className='bg-background mt-2 w-full rounded-[12px] border px-3 py-2'
                       >
                         <option value=''>Select Gender</option>
                         <option value='Male'>Male</option>
@@ -429,7 +429,7 @@ function BioData({
             className={`rounded border px-4 py-2 ${
               step === 1
                 ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
+                : 'bg-background hover:bg-gray-50 hover:text-background'
             }`}
           >
             Back

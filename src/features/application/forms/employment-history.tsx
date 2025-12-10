@@ -201,7 +201,7 @@ function EmploymentHistory({
                   <FormControl>
                     <select
                       {...field}
-                      className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                      className='bg-background mt-[12px] w-full rounded-[12px] border px-2 py-2'
                     >
                       <option value=''>Select status</option>
                       <option value='full_time'>Full Time</option>
@@ -243,7 +243,7 @@ function EmploymentHistory({
           {fields.map((item, index) => (
             <div
               key={item.id}
-              className='space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4'
+              className='space-y-4 rounded-lg border border-gray-200 bg-background p-4'
             >
               <div className='flex items-center justify-between'>
                 <p className='text-sm font-semibold'>Experience {index + 1}</p>
@@ -344,7 +344,7 @@ function EmploymentHistory({
             className={`rounded border px-4 py-2 ${
               step === 1
                 ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
+                : 'bg-background text-white hover:bg-gray-50 hover:text-background'
             }`}
           >
             Back

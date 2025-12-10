@@ -102,7 +102,8 @@ export function createGetQueryHook<
         .get<ApiResponse<unknown>>(url, { headers })
         .then((response) => {
           // console.log('GET Response:', response.data)
-          return responseSchema.parse(response.data)
+          return responseSchema.parse(response.data.data)
+
         })
         .catch((error: unknown) => {
           if (error instanceof z.ZodError) {

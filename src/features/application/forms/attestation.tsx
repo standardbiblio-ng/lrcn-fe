@@ -334,7 +334,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
             type='button'
             onClick={handleBack}
             disabled={isLoading}
-            className='rounded border bg-white px-4 py-2 hover:bg-gray-50'
+            className='rounded border bg-white text-background px-4 py-2 hover:bg-gray-50'
           >
             Back
           </button>

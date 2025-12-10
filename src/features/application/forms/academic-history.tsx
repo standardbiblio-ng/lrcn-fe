@@ -135,7 +135,7 @@ function AcademicHistory({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <form  onSubmit={form.handleSubmit(onSubmit)}>
         <p className='font-montserrat text-active font-normal italic'>
           Step {step}
         </p>
@@ -151,7 +151,7 @@ function AcademicHistory({
           {fields.map((item, index) => (
             <div
               key={item.id}
-              className='space-y-4 rounded-lg border bg-gray-50 p-4'
+              className='space-y-4 rounded-lg border bg-background p-4'
             >
               <div className='flex items-center justify-between'>
                 <p className='font-montserrat text-base font-bold'>
@@ -179,7 +179,7 @@ function AcademicHistory({
                       <Input
                         placeholder='Enter institution name'
                         {...field}
-                        className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2 capitalize'
+                        className='!bg-background mt-[12px] w-full rounded-[12px] border px-2 py-2 capitalize'
                       />
                     </FormControl>
                     <FormMessage />
@@ -192,13 +192,13 @@ function AcademicHistory({
                 name={`items.${index}.qualification`}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className='block text-sm'>
+                    <FormLabel className='text-gray-700 block text-sm'>
                       Qualification Obtained
                     </FormLabel>
                     <FormControl>
                       <select
                         {...field}
-                        className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                        className='bg-background mt-[12px] w-full rounded-[12px] border px-2 py-2'
                       >
                         <option value=''>Select qualification</option>
                         <option value='BLIS'>BLIS</option>
@@ -220,14 +220,14 @@ function AcademicHistory({
                   name={`items.${index}.startDate`}
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel className='block text-sm'>
+                      <FormLabel className='text-gray-700 block text-sm'>
                         Start Date
                       </FormLabel>
                       <FormControl>
                         <Input
                           type='date'
                           {...field}
-                          className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                          className='!bg-background mt-[12px] w-full rounded-[12px] border px-2 py-2'
                         />
                       </FormControl>
                       <FormMessage />
@@ -240,12 +240,12 @@ function AcademicHistory({
                   name={`items.${index}.endDate`}
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel className='block text-sm'>End Date</FormLabel>
+                      <FormLabel className=' text-gray-700 block text-sm'>End Date</FormLabel>
                       <FormControl>
                         <Input
                           type='date'
                           {...field}
-                          className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                          className='!bg-background mt-[12px] w-full rounded-[12px] border px-2 py-2'
                         />
                       </FormControl>
                       <FormMessage />
@@ -283,7 +283,7 @@ function AcademicHistory({
             className={`rounded border px-4 py-2 ${
               step === 1
                 ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
+                : 'bg-background text-white hover:bg-white hover:text-background'
             }`}
           >
             Back

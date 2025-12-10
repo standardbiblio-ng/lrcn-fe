@@ -249,7 +249,7 @@ function Upload({
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className='space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4'
+              className='space-y-4 rounded-lg border border-gray-200 bg-background p-4'
             >
               <div className='flex items-center justify-between'>
                 <p className='text-sm font-semibold'>Document {index + 1}</p>
@@ -276,7 +276,7 @@ function Upload({
                     <FormControl>
                       <select
                         {...field}
-                        className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                        className='bg-background mt-[12px] w-full rounded-[12px] border px-2 py-2'
                       >
                         <option value=''>Select document type</option>
                         {Object.entries(documentTypes).map(([key, value]) => (
@@ -295,7 +295,7 @@ function Upload({
               <div>
                 <label className='mb-2 block text-sm'>Document</label>
                 <div
-                  className={`bg-neutral2 relative mt-[12px] flex h-[150px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[12px] border lg:h-[200px]`}
+                  className={`bg-background relative mt-[12px] flex h-[150px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[12px] border lg:h-[200px]`}
                   style={{
                     backgroundImage: documents[index]?.fileUrl
                       ? `url(${documents[index].fileUrl})`
@@ -358,7 +358,7 @@ function Upload({
             className={`rounded border px-4 py-2 ${
               step === 1
                 ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
+                : 'bg-background text-white hover:bg-white hover:text-background'
             }`}
           >
             Back
