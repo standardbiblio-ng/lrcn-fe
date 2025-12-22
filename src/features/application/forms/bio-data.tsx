@@ -1,15 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { bioDataSchema, submitBioDataApiSchema } from '@/schemas/bioData'
+import { bioDataSchema, bioDataSubmitSchema } from '@/schemas/application'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import nigeriaData from '@/assets/statesAndLGA/nigeria-state-and-lgas.json'
 import { createPostMutationHook } from '@/api/hooks/usePost'
-import { createPutMutationHook } from '@/api/hooks/usePut'
-import { useBioDataStore } from '@/stores/bio-data-store'
 import { formatNigerianPhoneNumberWithCode } from '@/utils/phoneFormatter'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -19,16 +18,16 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 const useCreateBioData = createPostMutationHook({
-  endpoint: '/applications/my/bio-data',
-  requestSchema: z.any(),
-  responseSchema: z.any(),
-  requiresAuth: true,
-})
-
-const useUpdateBioData = createPutMutationHook({
-  endpoint: '/applications/my/bio-data',
+  endpoint: '/applications',
   requestSchema: z.any(),
   responseSchema: z.any(),
   requiresAuth: true,
@@ -39,78 +38,59 @@ function BioData({
   handleNext,
   step,
   lastCompletedStep,
+  initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const { formData: bioData, setFormData } = useBioDataStore()
 
   const registerBioDataMutation = useCreateBioData()
-  const updateBioDataMutation = useUpdateBioData()
 
   const form = useForm<z.infer<typeof bioDataSchema>>({
     resolver: zodResolver(bioDataSchema),
     mode: 'onChange',
-    defaultValues: bioData,
+    defaultValues: initialData || {},
   })
 
   const { isValid, isDirty } = form.formState
 
-  function onSubmit(data: z.infer<typeof bioDataSchema>) {
-    // console.log('Submitting', { data })
+  // Reset form when initialData changes (e.g., after page refresh)
+  useEffect(() => {
+    if (initialData) {
+      form.reset(initialData)
+    }
+  }, [initialData])
 
+  function onSubmit(data: z.infer<typeof bioDataSchema>) {
     setIsLoading(true)
     const formattedData = {
       ...data,
       phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
     }
 
-    console.log('outside isDirty: ', isDirty)
-
-    // Validate against API schema (optional extra validation)
-    const validatedApiData = submitBioDataApiSchema.parse(formattedData)
-    console.log('biodata: ', bioData)
-    if (bioData) {
-      console.log('isDirty: ', isDirty)
-      if (!isDirty) {
-        // when i want to move to next step without changes
-        console.log('yes..............')
-        setIsLoading(false)
-        handleNext()
-        return
-      }
-
-      updateBioDataMutation.mutate(validatedApiData, {
-        onSuccess: (responseData: any) => {
-          setIsLoading(false)
-          // console.log('update responseData:', responseData)
-          toast.success(`Updated Bio-Data Successfully!`)
-          setFormData(responseData)
-          handleNext()
-        },
-        onError: (error) => {
-          console.error('bio data update error:', error)
-          setIsLoading(false)
-          toast.error('Failed to update Bio-Data. Please try again.')
-        },
-      })
-    } else {
-      registerBioDataMutation.mutate(validatedApiData, {
-        onSuccess: (responseData: any) => {
-          setIsLoading(false)
-
-          setFormData(responseData)
-
-          toast.success(`Recorded Bio-Data Successfully! Please proceed.`)
-
-          // move to the next step in the application process
-          handleNext()
-        },
-        onError: (error) => {
-          console.error('bio data register error:', error)
-          setIsLoading(false)
-          toast.error('Failed to record Bio-Data. Please try again.')
-        },
-      })
+    if (initialData && !isDirty) {
+      // when i want to move to next step without changes
+      setIsLoading(false)
+      handleNext()
+      return
     }
+
+    // Validate against API schema
+    const validatedApiData = bioDataSubmitSchema.parse(formattedData)
+
+    registerBioDataMutation.mutate(
+      { bioData: validatedApiData },
+      {
+        onSuccess: () => {
+          setIsLoading(false)
+          toast.success(`Bio-Data saved successfully!`)
+          handleNext()
+        },
+        onError: (error) => {
+          console.error('bio data error:', error)
+          setIsLoading(false)
+          toast.error('Failed to save Bio-Data. Please try again.')
+        },
+      }
+    )
   }
 
   if (status === 'pending')
@@ -281,17 +261,21 @@ function BioData({
                 <FormLabel className='block text-sm font-medium text-gray-700'>
                   Nationality
                 </FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                  >
-                    <option value=''>Select Nationality</option>
-                    <option value='Nigerian'>Nigerian</option>
-                    <option value='American'>American</option>
-                    <option value='British'>British</option>
-                  </select>
-                </FormControl>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger className='mt-2 w-full rounded-[12px]'>
+                      <SelectValue placeholder='Select Nationality' />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value='Nigerian'>Nigerian</SelectItem>
+                    <SelectItem value='American'>American</SelectItem>
+                    <SelectItem value='British'>British</SelectItem>
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -308,19 +292,23 @@ function BioData({
                     <FormLabel className='block text-sm font-medium text-gray-700'>
                       State
                     </FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                      >
-                        <option value=''>Select State</option>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className='mt-2 w-full rounded-[12px]'>
+                          <SelectValue placeholder='Select State' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
                         {nigeriaData.map((item, index) => (
-                          <option key={index} value={item.state}>
+                          <SelectItem key={index} value={item.state}>
                             {item.state}
-                          </option>
+                          </SelectItem>
                         ))}
-                      </select>
-                    </FormControl>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -342,24 +330,30 @@ function BioData({
                       <FormLabel className='block text-sm font-medium text-gray-700'>
                         LGA
                       </FormLabel>
-                      <FormControl>
-                        <select
-                          {...field}
-                          disabled={!selectedState}
-                          className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                        >
-                          <option value=''>
-                            {selectedState
-                              ? 'Select LGA'
-                              : 'Select State First'}
-                          </option>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={!selectedState}
+                      >
+                        <FormControl>
+                          <SelectTrigger className='mt-2 w-full rounded-[12px]'>
+                            <SelectValue
+                              placeholder={
+                                selectedState
+                                  ? 'Select LGA'
+                                  : 'Select State First'
+                              }
+                            />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
                           {lgaList.map((lga, index) => (
-                            <option key={index} value={lga}>
+                            <SelectItem key={index} value={lga}>
                               {lga}
-                            </option>
+                            </SelectItem>
                           ))}
-                        </select>
-                      </FormControl>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )
@@ -403,16 +397,20 @@ function BioData({
                     <FormLabel className='block text-sm font-medium text-gray-700'>
                       Gender
                     </FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
-                      >
-                        <option value=''>Select Gender</option>
-                        <option value='Male'>Male</option>
-                        <option value='Female'>Female</option>
-                      </select>
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className='mt-2 w-full rounded-[12px]'>
+                          <SelectValue placeholder='Select Gender' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value='Male'>Male</SelectItem>
+                        <SelectItem value='Female'>Female</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -423,35 +421,25 @@ function BioData({
 
         {/* Navigation */}
         <div className='mt-6 flex justify-between'>
-          <button
+          <Button
+            type='button'
+            variant='outline'
             onClick={handleBack}
-            disabled={isLoading}
-            className={`rounded border px-4 py-2 ${
-              step === 1
-                ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
-            }`}
+            disabled={isLoading || step === 1}
           >
             Back
-          </button>
-          <button
+          </Button>
+          <Button
             type='submit'
             disabled={
               isLoading ||
-              (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (bioData
-                  ? !isDirty // Update: Only enable when form has changed
-                  : !isValid)) // Next: Only enable when form is valid
+              (step !== lastCompletedStep &&
+                (initialData ? !isDirty : !isValid))
             }
-            className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
-              (isLoading ||
-                (step !== lastCompletedStep &&
-                  (bioData ? !isDirty : !isValid))) &&
-              'cursor-not-allowed opacity-50'
-            }`}
+            className='bg-mainGreen hover:bg-blue-700'
           >
-            {'Next'}
-          </button>
+            Next
+          </Button>
         </div>
       </form>
     </Form>

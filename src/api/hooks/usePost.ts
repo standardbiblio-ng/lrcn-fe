@@ -2,6 +2,7 @@ import { z } from 'zod'
 import {
   useMutation,
   UseMutationResult,
+  useQueryClient,
   QueryClient,
   UseMutationOptions,
 } from '@tanstack/react-query'
@@ -75,9 +76,8 @@ export function createPostMutationHook<
   requiresAuth = true,
 }: CreatePostMutationHookArgs<RequestSchema, ResponseSchema>) {
   return () => {
-    const queryClient = new QueryClient()
+    const queryClient = useQueryClient()
     const { auth } = useAuthStore()
-    // console.log('Creating POST mutation hook for:', auth)
 
     const mutationFn = async (data: z.infer<RequestSchema>) => {
       const validatedData = requestSchema.parse(data)
@@ -90,8 +90,6 @@ export function createPostMutationHook<
       return axiosInstance
         .post(endpoint, validatedData, { headers })
         .then((response: { data: unknown }) => {
-          console.log('Raw response:', response)
-
           return responseSchema.parse(response.data)
         })
         .catch((error: unknown) => {
@@ -105,7 +103,11 @@ export function createPostMutationHook<
 
     return useMutation({
       mutationFn,
-      onSuccess: (data, variables) => onSuccess?.(data, variables, queryClient),
+      onSuccess: (data, variables) => {
+        // Invalidate my-application query to refetch updated data
+        queryClient.invalidateQueries({ queryKey: ['my-application'] })
+        onSuccess?.(data, variables, queryClient)
+      },
       onError: (error, variables) =>
         onError?.(error as Error, variables, queryClient),
       onSettled: (data, error, variables) =>

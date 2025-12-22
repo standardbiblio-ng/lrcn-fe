@@ -1,10 +1,10 @@
 // src/stores/upload-store.ts
 import { z } from 'zod'
-import { uploadSchema } from '@/schemas/uploadSchema'
+import { documentsSubmitSchema } from '@/schemas/application'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type UploadedDocumentFormData = z.infer<typeof uploadSchema>
+type UploadedDocumentFormData = z.infer<typeof documentsSubmitSchema>
 
 interface UploadedDocumentStore {
   formData: UploadedDocumentFormData
@@ -15,10 +15,10 @@ interface UploadedDocumentStore {
 }
 
 const initialValues: UploadedDocumentFormData = {
-  documents: [
+  items: [
     {
       name: '',
-      fileUrl: '',
+      fileKey: '',
       fileType: '',
       uploadedAt: '2025-10-28T12:00:00Z',
     },
