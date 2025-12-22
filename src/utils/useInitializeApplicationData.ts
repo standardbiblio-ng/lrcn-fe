@@ -1,13 +1,6 @@
 import { useEffect } from 'react'
-// import all GET hooks
-import {
-  useGetAcademicHistory,
-  useGetAttestation,
-  useGetBioData,
-  useGetEmploymentHistory,
-  useGetRecommendation,
-  useGetUploadDocuments,
-} from '@/api/hooks/useGetData'
+// import unified GET hook
+import { useGetMyApplication } from '@/api/hooks/useGetData'
 import { useAcademicHistoryStore } from '@/stores/academic-history-store'
 import { useStepperStore } from '@/stores/application-stepper-store'
 import { useAttestationStore } from '@/stores/attestation-store'
@@ -43,19 +36,18 @@ export function useInitializeApplicationData() {
     useAttestationStore()
   //   const { setFormData: setPaymentData, markInitialized: markPayInit } = usePaymentStore()
 
-  // queries
-  const { data: bio } = useGetBioData()
-  const { data: academic } = useGetAcademicHistory()
-  const { data: employment } = useGetEmploymentHistory()
-  const { data: rec } = useGetRecommendation()
-  const { data: upload } = useGetUploadDocuments()
-  const { data: attest } = useGetAttestation()
-  console.log('Fetched bio application data: ', bio)
-  console.log('Fetched academic application data: ', academic)
-  console.log('Fetched employment application data: ', employment)
-  console.log('Fetched recommendation application data: ', rec)
-  console.log('Fetched upload application data: ', upload)
-  console.log('Fetched attestation application data: ', attest)
+  // Single query for entire application
+  const { data: application } = useGetMyApplication()
+
+  console.log('Fetched application data: ', application)
+
+  // Extract data from unified response
+  const bio = application?.bioData
+  const academic = application?.academicHistory
+  const employment = application?.employmentHistory
+  const rec = application?.recommendations
+  const upload = application?.documents
+  const attest = application?.attestation
 
   useEffect(() => {
     // console.log('Initialize Application Data........')
@@ -115,9 +107,9 @@ export function useInitializeApplicationData() {
 
     if (upload?.length > 0) {
       const formattedData = {
-        documents: upload.map((doc: any) => ({
+        items: upload.map((doc: any) => ({
           name: doc.name || '',
-          fileUrl: doc.fileUrl || '',
+          fileKey: doc.fileKey || '',
           fileType: doc.fileType || '',
           uploadedAt: doc.uploadedAt?.split('T')[0] || '',
         })),

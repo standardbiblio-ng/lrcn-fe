@@ -1,45 +1,16 @@
 import z from 'zod'
-import { attestationSchema } from '@/schemas/attestation'
 import { createGetQueryHook } from './useGet'
 
-export const useGetBioData = createGetQueryHook({
-  endpoint: '/applications/my/bio-data',
+// Single unified GET hook for entire application data
+// Uses staleTime: 5 minutes by default (set in useGet.ts)
+// Data is automatically refetched when invalidated after mutations
+export const useGetMyApplication = createGetQueryHook({
+  endpoint: '/applications',
   responseSchema: z.any(),
-  queryKey: ['my-bio-data'],
+  queryKey: ['my-application'],
   requiresAuth: true,
-})
-
-export const useGetAcademicHistory = createGetQueryHook({
-  endpoint: '/applications/my/academic-history',
-  responseSchema: z.any(),
-  queryKey: ['my-acad-history'],
-  requiresAuth: true,
-})
-
-export const useGetAttestation = createGetQueryHook({
-  endpoint: '/applications/my/attestation',
-  responseSchema: attestationSchema,
-  queryKey: ['my-attestation'],
-  requiresAuth: true,
-})
-
-export const useGetEmploymentHistory = createGetQueryHook({
-  endpoint: '/applications/my/employment-history',
-  responseSchema: z.any(),
-  queryKey: ['my-employment-history'],
-  requiresAuth: true,
-})
-
-export const useGetRecommendation = createGetQueryHook({
-  endpoint: '/applications/my/recommendations',
-  responseSchema: z.any(),
-  queryKey: ['my-recommendations'],
-  requiresAuth: true,
-})
-
-export const useGetUploadDocuments = createGetQueryHook({
-  endpoint: '/applications/my/documents',
-  responseSchema: z.any(),
-  queryKey: ['my-documents'],
-  requiresAuth: true,
+  options: {
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch on window focus
+  },
 })

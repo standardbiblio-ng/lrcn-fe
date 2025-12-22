@@ -1,4 +1,5 @@
 import { StepperProps } from '@/types/stepper.type'
+import { Button } from '@/components/ui/button'
 
 function Instructions({ handleBack, handleNext, step }: StepperProps) {
   return (
@@ -63,7 +64,7 @@ function Instructions({ handleBack, handleNext, step }: StepperProps) {
         </section>
 
         {/* Contact Info */}
-        <section className='rounded-md border bg-gray-50 p-4'>
+        <section className='bg-background rounded-md border p-4'>
           <p className='text-active text-sm font-semibold'>
             For any inquiries or assistance, please contact the{' '}
             <strong>Registrar</strong> at LRCN Headquarters in Abuja or reach
@@ -76,23 +77,21 @@ function Instructions({ handleBack, handleNext, step }: StepperProps) {
 
       {/* Navigation */}
       <div className='mt-6 flex justify-between'>
-        <button
+        <Button
+          type='button'
+          variant='outline'
           onClick={handleBack}
           disabled={step === 1}
-          className={`rounded border px-4 py-2 ${
-            step === 1
-              ? 'bg-gray-200 text-gray-400'
-              : 'bg-white hover:bg-gray-50'
-          }`}
         >
           Back
-        </button>
-        <button
+        </Button>
+        <Button
+          type='button'
           onClick={handleNext}
-          className='bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700'
+          className='bg-mainGreen hover:bg-blue-700'
         >
           Next
-        </button>
+        </Button>
       </div>
     </>
   )

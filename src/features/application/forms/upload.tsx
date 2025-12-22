@@ -1,14 +1,14 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import z from 'zod'
 import axios from 'axios'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { uploadSchema } from '@/schemas/uploadSchema'
+import { documentsSubmitSchema } from '@/schemas/application'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
-import { createPutMutationHook } from '@/api/hooks/usePut'
+import { createPostMutationHook } from '@/api/hooks/usePost'
 import { useAuthStore } from '@/stores/auth-store'
-import { useUploadDocumentStore } from '@/stores/upload-store'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -17,22 +17,16 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
-// interface DocumentType {
-//   type: string
-//   file: File | null
-//   preview: string | null
-// }
-
-// const useCreateDocument = createPostMutationHook({
-//   endpoint: '/applications/my/documents',
-//   requestSchema: z.any(),
-//   responseSchema: z.any(),
-//   requiresAuth: true,
-// })
-
-const useUpdateDocument = createPutMutationHook({
-  endpoint: '/applications/my/documents',
+const useUpdateDocument = createPostMutationHook({
+  endpoint: '/applications',
   requestSchema: z.any(),
   responseSchema: z.any(),
   requiresAuth: true,
@@ -43,33 +37,66 @@ function Upload({
   handleNext,
   step,
   lastCompletedStep,
+  initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const [fileObjects, setFileObjects] = useState<{ [key: number]: File }>({})
+  const [filePreviews, setFilePreviews] = useState<{ [key: number]: string }>(
+    {}
+  )
 
-  // const registerDocumentMutation = useCreateDocument()
   const updateDocumentMutation = useUpdateDocument()
+  const { auth } = useAuthStore()
 
-  const { formData, setFormData } = useUploadDocumentStore()
+  // Format initialData for form
+  const formattedInitialData =
+    initialData?.length > 0
+      ? {
+          items: initialData.map((doc: any) => ({
+            name: doc.name || '',
+            fileKey: doc.fileKey || '',
+            fileType: doc.fileType || '',
+            uploadedAt: doc.uploadedAt?.split('T')[0] || '',
+            fileUrl: doc.fileUrl || '',
+          })),
+        }
+      : { items: [] }
 
-  // console.log('prevDocuments:', prevDocuments)
-
-  const form = useForm<z.infer<typeof uploadSchema>>({
-    resolver: zodResolver(uploadSchema),
+  const form = useForm<z.infer<typeof documentsSubmitSchema>>({
+    resolver: zodResolver(documentsSubmitSchema),
     mode: 'onChange',
-    defaultValues: formData,
+    defaultValues: formattedInitialData,
   })
 
-  const { control, formState, setValue, watch } = form
+  const { control, formState, setValue, watch, reset } = form
   const { isValid, isDirty } = formState
 
-  const { fields, remove } = useFieldArray({
+  const { fields, remove, append } = useFieldArray({
     control,
-    name: 'documents',
+    name: 'items',
   })
 
+  // Reset form when initialData changes (e.g., after page refresh)
+  useEffect(() => {
+    if (initialData?.length > 0) {
+      reset(formattedInitialData)
+    }
+  }, [initialData, reset])
+
+  // Ensure at least one field is visible by default
+  useEffect(() => {
+    if (fields.length === 0) {
+      append({
+        name: '',
+        fileKey: '',
+        fileType: '',
+        uploadedAt: '',
+      })
+    }
+  }, [fields.length, append])
+
   // Watch all docs for dynamic rendering
-  const documents = watch('documents')
-  const isFormEmpty = formData?.documents.length > 0
+  const items = watch('items')
   const documentTypes = {
     1: 'NYSC',
     2: 'BLIS',
@@ -82,62 +109,53 @@ function Upload({
   ) => {
     const file = e.target.files?.[0]
     if (file) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        setValue(`documents.${index}.fileUrl`, reader.result as string, {
-          shouldDirty: true,
-        })
-        setValue(`documents.${index}.fileType`, file.type, {
-          shouldDirty: true,
-        })
-      }
-      reader.readAsDataURL(file)
+      // Store the actual file object
+      setFileObjects((prev) => ({ ...prev, [index]: file }))
+
+      // Create preview URL for display
+      const previewUrl = URL.createObjectURL(file)
+      setFilePreviews((prev) => ({ ...prev, [index]: previewUrl }))
+
+      setValue(`items.${index}.fileType`, file.type, {
+        shouldDirty: true,
+      })
+      setValue(`items.${index}.fileKey`, 'pending', {
+        shouldDirty: true,
+      })
     }
   }
 
-  // // Remove specific file
+  // Remove specific file
   const removeFile = (index: number) => {
-    setValue(`documents.${index}.fileUrl`, '', { shouldDirty: true })
-    setValue(`documents.${index}.fileType`, '', { shouldDirty: true })
+    // Clean up preview URL
+    if (filePreviews[index]) {
+      URL.revokeObjectURL(filePreviews[index])
+    }
+
+    // Remove from state
+    setFileObjects((prev) => {
+      const updated = { ...prev }
+      delete updated[index]
+      return updated
+    })
+    setFilePreviews((prev) => {
+      const updated = { ...prev }
+      delete updated[index]
+      return updated
+    })
+
+    setValue(`items.${index}.fileKey`, '', { shouldDirty: true })
+    setValue(`items.${index}.fileType`, '', { shouldDirty: true })
   }
-  const { auth } = useAuthStore()
 
-  // Filter out already selected document types
-  // const usedTypes = documents.map((doc) => doc.type)
+  const uploadFile = async (file: File) => {
+    // Create FormData and append file
+    const formData = new FormData()
+    formData.append('file', file)
 
-  const makePostRequest = async (data: any) => {
     try {
-      const fileDataUrl = data?.documents[0].fileUrl
-      const name = data?.documents[0].name
-      // const fileType = data?.documents[0].fileType
-
-      // ✅ Convert base64 Data URL → Blob
-      const base64ToBlob = (dataUrl: string) => {
-        const arr = dataUrl.split(',')
-        const mime = arr[0].match(/:(.*?);/)![1]
-        const bstr = atob(arr[1])
-        let n = bstr.length
-        const u8arr = new Uint8Array(n)
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n)
-        }
-        return new Blob([u8arr], { type: mime })
-      }
-
-      const blob = base64ToBlob(fileDataUrl)
-
-      // ✅ Create FormData and append Blob as file
-      const formData = new FormData()
-      formData.append('file', blob, name) // 👈 this is the actual file now
-      formData.append('name', name)
-
-      // ✅ Log FormData entries for debugging
-      // for (const [key, value] of formData.entries()) {
-      //   console.log(`${key}:`, value)
-      // }
-
       const response = await axios.post(
-        'https://api.bibliodev.com.ng/api/applications/my/documents/upload',
+        `${import.meta.env.VITE_API_BASE_URL}/upload`,
         formData,
         {
           headers: {
@@ -147,73 +165,64 @@ function Upload({
         }
       )
 
-      const responseData = response.data
-      // console.log('recorded documents upload responseData:', responseData)
-      toast.success('Recorded documents upload successfully!')
-
-      const formattedData = {
-        documents: [...responseData],
-      }
-
-      setFormData(formattedData)
-      handleNext()
+      return response.data.key
     } catch (error) {
-      console.error('documents upload register error:', error)
-      toast.error('Failed to record documents upload. Please try again.')
-    } finally {
-      setIsLoading(false)
+      console.error('File upload error:', error)
+      throw error
     }
   }
 
-  function onSubmit(data: z.infer<typeof uploadSchema>) {
-    // console.log('Submitting', { data })
-
+  async function onSubmit(data: z.infer<typeof documentsSubmitSchema>) {
     setIsLoading(true)
-    const formattedData = {
-      items: data?.documents,
+
+    if (!isDirty) {
+      // when i want to move to next step without changes
+      setIsLoading(false)
+      handleNext()
+      return
     }
 
-    //  const validatedApiData = submitBioDataApiSchema.parse(formattedData)
+    try {
+      // Upload all files and get their keys
+      const uploadPromises = data.items.map(async (item, index) => {
+        const file = fileObjects[index]
 
-    if (isFormEmpty) {
-      // console.log('Submitting for Updating', { formattedData })
-      console.log('updating documents upload....')
-      // console.log('isDirty:', isDirty)
-      if (!isDirty) {
-        // when i want to move to next step without changes
-        setIsLoading(false)
-        handleNext()
-        return
-      }
-      updateDocumentMutation.mutate(formattedData, {
-        onSuccess: (responseData) => {
-          setIsLoading(false)
-          toast.success(`Updated documents upload Successfully!`)
-          console.log('updated documents upload responseData:', responseData)
-
-          const formattedData = {
-            documents: responseData.map((doc: any) => ({
-              name: doc.name || '',
-              fileUrl: doc.fileUrl || '',
-              fileType: doc.fileType || '',
-              uploadedAt:
-                doc.uploadedAt?.split('T')[0] || '2025-10-28T12:00:00Z',
-            })),
+        // If there's a file to upload (fileKey is 'pending'), upload it
+        if (file && item.fileKey === 'pending') {
+          const key = await uploadFile(file)
+          return {
+            ...item,
+            fileKey: key,
+            uploadedAt: new Date().toISOString().split('T')[0],
           }
+        }
 
-          setFormData(formattedData)
-          handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error('documents upload update error:', error)
-
-          toast.error('Failed to update documents upload. Please try again.')
-        },
+        // If no file or already has a key, return as is
+        return item
       })
-    } else {
-      // console.log('registering academic history....')
-      makePostRequest(data)
+
+      const itemsWithKeys = await Promise.all(uploadPromises)
+
+      // Now submit to backend with actual file keys
+      updateDocumentMutation.mutate(
+        { documents: itemsWithKeys },
+        {
+          onSuccess: () => {
+            setIsLoading(false)
+            toast.success(`Documents saved successfully!`)
+            handleNext()
+          },
+          onError: (error) => {
+            setIsLoading(false)
+            console.error('documents upload error:', error)
+            toast.error('Failed to save documents. Please try again.')
+          },
+        }
+      )
+    } catch (error) {
+      setIsLoading(false)
+      console.error('File upload error:', error)
+      toast.error('Failed to upload files. Please try again.')
     }
   }
 
@@ -245,21 +254,24 @@ function Upload({
             Please upload valid and required documents.
           </h4>
 
-          {/* {documents.map((doc, index) => ( */}
+          {/* {items.map((doc, index) => ( */}
           {fields.map((field, index) => (
             <div
               key={field.id}
-              className='space-y-4 rounded-lg border border-gray-200 bg-gray-50 p-4'
+              className='bg-background space-y-4 rounded-lg border border-gray-200 p-4'
             >
               <div className='flex items-center justify-between'>
                 <p className='text-sm font-semibold'>Document {index + 1}</p>
-                {documents.length > 1 && (
-                  <button
+                {items.length > 1 && (
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='sm'
                     onClick={() => remove(index)}
-                    className='text-xs font-medium text-red-500 hover:underline'
+                    className='text-xs text-red-500 hover:text-red-600'
                   >
                     Remove
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -267,25 +279,29 @@ function Upload({
 
               <FormField
                 control={form.control}
-                name={`documents.${index}.name`}
+                name={`items.${index}.name`}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm'>
                       Document type
                     </FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-                      >
-                        <option value=''>Select document type</option>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
+                          <SelectValue placeholder='Select document type' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
                         {Object.entries(documentTypes).map(([key, value]) => (
-                          <option key={key} value={value}>
+                          <SelectItem key={key} value={value}>
                             {value}
-                          </option>
+                          </SelectItem>
                         ))}
-                      </select>
-                    </FormControl>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -297,14 +313,16 @@ function Upload({
                 <div
                   className={`bg-neutral2 relative mt-[12px] flex h-[150px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[12px] border lg:h-[200px]`}
                   style={{
-                    backgroundImage: documents[index]?.fileUrl
-                      ? `url(${documents[index].fileUrl})`
-                      : 'none',
+                    backgroundImage: filePreviews[index]
+                      ? `url(${filePreviews[index]})`
+                      : items[index]?.fileUrl
+                        ? `url(${items[index].fileUrl})`
+                        : 'none',
                     backgroundSize: 'cover',
                     backgroundPosition: 'center',
                   }}
                 >
-                  {!documents[index]?.fileUrl && (
+                  {!filePreviews[index] && !items[index]?.fileUrl && (
                     <span className='text-sm text-gray-500'>
                       Click to upload document
                     </span>
@@ -317,14 +335,16 @@ function Upload({
                     className='absolute inset-0 cursor-pointer opacity-0'
                   />
 
-                  {documents[index]?.fileUrl && (
-                    <button
+                  {(filePreviews[index] || items[index]?.fileUrl) && (
+                    <Button
                       onClick={() => removeFile(index)}
                       type='button'
-                      className='absolute top-2 right-2 rounded-md bg-black/50 px-2 py-1 text-xs text-white'
+                      size='sm'
+                      variant='secondary'
+                      className='absolute top-2 right-2 bg-black/50 text-xs text-white hover:bg-black/70'
                     >
                       Remove
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -352,35 +372,21 @@ function Upload({
 
         {/* Navigation */}
         <div className='mt-6 flex justify-between'>
-          <button
+          <Button
+            type='button'
+            variant='outline'
             onClick={handleBack}
-            disabled={isLoading}
-            className={`rounded border px-4 py-2 ${
-              step === 1
-                ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
-            }`}
+            disabled={isLoading || step === 1}
           >
             Back
-          </button>
-          <button
+          </Button>
+          <Button
             type='submit'
-            disabled={
-              isLoading ||
-              (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (isFormEmpty
-                  ? !isDirty // Update: Only enable when form has changed
-                  : !isValid)) // Next: Only enable when form is valid
-            }
-            className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
-              (isLoading ||
-                (step !== lastCompletedStep &&
-                  (isFormEmpty ? !isDirty : !isValid))) &&
-              'cursor-not-allowed opacity-50'
-            }`}
+            disabled={isLoading || (step !== lastCompletedStep && !isValid)}
+            className='bg-mainGreen hover:bg-blue-700'
           >
-            {'Next'}
-          </button>
+            Next
+          </Button>
         </div>
       </form>
     </Form>

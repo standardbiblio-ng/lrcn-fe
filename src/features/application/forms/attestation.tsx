@@ -1,49 +1,60 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { attestationSchema } from '@/schemas/attestation'
+import { attestationSchema } from '@/schemas/application'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import logo from '@/assets/images/LOGO.png'
 import { createPostMutationHook } from '@/api/hooks/usePost'
-import { useAcademicHistoryStore } from '@/stores/academic-history-store'
-import { useAttestationStore } from '@/stores/attestation-store'
-import { useBioDataStore } from '@/stores/bio-data-store'
-import { useEmploymentHistoryStore } from '@/stores/employment-history-store'
-import { useRecommendationStore } from '@/stores/recommendation-store'
-import { useUploadDocumentStore } from '@/stores/upload-store'
+import { Button } from '@/components/ui/button'
 import { Form } from '@/components/ui/form'
 
 const usePostAttestation = createPostMutationHook({
-  endpoint: '/applications/my/attestation',
-  requestSchema: attestationSchema,
-  responseSchema: attestationSchema,
+  endpoint: '/applications',
+  requestSchema: z.object({ attestation: attestationSchema }),
+  responseSchema: z.any(),
   requiresAuth: true,
 })
-function Attestation({ handleBack, handleNext }: StepperProps) {
-  // const [attest, setAttest] = useState(false)
+function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const attestationMutation = usePostAttestation()
-  const { formData, setFormData } = useAttestationStore()
+
+  // Extract all form data from initialData
+  const attestationData = initialData?.attestation || {}
+  const bioData = initialData?.bioData || {}
+  const academicData = initialData?.academicHistory || []
+  const employmentData = initialData?.employmentHistory?.[0] || {}
+  const recommendationData = initialData?.recommendations?.[0] || {}
+  const uploadData = initialData?.documents || []
 
   const form = useForm<z.infer<typeof attestationSchema>>({
     resolver: zodResolver(attestationSchema),
     mode: 'onChange',
-    defaultValues: formData,
+    defaultValues: {
+      agreed: attestationData?.agreed || false,
+    },
   })
   const { register } = form
+
+  // Reset form when initialData changes (e.g., after page refresh)
+  useEffect(() => {
+    if (initialData?.attestation) {
+      form.reset({
+        agreed: attestationData?.agreed || false,
+      })
+    }
+  }, [initialData])
 
   const onSubmit = (data: z.infer<typeof attestationSchema>) => {
     setIsLoading(true)
 
-    attestationMutation.mutate(data, {
-      onSuccess: (responseData) => {
+    console.log('Submitting attestation:', data)
+    attestationMutation.mutate({ attestation: data } as any, {
+      onSuccess: () => {
         toast.success('Attestation recorded successfully!')
-        setFormData(responseData)
         setIsLoading(false)
-
         handleNext()
       },
       onError: (error) => {
@@ -54,27 +65,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
     })
   }
 
-  if (status === 'pending')
-    return (
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        Loading...
-      </div>
-    )
-  const alreadyAttested = !!formData?.agreed
-  const { formData: bioData } = useBioDataStore()
-
-  const { formData: academicData } = useAcademicHistoryStore()
-
-  const { formData: employmentData } = useEmploymentHistoryStore()
-  const { formData: recommendationData } = useRecommendationStore()
-  const { formData: uploadData } = useUploadDocumentStore()
+  const alreadyAttested = !!attestationData?.agreed
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 p-4'>
@@ -170,7 +161,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
           </h3>
           <table className='w-full border-collapse text-left'>
             <tbody>
-              {academicData?.items?.map((item, index) => (
+              {academicData?.map((item: any, index: number) => (
                 <React.Fragment key={index}>
                   <tr className='border-b'>
                     <td className='w-1/2 font-medium'>Institution</td>
@@ -182,11 +173,15 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                   </tr>
                   <tr className='border-b'>
                     <td className='font-medium'>Start – End Date</td>
-                    <td>{item.startDate + ' – ' + item.endDate}</td>
+                    <td>
+                      {item.startDate?.split('T')[0] +
+                        ' – ' +
+                        item.endDate?.split('T')[0]}
+                    </td>
                   </tr>
 
                   {/* Add spacing between records */}
-                  {index < academicData?.items.length - 1 && (
+                  {index < academicData.length - 1 && (
                     <tr>
                       <td colSpan={2}>
                         <div className='my-3 border-b border-dashed border-gray-300'></div>
@@ -237,24 +232,26 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
               </tr>
             </thead>
             <tbody>
-              {employmentData?.workExperience?.map((item, index) => (
-                <React.Fragment key={index}>
-                  <tr className='border-b'>
-                    <td className='capitalize'>{item.organisation}</td>
-                    <td>{item.startDate}</td>
-                    <td className='capitalize'>{item.positionHeld}</td>
-                  </tr>
-
-                  {/* Add spacing between records */}
-                  {index < employmentData?.workExperience.length - 1 && (
-                    <tr>
-                      <td colSpan={3}>
-                        <div className='my-3 border-b border-dashed border-gray-300'></div>
-                      </td>
+              {employmentData?.workExperience?.map(
+                (item: any, index: number) => (
+                  <React.Fragment key={index}>
+                    <tr className='border-b'>
+                      <td className='capitalize'>{item.organisation}</td>
+                      <td>{item.startDate}</td>
+                      <td className='capitalize'>{item.positionHeld}</td>
                     </tr>
-                  )}
-                </React.Fragment>
-              ))}
+
+                    {/* Add spacing between records */}
+                    {index < employmentData?.workExperience.length - 1 && (
+                      <tr>
+                        <td colSpan={3}>
+                          <div className='my-3 border-b border-dashed border-gray-300'></div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
+                )
+              )}
             </tbody>
           </table>
         </section>
@@ -289,7 +286,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
           </h3>
           <table className='w-full border-collapse text-left'>
             <tbody>
-              {uploadData?.documents?.map((item, index) => (
+              {uploadData?.map((item: any, index: number) => (
                 <React.Fragment key={index}>
                   <tr className='border-b'>
                     <td className='w-1/2 font-medium'>Document Type</td>
@@ -301,7 +298,7 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
                   </tr>
 
                   {/* Add spacing between records */}
-                  {index < uploadData?.documents.length - 1 && (
+                  {index < uploadData.length - 1 && (
                     <tr>
                       <td colSpan={2}>
                         <div className='my-3 border-b border-dashed border-gray-300'></div>
@@ -318,7 +315,9 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
         <div className='mt-6 flex items-start space-x-3 border-t pt-4'>
           <input
             type='checkbox'
-            {...register('agreed')}
+            {...register('agreed', {
+              setValueAs: (value) => Boolean(value),
+            })}
             id='agreed'
             className='accent-mainGreen mt-1 h-5 w-5'
           />
@@ -330,27 +329,24 @@ function Attestation({ handleBack, handleNext }: StepperProps) {
 
         {/* === ACTION BUTTONS === */}
         <div className='mt-8 flex justify-between'>
-          <button
+          <Button
             type='button'
+            variant='outline'
             onClick={handleBack}
             disabled={isLoading}
-            className='rounded border bg-white px-4 py-2 hover:bg-gray-50'
           >
             Back
-          </button>
-          <button
+          </Button>
+          <Button
             type={alreadyAttested ? 'button' : 'submit'}
             onClick={() => {
               if (alreadyAttested) handleNext()
             }}
             disabled={isLoading || (!alreadyAttested && !form.watch('agreed'))}
-            className={`bg-mainGreen rounded px-4 py-2 text-white transition hover:bg-green-700 ${
-              (isLoading || (!alreadyAttested && !form.watch('agreed'))) &&
-              'cursor-not-allowed opacity-50'
-            }`}
+            className='bg-mainGreen hover:bg-green-700'
           >
-            {'Next'}
-          </button>
+            Next
+          </Button>
         </div>
       </form>
     </Form>

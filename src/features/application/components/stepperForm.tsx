@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import {
   ScrollText,
   Fingerprint,
@@ -8,6 +9,7 @@ import {
   CreditCard,
   FileCheck,
 } from 'lucide-react'
+import { useGetMyApplication } from '@/api/hooks/useGetData'
 import { useStepperStore } from '@/stores/application-stepper-store'
 import AcademicHistory from '../forms/academic-history'
 import Attestation from '../forms/attestation'
@@ -74,6 +76,38 @@ export default function StepperForm() {
     useStepperStore()
   const totalSteps = steps.length
 
+  // Fetch all application data once
+  const { data: application } = useGetMyApplication()
+
+  // Extract data for each form
+  const bioData = application?.bioData
+  const academicHistory = application?.academicHistory
+  const employmentHistory = application?.employmentHistory
+  const recommendations = application?.recommendations
+  const documents = application?.documents
+  const attestation = application?.attestation
+
+  // Auto-mark completed steps when data loads
+  useEffect(() => {
+    if (!application) return
+
+    if (bioData) markComplete(2)
+    if (academicHistory?.length > 0) markComplete(3)
+    if (employmentHistory?.length > 0) markComplete(4)
+    if (recommendations?.length > 0) markComplete(5)
+    if (documents?.length > 0) markComplete(6)
+    if (attestation) markComplete(7)
+  }, [
+    application,
+    bioData,
+    academicHistory,
+    employmentHistory,
+    recommendations,
+    documents,
+    attestation,
+    markComplete,
+  ])
+
   const handleNext = () => {
     markComplete(step)
     next(totalSteps)
@@ -86,8 +120,6 @@ export default function StepperForm() {
   const handleStepClick = (stepId: number) => {
     if (stepId <= maxStep) setStep(stepId)
   }
-
-  console.log('step: ', step)
 
   // Example content renderer for each step
   const renderStepContent = () => {
@@ -109,7 +141,7 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            // totalSteps={totalSteps}
+            initialData={bioData}
           />
         )
       case 3:
@@ -119,7 +151,7 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            // totalSteps={totalSteps}
+            initialData={academicHistory}
           />
         )
       case 4:
@@ -129,7 +161,7 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            // totalSteps={totalSteps}
+            initialData={employmentHistory}
           />
         )
       case 5:
@@ -139,7 +171,7 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            // totalSteps={totalSteps}
+            initialData={recommendations}
           />
         )
       case 6:
@@ -149,15 +181,30 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
+            initialData={documents}
           />
         )
       case 7:
-        return <Attestation handleBack={handleBack} handleNext={handleNext} />
+        return (
+          <Attestation
+            handleBack={handleBack}
+            handleNext={handleNext}
+            initialData={{
+              attestation,
+              bioData,
+              academicHistory,
+              employmentHistory,
+              recommendations,
+              documents,
+            }}
+          />
+        )
       case 8:
         return (
           <Payment
             // handleBack={handleBack}
-            handleNext={handleNext}
+
+            bioData={bioData}
             // step={step}
             // lastCompletedStep={maxStep}
             // totalSteps={totalSteps}
@@ -169,7 +216,7 @@ export default function StepperForm() {
   return (
     <div className='flex min-h-screen overflow-y-auto'>
       {/* Sidebar Steps */}
-      <aside className='w-1/3 border-r bg-gray-50 p-6'>
+      <aside className='bg-background/50 w-1/3 border-r p-6'>
         <ul className='space-y-4'>
           {steps.map((stepItem) => (
             <li

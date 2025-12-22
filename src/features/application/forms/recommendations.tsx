@@ -1,13 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import z from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { recommendationSchema } from '@/schemas/recommendation'
+import { recommendationSubmitSchema } from '@/schemas/application'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
-import { createPutMutationHook } from '@/api/hooks/usePut'
-import { useRecommendationStore } from '@/stores/recommendation-store'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -19,14 +18,7 @@ import {
 import { Input } from '@/components/ui/input'
 
 const useCreateRecommendations = createPostMutationHook({
-  endpoint: '/applications/my/recommendations',
-  requestSchema: z.any(),
-  responseSchema: z.any(),
-  requiresAuth: true,
-})
-
-const useUpdateRecommendations = createPutMutationHook({
-  endpoint: '/applications/my/recommendations',
+  endpoint: '/applications',
   requestSchema: z.any(),
   responseSchema: z.any(),
   requiresAuth: true,
@@ -37,73 +29,59 @@ function Recommendations({
   handleNext,
   step,
   lastCompletedStep,
+  initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const registerRecommendationsMutation = useCreateRecommendations()
-  const updateRecommendationsMutation = useUpdateRecommendations()
 
-  const { formData, setFormData } = useRecommendationStore()
+  // Format initialData - recommendations comes as array, we use first item
+  const formattedInitialData = initialData?.length > 0 ? initialData[0] : {}
 
-  // console.log('prevRecommendations:', prevRecommendations)
-
-  const form = useForm<z.infer<typeof recommendationSchema>>({
-    resolver: zodResolver(recommendationSchema),
+  const form = useForm<z.infer<typeof recommendationSubmitSchema>>({
+    resolver: zodResolver(recommendationSubmitSchema),
     mode: 'onChange',
-    defaultValues: formData,
+    defaultValues: formattedInitialData,
   })
 
   const { isValid, isDirty } = form.formState
 
-  const isFormEmpty = formData?.name ? true : false
+  // Reset form when initialData changes (e.g., after page refresh)
+  useEffect(() => {
+    if (initialData?.length > 0) {
+      form.reset(formattedInitialData)
+    }
+  }, [initialData])
 
-  function onSubmit(data: z.infer<typeof recommendationSchema>) {
+  const isFormEmpty = formattedInitialData?.name ? true : false
+
+  function onSubmit(data: z.infer<typeof recommendationSubmitSchema>) {
     // console.log('Submitting', { data })
 
     setIsLoading(true)
 
-    if (isFormEmpty) {
-      if (!isDirty) {
-        console.log('No changes detected, moving to next step')
-        // when i want to move to next step without changes
-        setIsLoading(false)
-        handleNext()
-        return
-      }
-      updateRecommendationsMutation.mutate(data, {
-        // registerRecommendationsMutation.mutate(data, {
-        onSuccess: (responseData) => {
-          setIsLoading(false)
-          toast.success(`Updated Recommendations Successfully!`)
-          // console.log('Updated recommendations responseData:', responseData)
-          setFormData(responseData[0])
-          handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error(' recommendations update error:', error)
-
-          toast.error('Failed to update Recommendations. Please try again.')
-        },
-      })
-    } else {
-      // console.log('registering recommendations....')
-      registerRecommendationsMutation.mutate(data, {
-        onSuccess: (responseData) => {
-          setIsLoading(false)
-          toast.success(`Recorded Recommendations Successfully!`)
-          setFormData(responseData[0])
-          // move to the next step in the application process
-          handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error('recommendations register error:', error)
-
-          toast.error('Failed to record Recommendations. Please try again.')
-        },
-      })
+    if (isFormEmpty && !isDirty) {
+      // when i want to move to next step without changes
+      setIsLoading(false)
+      handleNext()
+      return
     }
+
+    registerRecommendationsMutation.mutate(
+      { recommendations: [data] },
+      {
+        onSuccess: () => {
+          setIsLoading(false)
+          toast.success(`Recommendations saved successfully!`)
+          handleNext()
+        },
+        onError: (error) => {
+          setIsLoading(false)
+          console.error('recommendations error:', error)
+          toast.error('Failed to save Recommendations. Please try again.')
+        },
+      }
+    )
   }
 
   if (status === 'pending')
@@ -200,35 +178,25 @@ function Recommendations({
 
         {/* Navigation */}
         <div className='mt-6 flex justify-between'>
-          <button
+          <Button
+            type='button'
+            variant='outline'
             onClick={handleBack}
-            disabled={isLoading}
-            className={`rounded border px-4 py-2 ${
-              step === 1
-                ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
-            }`}
+            disabled={isLoading || step === 1}
           >
             Back
-          </button>
-          <button
+          </Button>
+          <Button
             type='submit'
             disabled={
               isLoading ||
-              (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (isFormEmpty
-                  ? !isDirty // Update: Only enable when form has changed
-                  : !isValid)) // Next: Only enable when form is valid
+              (step !== lastCompletedStep &&
+                (isFormEmpty ? !isDirty : !isValid))
             }
-            className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
-              (isLoading ||
-                (step !== lastCompletedStep &&
-                  (isFormEmpty ? !isDirty : !isValid))) &&
-              'cursor-not-allowed opacity-50'
-            }`}
+            className='bg-mainGreen hover:bg-blue-700'
           >
-            {'Next'}
-          </button>
+            Next
+          </Button>
         </div>
       </form>
     </Form>

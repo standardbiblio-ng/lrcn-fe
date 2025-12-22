@@ -4,4 +4,5 @@ export type StepperProps = {
   step?: number
   // totalSteps?: number
   lastCompletedStep?: number
+  initialData?: any // Data fetched from API for the form
 }

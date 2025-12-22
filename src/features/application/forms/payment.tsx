@@ -1,85 +1,101 @@
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import z from 'zod'
-import { StepperProps } from '@/types/stepper.type'
-import { useRemitaInline } from '@farayolaj/react-remita-inline'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
-import { useBioDataStore } from '@/stores/bio-data-store'
-import { usePaymentStore } from '@/stores/payment-store'
+import { Button } from '@/components/ui/button'
 import { ConfirmApplicationDialog } from '../components/success-appl-dialog'
 
 // Generate unique transaction ID
 const generateTransactionId = () =>
   String(Math.floor(Math.random() * 1_101_233))
 
-const useCreatePayment = createPostMutationHook({
-  endpoint: '/payment',
+// Declare global RmPaymentEngine
+declare global {
+  interface Window {
+    RmPaymentEngine: {
+      init: (config: any) => {
+        showPaymentWidget: () => void
+      }
+    }
+  }
+}
+
+const useInitiatePayment = createPostMutationHook({
+  endpoint: '/payment/initialize',
   requestSchema: z.any(),
   responseSchema: z.any(),
   requiresAuth: true,
 })
 
-function Payment({ handleNext }: StepperProps) {
+function Payment({ bioData }: { bioData: any }) {
   const [open, setOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const initiatePaymentMutation = useInitiatePayment()
 
   const onOpenChange = (value: boolean) => setOpen(value)
 
-  const { formData: bioData } = useBioDataStore()
-  const { formData, setFormData } = usePaymentStore()
-  const [paymentData] = useState({
-    key: 'QzAwMDAyNzEyNTl8MTEwNjE4NjF8OWZjOWYwNmMyZDk3MDRhYWM3YThiOThlNTNjZTE3ZjYxOTY5NDdmZWE1YzU3NDc0ZjE2ZDZjNTg1YWYxNWY3NWM4ZjMzNzZhNjNhZWZlOWQwNmJhNTFkMjIxYTRiMjYzZDkzNGQ3NTUxNDIxYWNlOGY4ZWEyODY3ZjlhNGUwYTY=',
-    transactionId: generateTransactionId(),
-    amount: 10000,
-    customerId: bioData?.email,
-    narration: 'LRCN Application Fee',
-    email: bioData?.email,
-    firstName: bioData?.firstName,
-    lastName: bioData?.lastName,
-  })
+  const handlePayment = async () => {
+    if (!bioData?.email || !bioData?.firstName || !bioData?.lastName) {
+      toast.error(
+        'Bio data is incomplete. Please complete your bio data first.'
+      )
+      return
+    }
 
-  // Mutation hook
-  const registerPaymentMutation = useCreatePayment()
+    setIsLoading(true)
 
-  // Complete application flow
-  const completeApplication = useCallback(() => {
-    return 0
-    // registerPaymentMutation.mutate(
-    //   {
-    //     status: 'completed',
-    //     isPaymentVerified: true,
-    //   },
-    //   {
-    //     onSuccess: (responseData) => {
-    //       toast.success('Your application was submitted successfully!')
-    //       setFormData(responseData[0])
-    //       handleNext()
-    //     },
-    //     onError: (error) => {
-    //       console.error('Payment completion error:', error)
-    //       toast.error('Something went wrong. Please try again.')
-    //     },
-    //   }
-    // )
-  }, [registerPaymentMutation, setFormData, handleNext])
+    // Step 1: Get RRR from backend
+    initiatePaymentMutation.mutate(
+      {},
+      {
+        onSuccess: (response: any) => {
+          setIsLoading(false)
+          const rrr = response.data.rrr
 
-  // Remita init config
-  const { initPayment } = useRemitaInline({
-    isLive: false,
-    onClose() {
-      toast.warning(`Payment process was not completed.`)
-      console.log('Remita closed')
-    },
-    onError(response) {
-      toast.error(`Payment Failed! Please try again.`)
-      console.log('Remita Error:', response)
-    },
-    onSuccess(response) {
-      toast.success(`Payment Successful!`)
-      console.log('Remita Success:', response)
-      onOpenChange(true)
-      completeApplication()
-    },
-  })
+          // Step 2: Initialize Remita payment with RRR
+          if (!window.RmPaymentEngine) {
+            toast.error('Payment system not loaded. Please refresh the page.')
+            return
+          }
+
+          const paymentEngine = window.RmPaymentEngine.init({
+            key: import.meta.env.VITE_REMITA_PUBLIC_KEY,
+            processRrr: true,
+            transactionId: response.data.transation_id,
+            extendedData: {
+              customFields: [
+                {
+                  name: 'rrr',
+                  value: rrr,
+                },
+              ],
+            },
+            onSuccess: (response: any) => {
+              console.log('Payment Successful Response:', response)
+              toast.success('Payment Successful!')
+              onOpenChange(true)
+            },
+            onError: (response: any) => {
+              console.log('Payment Error Response:', response)
+              toast.error('Payment Failed! Please try again.')
+            },
+            onClose: () => {
+              console.log('Payment widget closed')
+              toast.warning('Payment process was not completed.')
+            },
+          })
+
+          paymentEngine.showPaymentWidget()
+        },
+        onError: (error) => {
+          console.error('RRR Generation Error:', error)
+          setIsLoading(false)
+          toast.error('Failed to initiate payment. Please try again.')
+        },
+      }
+    )
+  }
 
   return (
     <div className='space-y-4'>
@@ -89,13 +105,13 @@ function Payment({ handleNext }: StepperProps) {
       </h4>
       <p>Proceed with Remita Payment</p>
 
-      <button
-        className='bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700'
-        disabled={formData.isPaymentVerified}
-        onClick={() => initPayment(paymentData)}
+      <Button
+        className='bg-mainGreen hover:bg-blue-700'
+        onClick={handlePayment}
+        disabled={isLoading || !bioData?.email}
       >
-        Pay Now
-      </button>
+        {isLoading ? 'Processing...' : 'Pay Now'}
+      </Button>
 
       <ConfirmApplicationDialog
         open={open}

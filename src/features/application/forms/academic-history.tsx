@@ -1,13 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import z from 'zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { acadHistoryRequestSchema } from '@/schemas/acadHistory'
+import { academicHistorySubmitSchema } from '@/schemas/application'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
-import { createPutMutationHook } from '@/api/hooks/usePut'
-import { useAcademicHistoryStore } from '@/stores/academic-history-store'
+import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
@@ -17,6 +16,13 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 export interface Institution {
   institution: string
@@ -26,14 +32,7 @@ export interface Institution {
 }
 
 const useCreateAcadHist = createPostMutationHook({
-  endpoint: '/applications/my/academic-history',
-  requestSchema: z.any(),
-  responseSchema: z.any(),
-  requiresAuth: true,
-})
-
-const useUpdateAcadHist = createPutMutationHook({
-  endpoint: '/applications/my/academic-history',
+  endpoint: '/applications',
   requestSchema: z.any(),
   responseSchema: z.any(),
   requiresAuth: true,
@@ -44,18 +43,28 @@ function AcademicHistory({
   handleNext,
   step,
   lastCompletedStep,
+  initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const registerAcadHistMutation = useCreateAcadHist()
-  const updateAcadHistMutation = useUpdateAcadHist()
 
-  const { formData, setFormData } = useAcademicHistoryStore()
-  // console.log('formData from store:', formData)
-  const form = useForm<z.infer<typeof acadHistoryRequestSchema>>({
-    resolver: zodResolver(acadHistoryRequestSchema),
+  // Format initialData to match form structure
+  const formattedInitialData =
+    initialData?.length > 0
+      ? {
+          items: initialData.map((record: any) => ({
+            ...record,
+            startDate: record.startDate?.split('T')[0] || '',
+            endDate: record.endDate?.split('T')[0] || '',
+          })),
+        }
+      : { items: [] }
+
+  const form = useForm<z.infer<typeof academicHistorySubmitSchema>>({
+    resolver: zodResolver(academicHistorySubmitSchema),
     mode: 'onChange',
-    defaultValues: formData,
+    defaultValues: formattedInitialData,
   })
 
   const { isValid, isDirty } = form.formState
@@ -65,58 +74,40 @@ function AcademicHistory({
     name: 'items',
   })
 
-  const isFormEmpty = formData?.items.length > 0
+  // Reset form when initialData changes (e.g., after page refresh)
+  useEffect(() => {
+    if (initialData?.length > 0) {
+      form.reset(formattedInitialData)
+    }
+  }, [initialData])
 
-  function onSubmit(data: z.infer<typeof acadHistoryRequestSchema>) {
-    // console.log('Submitting', { data })
+  const isFormEmpty = formattedInitialData.items.length > 0
 
+  function onSubmit(data: z.infer<typeof academicHistorySubmitSchema>) {
     setIsLoading(true)
 
-    if (isFormEmpty) {
-      // console.log('Submitting for Updating', { formattedData })
-      console.log('updating academic history....')
-      // console.log('isDirty:', isDirty)
-      if (!isDirty) {
-        // when i want to move to next step without changes
-        setIsLoading(false)
-        handleNext()
-        return
-      }
-      updateAcadHistMutation.mutate(data, {
-        onSuccess: (responseData: any) => {
-          setIsLoading(false)
-          toast.success(`Updated Academic History Successfully!`)
-          // console.log('update responseData:', responseData)
-          setFormData({ items: responseData })
-          handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error('academic history update error:', error)
-
-          toast.error('Failed to update Academic History. Please try again.')
-        },
-      })
-    } else {
-      // console.log('registering academic history....')
-      registerAcadHistMutation.mutate(data, {
-        onSuccess: (responseData: any) => {
-          setIsLoading(false)
-
-          setFormData({ items: responseData })
-          toast.success(`Recorded Academic History Successfully!`)
-
-          // move to the next step in the application process
-          handleNext()
-        },
-        onError: (error) => {
-          setIsLoading(false)
-          console.error('academic history register error:', error)
-
-          toast.error('Failed to record Academic History. Please try again.')
-        },
-      })
+    if (isFormEmpty && !isDirty) {
+      // when i want to move to next step without changes
+      setIsLoading(false)
+      handleNext()
+      return
     }
+
+    registerAcadHistMutation.mutate(
+      { academicHistory: data.items },
+      {
+        onSuccess: () => {
+          setIsLoading(false)
+          toast.success(`Academic History saved successfully!`)
+          handleNext()
+        },
+        onError: (error) => {
+          setIsLoading(false)
+          console.error('academic history error:', error)
+          toast.error('Failed to save Academic History. Please try again.')
+        },
+      }
+    )
   }
 
   if (status === 'pending')
@@ -151,19 +142,22 @@ function AcademicHistory({
           {fields.map((item, index) => (
             <div
               key={item.id}
-              className='space-y-4 rounded-lg border bg-gray-50 p-4'
+              className='bg-background space-y-4 rounded-lg border p-4'
             >
               <div className='flex items-center justify-between'>
                 <p className='font-montserrat text-base font-bold'>
                   Tertiary Institution {index + 1}
                 </p>
                 {fields.length > 1 && (
-                  <button
+                  <Button
+                    type='button'
+                    variant='ghost'
+                    size='sm'
                     onClick={() => remove(index)}
-                    className='text-sm font-medium text-red-500 hover:underline'
+                    className='text-sm text-red-500 hover:text-red-600'
                   >
                     Remove
-                  </button>
+                  </Button>
                 )}
               </div>
 
@@ -195,20 +189,24 @@ function AcademicHistory({
                     <FormLabel className='block text-sm'>
                       Qualification Obtained
                     </FormLabel>
-                    <FormControl>
-                      <select
-                        {...field}
-                        className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-                      >
-                        <option value=''>Select qualification</option>
-                        <option value='BLIS'>BLIS</option>
-                        <option value='BSc'>BSc</option>
-                        <option value='MSc'>MSc</option>
-                        <option value='PhD'>PhD</option>
-                        <option value='HND'>HND</option>
-                        <option value='OND'>OND</option>
-                      </select>
-                    </FormControl>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
+                          <SelectValue placeholder='Select qualification' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value='BLIS'>BLIS</SelectItem>
+                        <SelectItem value='BSc'>BSc</SelectItem>
+                        <SelectItem value='MSc'>MSc</SelectItem>
+                        <SelectItem value='PhD'>PhD</SelectItem>
+                        <SelectItem value='HND'>HND</SelectItem>
+                        <SelectItem value='OND'>OND</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -256,8 +254,9 @@ function AcademicHistory({
             </div>
           ))}
 
-          <button
+          <Button
             type='button'
+            variant='ghost'
             onClick={() =>
               append({
                 institution: '',
@@ -266,46 +265,36 @@ function AcademicHistory({
                 endDate: '',
               })
             }
-            className='text-mainGreen flex items-center font-medium hover:text-green-700'
+            className='text-mainGreen hover:text-green-700'
           >
             <span className='bg-mainGreen mr-2 flex h-6 w-6 items-center justify-center rounded-full text-lg text-white'>
               +
             </span>
             Add Another Institution
-          </button>
+          </Button>
         </div>
 
         {/* Navigation */}
         <div className='mt-6 flex justify-between'>
-          <button
+          <Button
+            type='button'
+            variant='outline'
             onClick={handleBack}
-            disabled={isLoading}
-            className={`rounded border px-4 py-2 ${
-              step === 1
-                ? 'bg-gray-200 text-gray-400'
-                : 'bg-white hover:bg-gray-50'
-            }`}
+            disabled={isLoading || step === 1}
           >
             Back
-          </button>
-          <button
+          </Button>
+          <Button
             type='submit'
             disabled={
               isLoading ||
-              (step !== lastCompletedStep && // ✅ If not the lastCompletedStep, apply form validity/dirty checks
-                (isFormEmpty
-                  ? !isDirty // Update: Only enable when form has changed
-                  : !isValid)) // Next: Only enable when form is valid
+              (step !== lastCompletedStep &&
+                (isFormEmpty ? !isDirty : !isValid))
             }
-            className={`bg-mainGreen rounded px-4 py-2 text-white hover:bg-blue-700 ${
-              (isLoading ||
-                (step !== lastCompletedStep &&
-                  (isFormEmpty ? !isDirty : !isValid))) &&
-              'cursor-not-allowed opacity-50'
-            }`}
+            className='bg-mainGreen hover:bg-blue-700'
           >
-            {'Next'}
-          </button>
+            Next
+          </Button>
         </div>
       </form>
     </Form>
