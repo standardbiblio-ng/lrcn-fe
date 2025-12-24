@@ -59,7 +59,16 @@ function AcademicHistory({
             endDate: record.endDate?.split('T')[0] || '',
           })),
         }
-      : { items: [] }
+      : {
+          items: [
+            {
+              institution: '',
+              qualification: '',
+              startDate: '',
+              endDate: '',
+            },
+          ],
+        }
 
   const form = useForm<z.infer<typeof academicHistorySubmitSchema>>({
     resolver: zodResolver(academicHistorySubmitSchema),
@@ -167,7 +176,7 @@ function AcademicHistory({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm font-medium text-gray-700'>
-                      Institution
+                      Institution <span className='text-red-500'>*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -187,12 +196,10 @@ function AcademicHistory({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm'>
-                      Qualification Obtained
+                      Qualification Obtained{' '}
+                      <span className='text-red-500'>*</span>
                     </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
                           <SelectValue placeholder='Select qualification' />
@@ -219,7 +226,7 @@ function AcademicHistory({
                   render={({ field }) => (
                     <FormItem className='flex-1'>
                       <FormLabel className='block text-sm'>
-                        Start Date
+                        Start Date <span className='text-red-500'>*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
@@ -238,7 +245,9 @@ function AcademicHistory({
                   name={`items.${index}.endDate`}
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel className='block text-sm'>End Date</FormLabel>
+                      <FormLabel className='block text-sm'>
+                        End Date <span className='text-red-500'>*</span>
+                      </FormLabel>
                       <FormControl>
                         <Input
                           type='date'

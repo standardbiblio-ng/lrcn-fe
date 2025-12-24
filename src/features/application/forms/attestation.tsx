@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import logo from '@/assets/images/LOGO.png'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { Button } from '@/components/ui/button'
-import { Form } from '@/components/ui/form'
+import { Form, FormField, FormItem, FormControl } from '@/components/ui/form'
 
 const usePostAttestation = createPostMutationHook({
   endpoint: '/applications',
@@ -36,7 +36,7 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
       agreed: attestationData?.agreed || false,
     },
   })
-  const { register } = form
+  const { watch } = form
 
   // Reset form when initialData changes (e.g., after page refresh)
   useEffect(() => {
@@ -66,6 +66,10 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
   }
 
   const alreadyAttested = !!attestationData?.agreed
+  const isAgreed = watch('agreed')
+
+  console.log(attestationData)
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 p-4'>
@@ -313,13 +317,22 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
 
         {/* === ATTESTATION CHECKBOX === */}
         <div className='mt-6 flex items-start space-x-3 border-t pt-4'>
-          <input
-            type='checkbox'
-            {...register('agreed', {
-              setValueAs: (value) => Boolean(value),
-            })}
-            id='agreed'
-            className='accent-mainGreen mt-1 h-5 w-5'
+          <FormField
+            control={form.control}
+            name='agreed'
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <input
+                    type='checkbox'
+                    checked={field.value}
+                    onChange={field.onChange}
+                    id='agreed'
+                    className='accent-mainGreen mt-1 h-5 w-5'
+                  />
+                </FormControl>
+              </FormItem>
+            )}
           />
           <label htmlFor='agreed' className='text-sm leading-6'>
             I hereby certify that the information provided above is true and
@@ -342,7 +355,7 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
             onClick={() => {
               if (alreadyAttested) handleNext()
             }}
-            disabled={isLoading || (!alreadyAttested && !form.watch('agreed'))}
+            disabled={isLoading || !isAgreed}
             className='bg-mainGreen hover:bg-green-700'
           >
             Next

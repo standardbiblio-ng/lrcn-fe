@@ -223,20 +223,6 @@ function Upload({
     }
   }
 
-  if (status === 'pending')
-    return (
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        Loading...
-      </div>
-    )
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -280,12 +266,9 @@ function Upload({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm'>
-                      Document type
+                      Document type <span className='text-red-500'>*</span>
                     </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
                           <SelectValue placeholder='Select document type' />
@@ -306,7 +289,9 @@ function Upload({
 
               {/* Document upload + preview */}
               <div>
-                <label className='mb-2 block text-sm'>Document</label>
+                <label className='mb-2 block text-sm'>
+                  Document <span className='text-red-500'>*</span>
+                </label>
                 <div
                   className={`bg-neutral2 relative mt-[12px] flex h-[150px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[12px] border lg:h-[200px]`}
                   style={{
@@ -379,7 +364,7 @@ function Upload({
           </Button>
           <Button
             type='submit'
-            disabled={isLoading || (step !== lastCompletedStep && !isValid)}
+            disabled={isLoading}
             className='bg-mainGreen hover:bg-blue-700'
           >
             Next

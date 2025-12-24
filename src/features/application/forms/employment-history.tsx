@@ -150,7 +150,7 @@ function EmploymentHistory({
               <FormItem>
                 {/* className='block text-sm' */}
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Employer
+                  Employer <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -171,7 +171,7 @@ function EmploymentHistory({
               <FormItem>
                 {/* className='block text-sm' */}
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Address
+                  Address <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -192,12 +192,9 @@ function EmploymentHistory({
               render={({ field }) => (
                 <FormItem className='flex-1'>
                   <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Status
+                    Status <span className='text-red-500'>*</span>
                   </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
                         <SelectValue placeholder='Select status' />
@@ -224,7 +221,7 @@ function EmploymentHistory({
               render={({ field }) => (
                 <FormItem className='flex-1'>
                   <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Start Date
+                    Start Date <span className='text-red-500'>*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -269,7 +266,7 @@ function EmploymentHistory({
                   <FormItem>
                     {/* className='block text-sm' */}
                     <FormLabel className='block text-sm'>
-                      Organisation Name
+                      Organisation Name <span className='text-red-500'>*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -290,7 +287,7 @@ function EmploymentHistory({
                   render={({ field }) => (
                     <FormItem className='flex-1'>
                       <FormLabel className='block text-sm'>
-                        Position Held
+                        Position Held <span className='text-red-500'>*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
