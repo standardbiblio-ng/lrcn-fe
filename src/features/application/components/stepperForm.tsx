@@ -11,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useGetMyApplication } from '@/api/hooks/useGetData'
 import { useStepperStore } from '@/stores/application-stepper-store'
+import { useAuthStore } from '@/stores/auth-store'
 import AcademicHistory from '../forms/academic-history'
 import Attestation from '../forms/attestation'
 import BioData from '../forms/bio-data'
@@ -76,6 +77,13 @@ export default function StepperForm() {
     useStepperStore()
   const totalSteps = steps.length
 
+  // Auth hook to get user role
+  const {
+    auth: { user },
+  } = useAuthStore()
+
+  console.log(user)
+
   // Fetch all application data once
   const { data: application } = useGetMyApplication()
 
@@ -108,9 +116,17 @@ export default function StepperForm() {
     markComplete,
   ])
 
+  // If user is 'member', allow skipping to payment
+  const canSkipToPayment = user?.role === 'member'
+
   const handleNext = () => {
     markComplete(step)
     next(totalSteps)
+  }
+
+  const handleSkipToPayment = () => {
+    setStep(8)
+    markComplete(8)
   }
 
   const handleBack = () => {
@@ -217,6 +233,14 @@ export default function StepperForm() {
     <div className='flex min-h-screen overflow-y-auto'>
       {/* Sidebar Steps */}
       <aside className='bg-background/50 w-1/3 border-r p-6'>
+        {canSkipToPayment && (
+          <button
+            className='mb-4 w-full rounded bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700'
+            onClick={handleSkipToPayment}
+          >
+            Skip to Payment
+          </button>
+        )}
         <ul className='space-y-4'>
           {steps.map((stepItem) => (
             <li

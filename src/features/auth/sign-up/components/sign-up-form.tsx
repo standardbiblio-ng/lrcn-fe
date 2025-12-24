@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -52,18 +53,21 @@ export function SignUpForm({
       password: '',
       confirmPassword: '',
       phoneNumber: '',
+      regNo: '',
     },
   })
 
   function onSubmit(data: z.infer<typeof registerUserRequestSchema>) {
-    // console.log('Submitting', { data })
+    console.log('Submitting', { data })
 
     setIsLoading(true)
     const formattedData = {
       email: data.email,
       password: data.password,
       phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
+      regNo: data.regNo,
     }
+
     // eslint-disable-next-line no-console
     // console.log('Submitting', { formattedData })
 
@@ -80,10 +84,14 @@ export function SignUpForm({
 
         toast.success(`Successful Registration! Please log in.`)
       },
-      onError: (error) => {
+      onError: (error: any) => {
         console.error('Registration error:', error)
         setIsLoading(false)
-        toast.error('Registration failed. Please try again.')
+        toast.error(
+          error.response.data.message ||
+            error.message ||
+            'Registration failed. Please try again.'
+        )
       },
     })
   }
@@ -104,6 +112,24 @@ export function SignUpForm({
               <FormControl>
                 <Input placeholder='name@example.com' {...field} />
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='regNo'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>LRCN Reg No.</FormLabel>
+              <FormControl>
+                <Input placeholder='123456' {...field} />
+              </FormControl>
+              <FormDescription>
+                If you are already a registered member, please enter your
+                registration number. This will help speed up your application
+                process.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}

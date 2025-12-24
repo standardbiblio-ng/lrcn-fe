@@ -87,8 +87,10 @@ export const registerUserRequestSchema = userRequestSchema
           message: 'Please enter a valid Nigerian mobile number',
         }
       ),
+    regNo: z.string().optional(),
     confirmPassword: z.string().min(1, 'Please confirm your password'),
   })
+
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match.",
     path: ['confirmPassword'],
@@ -109,4 +111,5 @@ export const registerUserApiSchema = userRequestSchema.extend({
   phoneNumber: z.string().regex(/^\+234\d{10}$/, {
     message: 'Phone number must be in format +2348012345678',
   }),
+  regNo: z.string().optional(),
 })
