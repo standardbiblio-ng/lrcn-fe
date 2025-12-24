@@ -116,17 +116,9 @@ export default function StepperForm() {
     markComplete,
   ])
 
-  // If user is 'member', allow skipping to payment
-  const canSkipToPayment = user?.role === 'member'
-
   const handleNext = () => {
     markComplete(step)
     next(totalSteps)
-  }
-
-  const handleSkipToPayment = () => {
-    setStep(8)
-    markComplete(8)
   }
 
   const handleBack = () => {
@@ -134,6 +126,7 @@ export default function StepperForm() {
   }
 
   const handleStepClick = (stepId: number) => {
+    // Allow navigation only if step is completed or is the next available step
     if (stepId <= maxStep) setStep(stepId)
   }
 
@@ -216,16 +209,29 @@ export default function StepperForm() {
           />
         )
       case 8:
-        return (
-          <Payment
-            // handleBack={handleBack}
+        // Only allow payment if all previous steps are completed
+        const allFormsCompleted =
+          bioData &&
+          academicHistory?.length > 0 &&
+          employmentHistory?.length > 0 &&
+          recommendations?.length > 0 &&
+          documents?.length > 0 &&
+          attestation
 
-            bioData={bioData}
-            // step={step}
-            // lastCompletedStep={maxStep}
-            // totalSteps={totalSteps}
-          />
-        )
+        if (!allFormsCompleted) {
+          return (
+            <div className='p-8 text-center'>
+              <h2 className='mb-4 text-xl font-semibold'>
+                Complete Required Forms
+              </h2>
+              <p className='text-gray-600'>
+                Please complete all previous steps before proceeding to payment.
+              </p>
+            </div>
+          )
+        }
+
+        return <Payment bioData={bioData} />
     }
   }
 
@@ -233,36 +239,44 @@ export default function StepperForm() {
     <div className='flex min-h-screen overflow-y-auto'>
       {/* Sidebar Steps */}
       <aside className='bg-background/50 w-1/3 border-r p-6'>
-        {canSkipToPayment && (
-          <button
-            className='mb-4 w-full rounded bg-blue-600 px-4 py-2 font-semibold text-white transition hover:bg-blue-700'
-            onClick={handleSkipToPayment}
-          >
-            Skip to Payment
-          </button>
-        )}
         <ul className='space-y-4'>
-          {steps.map((stepItem) => (
-            <li
-              key={stepItem.id}
-              onClick={() => handleStepClick(stepItem.id)}
-              className={`flex cursor-pointer flex-row justify-between space-x-2 rounded-lg p-3 ${
-                step === stepItem.id
-                  ? 'bg-blue-100 text-blue-700'
-                  : stepItem.id <= maxStep
-                    ? 'text-gray-700 hover:bg-gray-100'
-                    : 'cursor-not-allowed text-gray-400'
-              }`}
-            >
-              <div className='flex flex-col'>
-                <span className='font-bold'>{stepItem.title}</span>
-                <span className='text-xs'>{stepItem.description}</span>
-              </div>
-              <div className='flex size-10 items-center justify-center rounded-full bg-[#C1C1C1]'>
-                <stepItem.icon />
-              </div>
-            </li>
-          ))}
+          {steps.map((stepItem) => {
+            // For payment step, ensure all previous steps are completed
+            const isPaymentStep = stepItem.id === 8
+            const canAccessPayment = isPaymentStep
+              ? bioData &&
+                academicHistory?.length > 0 &&
+                employmentHistory?.length > 0 &&
+                recommendations?.length > 0 &&
+                documents?.length > 0 &&
+                attestation
+              : true
+
+            const isClickable =
+              stepItem.id <= maxStep && (!isPaymentStep || canAccessPayment)
+
+            return (
+              <li
+                key={stepItem.id}
+                onClick={() => isClickable && handleStepClick(stepItem.id)}
+                className={`flex cursor-pointer flex-row justify-between space-x-2 rounded-lg p-3 ${
+                  step === stepItem.id
+                    ? 'bg-blue-100 text-blue-700'
+                    : isClickable
+                      ? 'text-gray-700 hover:bg-gray-100'
+                      : 'cursor-not-allowed text-gray-400'
+                }`}
+              >
+                <div className='flex flex-col'>
+                  <span className='font-bold'>{stepItem.title}</span>
+                  <span className='text-xs'>{stepItem.description}</span>
+                </div>
+                <div className='flex size-10 items-center justify-center rounded-full bg-[#C1C1C1]'>
+                  <stepItem.icon />
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </aside>
 

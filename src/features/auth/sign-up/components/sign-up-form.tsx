@@ -108,7 +108,9 @@ export function SignUpForm({
           name='email'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>
+                Email <span className='text-red-500'>*</span>
+              </FormLabel>
               <FormControl>
                 <Input placeholder='name@example.com' {...field} />
               </FormControl>
@@ -139,7 +141,9 @@ export function SignUpForm({
           name='password'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>
+                Password <span className='text-red-500'>*</span>
+              </FormLabel>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
@@ -152,7 +156,9 @@ export function SignUpForm({
           name='confirmPassword'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirm Password</FormLabel>
+              <FormLabel>
+                Confirm Password <span className='text-red-500'>*</span>
+              </FormLabel>
               <FormControl>
                 <PasswordInput placeholder='********' {...field} />
               </FormControl>
@@ -166,7 +172,9 @@ export function SignUpForm({
           name='phoneNumber'
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone Number</FormLabel>
+              <FormLabel>
+                Phone Number <span className='text-red-500'>*</span>
+              </FormLabel>
               <FormControl>
                 <Input placeholder='07**********' {...field} />
               </FormControl>

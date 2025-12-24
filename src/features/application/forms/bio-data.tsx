@@ -108,6 +108,7 @@ function BioData({
     )
   // if (status === 'error') return <div>Could not load bio data.</div>;
 
+  console.log(initialData)
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -134,7 +135,7 @@ function BioData({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  First Name
+                  First Name <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -155,7 +156,7 @@ function BioData({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Last Name
+                  Last Name <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -217,7 +218,7 @@ function BioData({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Email
+                    Email <span className='text-red-500'>*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -237,7 +238,7 @@ function BioData({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Phone Number
+                    Phone Number <span className='text-red-500'>*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
@@ -259,7 +260,7 @@ function BioData({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Nationality
+                  Nationality <span className='text-red-500'>*</span>
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
@@ -290,7 +291,7 @@ function BioData({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm font-medium text-gray-700'>
-                      State
+                      State <span className='text-red-500'>*</span>
                     </FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -328,7 +329,7 @@ function BioData({
                   return (
                     <FormItem>
                       <FormLabel className='block text-sm font-medium text-gray-700'>
-                        LGA
+                        LGA <span className='text-red-500'>*</span>
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -372,7 +373,7 @@ function BioData({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm font-medium text-gray-700'>
-                      Date of Birth
+                      Date of Birth <span className='text-red-500'>*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -395,7 +396,7 @@ function BioData({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm font-medium text-gray-700'>
-                      Gender
+                      Gender <span className='text-red-500'>*</span>
                     </FormLabel>
                     <Select
                       onValueChange={field.onChange}

@@ -60,7 +60,16 @@ function Upload({
             fileUrl: doc.fileUrl || '',
           })),
         }
-      : { items: [] }
+      : {
+          items: [
+            {
+              name: '',
+              fileKey: '',
+              fileType: '',
+              uploadedAt: '',
+            },
+          ],
+        }
 
   const form = useForm<z.infer<typeof documentsSubmitSchema>>({
     resolver: zodResolver(documentsSubmitSchema),
@@ -82,18 +91,6 @@ function Upload({
       reset(formattedInitialData)
     }
   }, [initialData, reset])
-
-  // Ensure at least one field is visible by default
-  useEffect(() => {
-    if (fields.length === 0) {
-      append({
-        name: '',
-        fileKey: '',
-        fileType: '',
-        uploadedAt: '',
-      })
-    }
-  }, [fields.length, append])
 
   // Watch all docs for dynamic rendering
   const items = watch('items')
@@ -351,12 +348,12 @@ function Upload({
             </div>
           ))}
 
-          {/* <button
+          <button
             type='button'
             onClick={() =>
               append({
                 name: '',
-                fileUrl: '',
+                fileKey: '',
                 fileType: '',
                 uploadedAt: '',
               })
@@ -367,7 +364,7 @@ function Upload({
               +
             </span>
             Add Another Document
-          </button> */}
+          </button>
         </div>
 
         {/* Navigation */}
