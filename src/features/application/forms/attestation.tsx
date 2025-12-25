@@ -276,7 +276,7 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
         {/* === RECOMMENDATIONS === */}
         <section className='rounded-xl border p-4 shadow-sm'>
           <h3 className='text-mainGreen mb-3 text-lg font-semibold'>
-            Recommendation
+            Referees
           </h3>
           <table className='w-full border-collapse text-left'>
             <thead>

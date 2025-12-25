@@ -48,7 +48,7 @@ const steps = [
   },
   {
     id: 5,
-    title: 'Recommendations',
+    title: 'Referees',
     description: 'Upload your recommendations',
     icon: FileUp,
   },
