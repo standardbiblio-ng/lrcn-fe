@@ -3,7 +3,7 @@ import z from 'zod'
 import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { attestationSchema } from '@/schemas/application'
+import { attestationSchema, EmploymentHistoryItem } from '@/schemas/application'
 import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import logo from '@/assets/images/LOGO.png'
@@ -26,9 +26,16 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
   const attestationData = initialData?.attestation || {}
   const bioData = initialData?.bioData || {}
   const academicData = initialData?.academicHistory || []
-  const employmentData = initialData?.employmentHistory?.[0] || {}
-  const recommendationData = initialData?.recommendations?.[0] || {}
+  const employmentData = initialData?.employmentHistory || []
+  const recommendationData = initialData?.recommendations || []
   const uploadData = initialData?.documents || []
+
+  // Utility function to extract filename from fileKey (format: "693fdbb7a0f215cd54e3685f/filename.pdf")
+  const getFilenameFromKey = (fileKey: string): string => {
+    if (!fileKey) return 'No file'
+    const parts = fileKey.split('/')
+    return parts.length > 1 ? parts[parts.length - 1] : fileKey
+  }
 
   const form = useForm<z.infer<typeof attestationSchema>>({
     resolver: zodResolver(attestationSchema),
@@ -51,7 +58,6 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
   const onSubmit = (data: z.infer<typeof attestationSchema>) => {
     setIsLoading(true)
 
-    console.log('Submitting attestation:', data)
     attestationMutation.mutate({ attestation: data } as any, {
       onSuccess: () => {
         toast.success('Attestation recorded successfully!')
@@ -68,8 +74,6 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
 
   const alreadyAttested = !!attestationData?.agreed
   const isAgreed = watch('agreed')
-
-  console.log(attestationData)
 
   return (
     <Form {...form}>
@@ -210,58 +214,38 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
           </h3>
           <table className='w-full border-collapse text-left'>
             <tbody>
-              <tr className='border-b'>
-                <td className='w-1/2 font-medium'>Employer</td>
-                <td className='capitalize'>{employmentData?.employer}</td>
-              </tr>
-              <tr className='border-b'>
-                <td className='font-medium'>Address</td>
-                <td className='capitalize'>{employmentData?.address}</td>
-              </tr>
-              <tr className='border-b'>
-                <td className='font-medium'>Status</td>
-                <td>{employmentData?.status}</td>
-              </tr>
-              <tr className='border-b'>
-                <td className='font-medium'>Start Date</td>
-                <td>
-                  {employmentData?.startDate
-                    ? format(new Date(employmentData.startDate), 'yyyy-MM-dd')
-                    : 'N/A'}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <h4 className='text-mainGreen mt-4 mb-2 font-semibold'>
-            Work Experience
-          </h4>
-          <table className='w-full border-collapse text-left'>
-            <thead>
-              <tr className='border-b font-semibold'>
-                <th>Organization</th>
-                <th>Start Date</th>
-                <th>Position</th>
-              </tr>
-            </thead>
-            <tbody>
-              {employmentData?.workExperience?.map(
-                (item: any, index: number) => (
+              {employmentData?.map(
+                (each: EmploymentHistoryItem, index: number) => (
                   <React.Fragment key={index}>
                     <tr className='border-b'>
-                      <td className='capitalize'>{item.organisation}</td>
+                      <td className='w-1/2 font-medium'>Organisation</td>
+                      <td className='capitalize'>{each?.organisation}</td>
+                    </tr>
+                    <tr className='border-b'>
+                      <td className='font-medium'>Position Held</td>
+                      <td className='capitalize'>{each?.positionHeld}</td>
+                    </tr>
+                    <tr className='border-b'>
+                      <td className='font-medium'>Address</td>
+                      <td className='capitalize'>{each?.address}</td>
+                    </tr>
+                    <tr className='border-b'>
+                      <td className='font-medium'>Status</td>
+                      <td>{each?.status}</td>
+                    </tr>
+                    <tr className='border-b'>
+                      <td className='font-medium'>Start Date</td>
                       <td>
-                        {item.startDate
-                          ? format(new Date(item.startDate), 'yyyy-MM-dd')
+                        {each?.startDate
+                          ? format(new Date(each.startDate), 'yyyy-MM-dd')
                           : 'N/A'}
                       </td>
-                      <td className='capitalize'>{item.positionHeld}</td>
                     </tr>
 
                     {/* Add spacing between records */}
-                    {index < employmentData?.workExperience.length - 1 && (
+                    {index < employmentData.length - 1 && (
                       <tr>
-                        <td colSpan={3}>
+                        <td colSpan={2}>
                           <div className='my-3 border-b border-dashed border-gray-300'></div>
                         </td>
                       </tr>
@@ -279,19 +263,32 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
             Referees
           </h3>
           <table className='w-full border-collapse text-left'>
-            <thead>
-              <tr className='border-b font-semibold'>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Phone</th>
-              </tr>
-            </thead>
             <tbody>
-              <tr>
-                <td className='capitalize'>{recommendationData.name}</td>
-                <td>{recommendationData.email}</td>
-                <td>{recommendationData.phoneNumber}</td>
-              </tr>
+              {recommendationData?.map((referee: any, index: number) => (
+                <React.Fragment key={index}>
+                  <tr className='border-b'>
+                    <td className='w-1/2 font-medium'>Name</td>
+                    <td className='capitalize'>{referee.name}</td>
+                  </tr>
+                  <tr className='border-b'>
+                    <td className='font-medium'>Email</td>
+                    <td>{referee.email}</td>
+                  </tr>
+                  <tr>
+                    <td className='font-medium'>Phone</td>
+                    <td>{referee.phoneNumber}</td>
+                  </tr>
+
+                  {/* Add spacing between records */}
+                  {index < recommendationData.length - 1 && (
+                    <tr>
+                      <td colSpan={2}>
+                        <div className='my-3 border-b border-dashed border-gray-300'></div>
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
             </tbody>
           </table>
         </section>
@@ -310,8 +307,10 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
                     <td>{item.name}</td>
                   </tr>
                   <tr>
-                    <td className='font-medium'>File Upload</td>
-                    <td>{item.fileType}</td>
+                    <td className='font-medium'>File Name</td>
+                    <td className='break-all'>
+                      {getFilenameFromKey(item.fileKey)}
+                    </td>
                   </tr>
 
                   {/* Add spacing between records */}

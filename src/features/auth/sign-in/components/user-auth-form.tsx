@@ -47,8 +47,6 @@ export function UserAuthForm({
   const navigate = useNavigate()
   const { auth } = useAuthStore()
 
-  // console.log('Auth store state:', auth)
-
   const loginMutation = useLogin()
 
   const form = useForm<z.infer<typeof userRequestSchema>>({
@@ -60,8 +58,6 @@ export function UserAuthForm({
   })
 
   function onSubmit(data: z.infer<typeof userRequestSchema>) {
-    // console.log('Submitting', { data })
-
     setIsLoading(true)
 
     loginMutation.mutate(data, {

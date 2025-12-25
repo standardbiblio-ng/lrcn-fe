@@ -58,8 +58,6 @@ export function SignUpForm({
   })
 
   function onSubmit(data: z.infer<typeof registerUserRequestSchema>) {
-    console.log('Submitting', { data })
-
     setIsLoading(true)
     const formattedData = {
       email: data.email,
@@ -69,7 +67,6 @@ export function SignUpForm({
     }
 
     // eslint-disable-next-line no-console
-    // console.log('Submitting', { formattedData })
 
     // Validate against API schema (optional extra validation)
     const validatedApiData = registerUserApiSchema.parse(formattedData)

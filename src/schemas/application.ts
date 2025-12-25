@@ -106,7 +106,11 @@ export const employmentHistorySubmitSchema = z.object({
   items: z.array(employmentHistoryItemSchema),
 })
 
-export const recommendationSubmitSchema = recommendationSchema
+export const recommendationSubmitSchema = z.object({
+  items: z
+    .array(recommendationSchema)
+    .min(1, 'At least one referee is required'),
+})
 
 export const documentsSubmitSchema = z.object({
   items: z.array(documentSchema),

@@ -152,7 +152,6 @@ function BioData({
     )
   // if (status === 'error') return <div>Could not load bio data.</div>;
 
-  console.log(initialData)
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>

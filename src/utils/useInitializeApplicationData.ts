@@ -39,8 +39,6 @@ export function useInitializeApplicationData() {
   // Single query for entire application
   const { data: application } = useGetMyApplication()
 
-  console.log('Fetched application data: ', application)
-
   // Extract data from unified response
   const bio = application?.bioData
   const academic = application?.academicHistory
@@ -50,7 +48,6 @@ export function useInitializeApplicationData() {
   const attest = application?.attestation
 
   useEffect(() => {
-    // console.log('Initialize Application Data........')
     const forms: FormItem[] = []
 
     if (bio) {
@@ -58,7 +55,6 @@ export function useInitializeApplicationData() {
     }
 
     if (academic?.length > 0) {
-      // console.log('Formatting academic data: ', academic)
       const formattedData = {
         items: academic.map((record: any) => ({
           ...record,
@@ -123,7 +119,6 @@ export function useInitializeApplicationData() {
     }
 
     if (attest) {
-      // console.log('Attestation data found: ', attest)
       forms.push({
         data: attest,
         set: setAttestationData,
@@ -131,12 +126,10 @@ export function useInitializeApplicationData() {
         step: 7, // ✅ FIXED
       })
     }
-    // console.log('forms: ', forms)
     // Run all updates
     let anyFormProcessed = false
     forms.forEach((form) => {
       if (form.data) {
-        // console.log('Initializing data for form: ', form.data)
         form.set(form.data)
         form.mark()
         markComplete(form.step)
@@ -146,7 +139,6 @@ export function useInitializeApplicationData() {
     if (anyFormProcessed) {
       next()
     }
-    // console.log('Application Data Initialized.')
   }, [
     bio,
     academic,

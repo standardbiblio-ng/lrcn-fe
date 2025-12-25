@@ -1,5 +1,5 @@
-import { isAxiosError } from 'axios'
 import { z, ZodError } from 'zod'
+import { isAxiosError } from 'axios'
 
 /**
  * Create a URL with query parameters and route parameters
@@ -15,11 +15,11 @@ import { z, ZodError } from 'zod'
 export function createUrl(
   base: string,
   queryParams?: Record<string, string | number | undefined>,
-  routeParams?: Record<string, string | number | undefined>,
+  routeParams?: Record<string, string | number | undefined>
 ) {
   const url = Object.entries(routeParams ?? {}).reduce(
     (acc, [key, value]) => acc.replaceAll(`:${key}`, String(value)),
-    base,
+    base
   )
 
   if (!queryParams) return url
@@ -44,7 +44,7 @@ export function createUrl(
 export function getQueryKey(
   queryKey: [string] | [string, Record<string, string | number | undefined>],
   route: Record<string, string | number | undefined> = {},
-  query: Record<string, string | number | undefined> = {},
+  query: Record<string, string | number | undefined> = {}
 ) {
   const [mainKey, otherKeys = {}] = queryKey
   return [mainKey, { ...otherKeys, ...route, ...query }]
@@ -66,7 +66,7 @@ export function handleRequestError(error: unknown) {
     console.error(error.format())
   }
 
-  console.log(error)
+  console.error(error)
   throw error
 }
 

@@ -82,8 +82,6 @@ export default function StepperForm() {
     auth: { user },
   } = useAuthStore()
 
-  console.log(user)
-
   // Fetch all application data once
   const { data: application } = useGetMyApplication()
 

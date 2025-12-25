@@ -93,7 +93,6 @@ export function createGetQueryHook<
       // const { auth } = useAuthStore()
       // Get token WITHOUT using a hook
       const token = useAuthStore.getState().auth?.accessToken
-      // console.log('Using token:', token)
 
       // Include the token in the headers if required
       const headers = requiresAuth ? { Authorization: `Bearer ${token}` } : {}
@@ -101,7 +100,6 @@ export function createGetQueryHook<
       return axiosInstance
         .get<ApiResponse<unknown>>(url, { headers })
         .then((response) => {
-          // console.log('GET Response:', response.data)
           return responseSchema.parse(response.data)
         })
         .catch((error: unknown) => {

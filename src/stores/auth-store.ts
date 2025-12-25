@@ -39,7 +39,6 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>()((set) => {
-  // console.log('Initializing auth store')
   // Initialize from cache
   const initialToken = authCache.getToken() || ''
   const initialRefreshToken = authCache.getRefreshToken()
