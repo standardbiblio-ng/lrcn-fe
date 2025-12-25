@@ -49,7 +49,7 @@ const steps = [
   {
     id: 5,
     title: 'Referees',
-    description: 'Upload your recommendations',
+    description: 'Add Referees',
     icon: FileUp,
   },
   {
