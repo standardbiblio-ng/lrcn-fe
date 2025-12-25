@@ -1,5 +1,14 @@
 import { create } from 'zustand'
-import { authCache } from '@/api/config/query-client'
+import { authCache, queryClient } from '@/api/config/query-client'
+import { useAcademicHistoryStore } from './academic-history-store'
+import { useStepperStore } from './application-stepper-store'
+import { useAttestationStore } from './attestation-store'
+// Import all application stores to reset them on logout
+import { useBioDataStore } from './bio-data-store'
+import { useEmploymentHistoryStore } from './employment-history-store'
+import { usePaymentStore } from './payment-store'
+import { useRecommendationStore } from './recommendation-store'
+import { useUploadDocumentStore } from './upload-store'
 
 // import { authCache } from './auth-cache' // Import your authCache
 
@@ -123,6 +132,9 @@ export const useAuthStore = create<AuthState>()((set) => {
         set((state) => {
           authCache.clearAuth()
 
+          // Clear React Query cache to prevent previous user's data from showing
+          queryClient.clear()
+
           // Clear all persisted application data stores to prevent data leakage between users
           localStorage.removeItem('bio-data-storage')
           localStorage.removeItem('academic-history-storage')
@@ -131,7 +143,17 @@ export const useAuthStore = create<AuthState>()((set) => {
           localStorage.removeItem('uploaded-document-storage')
           localStorage.removeItem('attestation-storage')
           localStorage.removeItem('payment-storage')
-          localStorage.removeItem('application-stepper-storage')
+          localStorage.removeItem('stepper-storage')
+
+          // Reset all application stores in memory
+          useBioDataStore.getState().reset()
+          useAcademicHistoryStore.getState().reset()
+          useEmploymentHistoryStore.getState().reset()
+          useRecommendationStore.getState().reset()
+          useUploadDocumentStore.getState().reset()
+          useAttestationStore.getState().reset()
+          usePaymentStore.getState().reset()
+          useStepperStore.getState().reset()
 
           return {
             ...state,
@@ -163,6 +185,9 @@ export const useAuthStore = create<AuthState>()((set) => {
         set((state) => {
           authCache.clearAuth()
 
+          // Clear React Query cache to prevent previous user's data from showing
+          queryClient.clear()
+
           // Clear all persisted application data stores to prevent data leakage between users
           localStorage.removeItem('bio-data-storage')
           localStorage.removeItem('academic-history-storage')
@@ -171,7 +196,17 @@ export const useAuthStore = create<AuthState>()((set) => {
           localStorage.removeItem('uploaded-document-storage')
           localStorage.removeItem('attestation-storage')
           localStorage.removeItem('payment-storage')
-          localStorage.removeItem('application-stepper-storage')
+          localStorage.removeItem('stepper-storage')
+
+          // Reset all application stores in memory
+          useBioDataStore.getState().reset()
+          useAcademicHistoryStore.getState().reset()
+          useEmploymentHistoryStore.getState().reset()
+          useRecommendationStore.getState().reset()
+          useUploadDocumentStore.getState().reset()
+          useAttestationStore.getState().reset()
+          usePaymentStore.getState().reset()
+          useStepperStore.getState().reset()
 
           return {
             ...state,

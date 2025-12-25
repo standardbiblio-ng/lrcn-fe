@@ -55,6 +55,7 @@ function BioData({
           ...initialData,
           email: user?.email || initialData.email || '',
           phoneNumber: user?.phoneNumber || initialData.phoneNumber || '',
+          nationality: 'Nigerian',
           dob: initialData.dob
             ? new Date(initialData.dob).toISOString().split('T')[0]
             : '',
@@ -62,6 +63,7 @@ function BioData({
       : {
           email: user?.email || '',
           phoneNumber: user?.phoneNumber || '',
+          nationality: 'Nigerian',
         },
   })
 
