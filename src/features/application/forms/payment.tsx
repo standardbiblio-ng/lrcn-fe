@@ -2,6 +2,7 @@ import { useState } from 'react'
 import z from 'zod'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
+import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { ConfirmApplicationDialog } from '../components/success-appl-dialog'
 
@@ -30,13 +31,19 @@ const useInitiatePayment = createPostMutationHook({
 function Payment({ bioData }: { bioData: any }) {
   const [open, setOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const {
+    auth: { user },
+  } = useAuthStore()
 
   const initiatePaymentMutation = useInitiatePayment()
 
   const onOpenChange = (value: boolean) => setOpen(value)
 
   const handlePayment = async () => {
-    if (!bioData?.email || !bioData?.firstName || !bioData?.lastName) {
+    if (
+      user?.role === 'applicant' &&
+      (!bioData?.email || !bioData?.firstName || !bioData?.lastName)
+    ) {
       toast.error(
         'Bio data is incomplete. Please complete your bio data first.'
       )
@@ -108,7 +115,7 @@ function Payment({ bioData }: { bioData: any }) {
       <Button
         className='bg-mainGreen hover:bg-blue-700'
         onClick={handlePayment}
-        disabled={isLoading || !bioData?.email}
+        disabled={isLoading || !(bioData?.email || user?.email)}
       >
         {isLoading ? 'Processing...' : 'Pay Now'}
       </Button>

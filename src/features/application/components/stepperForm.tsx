@@ -126,8 +126,14 @@ export default function StepperForm() {
   }
 
   const handleStepClick = (stepId: number) => {
+    // Check if user is registered member
+    const isRegisteredMember = user?.role === 'member'
+
     // Allow navigation only if step is completed or is the next available step
-    if (stepId <= maxStep) setStep(stepId)
+    // For registered members, allow direct access to payment step
+    if (stepId <= maxStep || (isRegisteredMember && stepId === 8)) {
+      setStep(stepId)
+    }
   }
 
   // Example content renderer for each step
@@ -209,7 +215,10 @@ export default function StepperForm() {
           />
         )
       case 8:
-        // Only allow payment if all previous steps are completed
+        // Check if user is already a registered member
+        const isRegisteredMember = user?.role === 'member'
+
+        // Only allow payment if user is registered member OR all previous steps are completed
         const allFormsCompleted =
           bioData &&
           academicHistory?.length > 0 &&
@@ -218,7 +227,7 @@ export default function StepperForm() {
           documents?.length > 0 &&
           attestation
 
-        if (!allFormsCompleted) {
+        if (!isRegisteredMember && !allFormsCompleted) {
           return (
             <div className='p-8 text-center'>
               <h2 className='mb-4 text-xl font-semibold'>
@@ -239,17 +248,55 @@ export default function StepperForm() {
     <div className='flex min-h-screen overflow-y-auto'>
       {/* Sidebar Steps */}
       <aside className='bg-background/50 w-1/3 border-r p-6'>
+        {/* Member Skip Notice */}
+        {user?.role === 'member' && (
+          <div className='mb-6 rounded-lg border border-green-200 bg-green-50 p-4'>
+            <div className='mb-2 flex items-center'>
+              <div className='flex-shrink-0'>
+                <svg
+                  className='h-5 w-5 text-green-400'
+                  viewBox='0 0 20 20'
+                  fill='currentColor'
+                >
+                  <path
+                    fillRule='evenodd'
+                    d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+                    clipRule='evenodd'
+                  />
+                </svg>
+              </div>
+              <div className='ml-3'>
+                <h3 className='text-sm font-medium text-green-800'>
+                  Registered Member
+                </h3>
+                <div className='mt-1 text-sm text-green-700'>
+                  <p>
+                    As a registered member, you can skip the application process
+                    and go directly to{' '}
+                    <span className='font-semibold'>Payment</span> to complete
+                    your registration renewal.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         <ul className='space-y-4'>
           {steps.map((stepItem) => {
-            // For payment step, ensure all previous steps are completed
+            // Check if user is already a registered member
+            const isRegisteredMember = user?.role === 'member'
+
+            // For payment step, ensure all previous steps are completed OR user is registered member
             const isPaymentStep = stepItem.id === 8
             const canAccessPayment = isPaymentStep
-              ? bioData &&
-                academicHistory?.length > 0 &&
-                employmentHistory?.length > 0 &&
-                recommendations?.length > 0 &&
-                documents?.length > 0 &&
-                attestation
+              ? isRegisteredMember ||
+                (bioData &&
+                  academicHistory?.length > 0 &&
+                  employmentHistory?.length > 0 &&
+                  recommendations?.length > 0 &&
+                  documents?.length > 0 &&
+                  attestation)
               : true
 
             const isClickable =

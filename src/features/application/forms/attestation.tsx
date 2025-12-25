@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import z from 'zod'
+import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { attestationSchema } from '@/schemas/application'
@@ -148,7 +149,11 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
 
               <tr className='border-b'>
                 <td className='font-medium'>Date of Birth</td>
-                <td>{bioData?.dob}</td>
+                <td>
+                  {bioData?.dob
+                    ? format(new Date(bioData.dob), 'yyyy-MM-dd')
+                    : 'N/A'}
+                </td>
               </tr>
               <tr>
                 <td className='font-medium'>Gender</td>
@@ -219,7 +224,11 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
               </tr>
               <tr className='border-b'>
                 <td className='font-medium'>Start Date</td>
-                <td>{employmentData?.startDate}</td>
+                <td>
+                  {employmentData?.startDate
+                    ? format(new Date(employmentData.startDate), 'yyyy-MM-dd')
+                    : 'N/A'}
+                </td>
               </tr>
             </tbody>
           </table>
@@ -241,7 +250,11 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
                   <React.Fragment key={index}>
                     <tr className='border-b'>
                       <td className='capitalize'>{item.organisation}</td>
-                      <td>{item.startDate}</td>
+                      <td>
+                        {item.startDate
+                          ? format(new Date(item.startDate), 'yyyy-MM-dd')
+                          : 'N/A'}
+                      </td>
                       <td className='capitalize'>{item.positionHeld}</td>
                     </tr>
 
