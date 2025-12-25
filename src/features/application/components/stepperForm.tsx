@@ -298,9 +298,13 @@ export default function StepperForm() {
               : true
 
             const isClickable =
-              stepItem.id <= maxStep && (!isPaymentStep || canAccessPayment)
+              stepItem.id <= maxStep || (isPaymentStep && canAccessPayment)
 
             const isCompleted = stepItem.id <= maxStep && stepItem.id !== step
+
+            // Special styling for payment step when accessible to members
+            const isPaymentAccessibleToMember =
+              isPaymentStep && isRegisteredMember && stepItem.id !== step
 
             return (
               <li
@@ -311,9 +315,11 @@ export default function StepperForm() {
                     ? 'bg-blue-100 text-blue-700'
                     : isCompleted
                       ? 'text-green-600 hover:bg-green-50'
-                      : isClickable
-                        ? 'text-gray-700 hover:bg-gray-100'
-                        : 'cursor-not-allowed text-gray-400'
+                      : isPaymentAccessibleToMember
+                        ? 'text-green-600 hover:bg-green-50'
+                        : isClickable
+                          ? 'text-gray-700 hover:bg-gray-100'
+                          : 'cursor-not-allowed text-gray-400'
                 }`}
               >
                 <div className='flex flex-col'>
