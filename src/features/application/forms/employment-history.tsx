@@ -42,28 +42,27 @@ function EmploymentHistory({
 
   const registerEmploymentHistoryMutation = useCreateEmploymentHistory()
 
-  // Format initialData - employment history comes as array, we use first item
-  const formattedInitialData =
-    initialData?.length > 0
-      ? {
-          employer: initialData[0].employer || '',
-          address: initialData[0].address || '',
-          status: initialData[0].status || '',
-          startDate: initialData[0].startDate?.split('T')[0] || '',
-          workExperience:
-            initialData[0].workExperience?.map((exp: any) => ({
-              organisation: exp.organisation || '',
-              positionHeld: exp.positionHeld || '',
-              startDate: exp.startDate?.split('T')[0] || '',
-            })) || [],
-        }
-      : {
-          employer: '',
-          address: '',
-          status: '',
-          startDate: '',
-          workExperience: [],
-        }
+  // Format initialData - employment history comes as array
+  const formattedInitialData = {
+    items:
+      initialData?.length > 0
+        ? initialData.map((item: any) => ({
+            address: item.address || '',
+            status: item.status || '',
+            startDate: item.startDate?.split('T')[0] || '',
+            organisation: item.organisation || '',
+            positionHeld: item.positionHeld || '',
+          }))
+        : [
+            {
+              address: '',
+              status: '',
+              startDate: '',
+              organisation: '',
+              positionHeld: '',
+            },
+          ],
+  }
 
   const form = useForm<z.infer<typeof employmentHistorySubmitSchema>>({
     resolver: zodResolver(employmentHistorySubmitSchema),
@@ -75,17 +74,26 @@ function EmploymentHistory({
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
-    name: 'workExperience',
+    name: 'items',
   })
 
   // Reset form when initialData changes (e.g., after page refresh)
   useEffect(() => {
     if (initialData?.length > 0) {
-      form.reset(formattedInitialData)
+      const updatedData = {
+        items: initialData.map((item: any) => ({
+          address: item.address || '',
+          status: item.status || '',
+          startDate: item.startDate?.split('T')[0] || '',
+          organisation: item.organisation || '',
+          positionHeld: item.positionHeld || '',
+        })),
+      }
+      form.reset(updatedData)
     }
   }, [initialData])
 
-  const isFormEmpty = formattedInitialData.employer ? true : false
+  const isFormEmpty = formattedInitialData.items[0]?.organisation ? true : false
 
   function onSubmit(data: z.infer<typeof employmentHistorySubmitSchema>) {
     setIsLoading(true)
@@ -98,7 +106,7 @@ function EmploymentHistory({
     }
 
     registerEmploymentHistoryMutation.mutate(
-      { employmentHistory: [data] },
+      { employmentHistory: data.items },
       {
         onSuccess: () => {
           setIsLoading(false)
@@ -143,112 +151,13 @@ function EmploymentHistory({
             Please fill out all fields.
           </h4>
 
-          <FormField
-            control={form.control}
-            name='employer'
-            render={({ field }) => (
-              <FormItem>
-                {/* className='block text-sm' */}
-                <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Employer
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Name of the employer'
-                    {...field}
-                    className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='address'
-            render={({ field }) => (
-              <FormItem>
-                {/* className='block text-sm' */}
-                <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Address
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Address of the employer'
-                    {...field}
-                    className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className='flex space-x-4'>
-            <FormField
-              control={form.control}
-              name='status'
-              render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Status
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
-                        <SelectValue placeholder='Select status' />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value='full_time'>Full Time</SelectItem>
-                      <SelectItem value='part_time'>Part Time</SelectItem>
-                      <SelectItem value='contract'>Contract</SelectItem>
-                      <SelectItem value='self_employed'>
-                        Self Employed
-                      </SelectItem>
-                      <SelectItem value='unemployed'>Unemployed</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name='startDate'
-              render={({ field }) => (
-                <FormItem className='flex-1'>
-                  <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Start Date
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type='date'
-                      {...field}
-                      className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          {/* Work Experience Section */}
-          <p className='font-montserrat text-base font-bold'>Work Experience</p>
-
           {fields.map((item, index) => (
             <div
               key={item.id}
               className='bg-background space-y-4 rounded-lg border border-gray-200 p-4'
             >
               <div className='flex items-center justify-between'>
-                <p className='text-sm font-semibold'>Experience {index + 1}</p>
+                <p className='text-sm font-semibold'>Employment {index + 1}</p>
                 {fields.length > 1 && (
                   <Button
                     type='button'
@@ -264,12 +173,11 @@ function EmploymentHistory({
 
               <FormField
                 control={form.control}
-                name={`workExperience.${index}.organisation`}
+                name={`items.${index}.organisation`}
                 render={({ field }) => (
                   <FormItem>
-                    {/* className='block text-sm' */}
-                    <FormLabel className='block text-sm'>
-                      Organisation Name
+                    <FormLabel className='block text-sm font-medium text-gray-700'>
+                      Organisation Name <span className='text-red-500'>*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
@@ -283,22 +191,74 @@ function EmploymentHistory({
                 )}
               />
 
+              <FormField
+                control={form.control}
+                name={`items.${index}.positionHeld`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='block text-sm font-medium text-gray-700'>
+                      Position Held <span className='text-red-500'>*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Position'
+                        {...field}
+                        className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name={`items.${index}.address`}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className='block text-sm font-medium text-gray-700'>
+                      Address <span className='text-red-500'>*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder='Address of the organization'
+                        {...field}
+                        className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <div className='flex space-x-4'>
                 <FormField
                   control={form.control}
-                  name={`workExperience.${index}.positionHeld`}
+                  name={`items.${index}.status`}
                   render={({ field }) => (
                     <FormItem className='flex-1'>
-                      <FormLabel className='block text-sm'>
-                        Position Held
+                      <FormLabel className='block text-sm font-medium text-gray-700'>
+                        Status <span className='text-red-500'>*</span>
                       </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder='Position'
-                          {...field}
-                          className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
-                        />
-                      </FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        value={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
+                            <SelectValue placeholder='Select status' />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value='full_time'>Full Time</SelectItem>
+                          <SelectItem value='part_time'>Part Time</SelectItem>
+                          <SelectItem value='contract'>Contract</SelectItem>
+                          <SelectItem value='self_employed'>
+                            Self Employed
+                          </SelectItem>
+                          <SelectItem value='unemployed'>Unemployed</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -306,17 +266,17 @@ function EmploymentHistory({
 
                 <FormField
                   control={form.control}
-                  name={`workExperience.${index}.startDate`}
+                  name={`items.${index}.startDate`}
                   render={({ field }) => (
                     <FormItem className='flex-1'>
                       <FormLabel className='block text-sm font-medium text-gray-700'>
-                        Start Date
+                        Start Date <span className='text-red-500'>*</span>
                       </FormLabel>
                       <FormControl>
                         <Input
                           type='date'
                           {...field}
-                          className='bg-neutral2 mt-[12px] w-full flex-1 rounded-[12px] border px-2 py-2'
+                          className='bg-neutral2 mt-[12px] w-full rounded-[12px] border px-2 py-2'
                         />
                       </FormControl>
                       <FormMessage />
@@ -331,14 +291,20 @@ function EmploymentHistory({
             type='button'
             variant='ghost'
             onClick={() =>
-              append({ organisation: '', positionHeld: '', startDate: '' })
+              append({
+                organisation: '',
+                positionHeld: '',
+                address: '',
+                status: '',
+                startDate: '',
+              })
             }
             className='text-mainGreen hover:text-green-700'
           >
             <span className='bg-mainGreen mr-2 flex h-6 w-6 items-center justify-center rounded-full text-lg text-white'>
               +
             </span>
-            Add Another Experience
+            Add Another Employment
           </Button>
         </div>
 

@@ -7,6 +7,7 @@ import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import nigeriaData from '@/assets/statesAndLGA/nigeria-state-and-lgas.json'
 import { createPostMutationHook } from '@/api/hooks/usePost'
+import { useAuthStore } from '@/stores/auth-store'
 import { formatNigerianPhoneNumberWithCode } from '@/utils/phoneFormatter'
 import { Button } from '@/components/ui/button'
 import {
@@ -41,23 +42,68 @@ function BioData({
   initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const {
+    auth: { user },
+  } = useAuthStore()
 
   const registerBioDataMutation = useCreateBioData()
-
   const form = useForm<z.infer<typeof bioDataSchema>>({
     resolver: zodResolver(bioDataSchema),
     mode: 'onChange',
-    defaultValues: initialData || {},
+    defaultValues: initialData
+      ? {
+          ...initialData,
+          email: user?.email || initialData.email || '',
+          phoneNumber: user?.phoneNumber || initialData.phoneNumber || '',
+          nationality: 'Nigerian',
+          dob: initialData.dob
+            ? new Date(initialData.dob).toISOString().split('T')[0]
+            : '',
+        }
+      : {
+          email: user?.email || '',
+          phoneNumber: user?.phoneNumber || '',
+          nationality: 'Nigerian',
+        },
   })
 
   const { isValid, isDirty } = form.formState
 
-  // Reset form when initialData changes (e.g., after page refresh)
+  // Reset form when initialData or user changes
   useEffect(() => {
-    if (initialData) {
-      form.reset(initialData)
+    const formattedData = {
+      ...(initialData || {}),
+      email: user?.email || initialData?.email || '',
+      phoneNumber: user?.phoneNumber || initialData?.phoneNumber || '',
+      dob: initialData?.dob
+        ? new Date(initialData.dob).toISOString().split('T')[0]
+        : '',
     }
-  }, [initialData])
+    form.reset(formattedData)
+  }, [initialData, user?.email, user?.phoneNumber, form])
+
+  // Watch for state changes and validate LGA
+  useEffect(() => {
+    const subscription = form.watch((values, { name }) => {
+      if (name === 'state' || (name === undefined && values.state)) {
+        const currentState = values.state
+        const currentLga = values.lga
+
+        if (currentState && currentLga) {
+          const stateData = nigeriaData.find(
+            (item) => item.state === currentState
+          )
+          const isValidLga = stateData?.lgas?.includes(currentLga)
+
+          if (!isValidLga) {
+            form.setValue('lga', '', { shouldDirty: true })
+          }
+        }
+      }
+    })
+
+    return () => subscription.unsubscribe()
+  }, [form])
 
   function onSubmit(data: z.infer<typeof bioDataSchema>) {
     setIsLoading(true)
@@ -134,7 +180,7 @@ function BioData({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  First Name
+                  First Name <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -155,7 +201,7 @@ function BioData({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Last Name
+                  Last Name <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
@@ -217,13 +263,14 @@ function BioData({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Email
+                    Email <span className='text-red-500'>*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Enter email'
                       {...field}
                       className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />
@@ -237,13 +284,14 @@ function BioData({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel className='block text-sm font-medium text-gray-700'>
-                    Phone Number
+                    Phone Number <span className='text-red-500'>*</span>
                   </FormLabel>
                   <FormControl>
                     <Input
                       placeholder='Enter phone number'
                       {...field}
                       className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />
@@ -259,11 +307,12 @@ function BioData({
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Nationality
+                  Nationality <span className='text-red-500'>*</span>
                 </FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  value={'Nigerian'}
+                  disabled
                 >
                   <FormControl>
                     <SelectTrigger className='mt-2 w-full rounded-[12px]'>
@@ -272,8 +321,6 @@ function BioData({
                   </FormControl>
                   <SelectContent>
                     <SelectItem value='Nigerian'>Nigerian</SelectItem>
-                    <SelectItem value='American'>American</SelectItem>
-                    <SelectItem value='British'>British</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -290,12 +337,9 @@ function BioData({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm font-medium text-gray-700'>
-                      State
+                      State <span className='text-red-500'>*</span>
                     </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className='mt-2 w-full rounded-[12px]'>
                           <SelectValue placeholder='Select State' />
@@ -321,19 +365,21 @@ function BioData({
                 control={form.control}
                 name='lga'
                 render={({ field }) => {
-                  const selectedState = form.watch('state')
+                  const formValues = form.watch()
+                  const selectedState = formValues.state
                   const lgaList =
                     nigeriaData.find((item) => item.state === selectedState)
                       ?.lgas || []
                   return (
                     <FormItem>
                       <FormLabel className='block text-sm font-medium text-gray-700'>
-                        LGA
+                        LGA <span className='text-red-500'>*</span>
                       </FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                         disabled={!selectedState}
+                        key={selectedState} // Force re-render when state changes
                       >
                         <FormControl>
                           <SelectTrigger className='mt-2 w-full rounded-[12px]'>
@@ -372,12 +418,17 @@ function BioData({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm font-medium text-gray-700'>
-                      Date of Birth
+                      Date of Birth <span className='text-red-500'>*</span>
                     </FormLabel>
                     <FormControl>
                       <Input
                         type='date'
                         {...field}
+                        value={
+                          field.value
+                            ? new Date(field.value).toISOString().split('T')[0]
+                            : ''
+                        }
                         className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
                       />
                     </FormControl>
@@ -395,12 +446,9 @@ function BioData({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm font-medium text-gray-700'>
-                      Gender
+                      Gender <span className='text-red-500'>*</span>
                     </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className='mt-2 w-full rounded-[12px]'>
                           <SelectValue placeholder='Select Gender' />

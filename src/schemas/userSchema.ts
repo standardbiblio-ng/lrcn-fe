@@ -4,15 +4,17 @@ export const userSchema = z.object({
   id: z.string(),
   email: z.string().email(),
   role: z.string(),
+  phoneNumber: z.string().optional(),
 })
 
 export const userRequestSchema = z.object({
-  email: z.email({
-    error: (iss) => (iss.input === '' ? 'Please enter your email' : undefined),
-  }),
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address'),
   password: z
     .string()
-    .min(1, 'Please enter your password')
+    .min(1, 'Password is required')
     .min(7, 'Password must be at least 7 characters long'),
 })
 
@@ -30,6 +32,7 @@ export const registerUserRequestSchema = userRequestSchema
   .extend({
     phoneNumber: z
       .string()
+      .min(1, 'Phone number is required')
       .regex(/^\d+$/, {
         message: 'Phone number must contain only digits (0-9)',
       })
@@ -87,8 +90,10 @@ export const registerUserRequestSchema = userRequestSchema
           message: 'Please enter a valid Nigerian mobile number',
         }
       ),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
+    regNo: z.string().optional(),
+    confirmPassword: z.string().min(1, 'Confirm password is required'),
   })
+
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match.",
     path: ['confirmPassword'],
@@ -109,4 +114,5 @@ export const registerUserApiSchema = userRequestSchema.extend({
   phoneNumber: z.string().regex(/^\+234\d{10}$/, {
     message: 'Phone number must be in format +2348012345678',
   }),
+  regNo: z.string().optional(),
 })

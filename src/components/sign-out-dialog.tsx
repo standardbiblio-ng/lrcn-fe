@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAcademicHistoryStore } from '@/stores/academic-history-store'
+import { useStepperStore } from '@/stores/application-stepper-store'
 import { useAttestationStore } from '@/stores/attestation-store'
 import { useAuthStore } from '@/stores/auth-store'
 import { useBioDataStore } from '@/stores/bio-data-store'
@@ -23,6 +24,7 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
   const { reset: resetRecommendationData } = useRecommendationStore()
   const { reset: resetUploadData } = useUploadDocumentStore()
   const { reset: resetAttestationData } = useAttestationStore()
+  const { reset: resetStepper } = useStepperStore()
 
   const handleSignOut = () => {
     auth.reset()
@@ -35,6 +37,7 @@ export function SignOutDialog({ open, onOpenChange }: SignOutDialogProps) {
     resetRecommendationData()
     resetUploadData()
     resetAttestationData()
+    resetStepper()
 
     // Preserve current location for redirect after sign-in
     const currentPath = location.pathname + location.search

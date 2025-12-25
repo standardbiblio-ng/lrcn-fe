@@ -32,8 +32,6 @@ export const useAcademicHistoryStore = create<AcademicHistoryStore>()(
       markInitialized: () => set({ initialized: true }),
       setFormData: (data) =>
         set((state) => {
-          // console.log('Updating academic history store with data:', data)
-
           const updated = {
             items:
               data?.items?.map((item) => ({

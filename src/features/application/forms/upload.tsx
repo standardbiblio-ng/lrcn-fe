@@ -32,13 +32,7 @@ const useUpdateDocument = createPostMutationHook({
   requiresAuth: true,
 })
 
-function Upload({
-  handleBack,
-  handleNext,
-  step,
-  lastCompletedStep,
-  initialData,
-}: StepperProps) {
+function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [fileObjects, setFileObjects] = useState<{ [key: number]: File }>({})
   const [filePreviews, setFilePreviews] = useState<{ [key: number]: string }>(
@@ -60,7 +54,16 @@ function Upload({
             fileUrl: doc.fileUrl || '',
           })),
         }
-      : { items: [] }
+      : {
+          items: [
+            {
+              name: '',
+              fileKey: '',
+              fileType: '',
+              uploadedAt: '',
+            },
+          ],
+        }
 
   const form = useForm<z.infer<typeof documentsSubmitSchema>>({
     resolver: zodResolver(documentsSubmitSchema),
@@ -69,7 +72,7 @@ function Upload({
   })
 
   const { control, formState, setValue, watch, reset } = form
-  const { isValid, isDirty } = formState
+  const { isDirty } = formState
 
   const { fields, remove, append } = useFieldArray({
     control,
@@ -83,18 +86,6 @@ function Upload({
     }
   }, [initialData, reset])
 
-  // Ensure at least one field is visible by default
-  useEffect(() => {
-    if (fields.length === 0) {
-      append({
-        name: '',
-        fileKey: '',
-        fileType: '',
-        uploadedAt: '',
-      })
-    }
-  }, [fields.length, append])
-
   // Watch all docs for dynamic rendering
   const items = watch('items')
   const documentTypes = {
@@ -103,12 +94,25 @@ function Upload({
     3: 'NLA Certificate',
   }
 
+  // Utility function to extract filename from fileKey (format: "693fdbb7a0f215cd54e3685f/filename.pdf")
+  const getFilenameFromKey = (fileKey: string): string => {
+    if (!fileKey) return ''
+    const parts = fileKey.split('/')
+    return parts.length > 1 ? parts[parts.length - 1] : fileKey
+  }
+
   const handleFileChange = (
     index: number,
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const file = e.target.files?.[0]
     if (file) {
+      // Validate file type is PDF
+      if (file.type !== 'application/pdf') {
+        toast.error('Please upload a valid PDF file.')
+        return
+      }
+
       // Store the actual file object
       setFileObjects((prev) => ({ ...prev, [index]: file }))
 
@@ -123,29 +127,6 @@ function Upload({
         shouldDirty: true,
       })
     }
-  }
-
-  // Remove specific file
-  const removeFile = (index: number) => {
-    // Clean up preview URL
-    if (filePreviews[index]) {
-      URL.revokeObjectURL(filePreviews[index])
-    }
-
-    // Remove from state
-    setFileObjects((prev) => {
-      const updated = { ...prev }
-      delete updated[index]
-      return updated
-    })
-    setFilePreviews((prev) => {
-      const updated = { ...prev }
-      delete updated[index]
-      return updated
-    })
-
-    setValue(`items.${index}.fileKey`, '', { shouldDirty: true })
-    setValue(`items.${index}.fileType`, '', { shouldDirty: true })
   }
 
   const uploadFile = async (file: File) => {
@@ -226,20 +207,6 @@ function Upload({
     }
   }
 
-  if (status === 'pending')
-    return (
-      <div
-        style={{
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        Loading...
-      </div>
-    )
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -251,7 +218,7 @@ function Upload({
             Upload Documents
           </h2>
           <h4 className='font-montserrat text-md text-active font-normal'>
-            Please upload valid and required documents.
+            Please upload valid PDF documents.
           </h4>
 
           {/* {items.map((doc, index) => ( */}
@@ -283,12 +250,9 @@ function Upload({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm'>
-                      Document type
+                      Document type <span className='text-red-500'>*</span>
                     </FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
                           <SelectValue placeholder='Select document type' />
@@ -309,54 +273,53 @@ function Upload({
 
               {/* Document upload + preview */}
               <div>
-                <label className='mb-2 block text-sm'>Document</label>
-                <div
-                  className={`bg-neutral2 relative mt-[12px] flex h-[150px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[12px] border lg:h-[200px]`}
-                  style={{
-                    backgroundImage: filePreviews[index]
-                      ? `url(${filePreviews[index]})`
-                      : items[index]?.fileUrl
-                        ? `url(${items[index].fileUrl})`
-                        : 'none',
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                  }}
-                >
+                <label className='mb-2 block text-sm'>
+                  Document <span className='text-red-500'>*</span>
+                </label>
+                <div className='bg-background relative mt-[12px] flex h-[70px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-[12px] border text-white transition-colors hover:bg-black'>
                   {!filePreviews[index] && !items[index]?.fileUrl && (
-                    <span className='text-sm text-gray-500'>
-                      Click to upload document
-                    </span>
+                    <div className='flex flex-col items-center justify-center p-4 text-center'>
+                      <span className='text-sm text-gray-500'>
+                        Click to upload PDF
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Show PDF info when file is selected */}
+                  {(filePreviews[index] || items[index]?.fileUrl) && (
+                    <div className='flex w-full items-center justify-between p-4'>
+                      <div className='flex items-center space-x-3'>
+                        <div className='min-w-0 flex-1'>
+                          <div className='truncate text-sm font-medium text-white'>
+                            {fileObjects[index]?.name ||
+                              getFilenameFromKey(items[index]?.fileKey || '') ||
+                              'PDF Document'}
+                          </div>
+                          <div className='text-xs text-white/40'>
+                            PDF document - Click to change document
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   )}
 
                   <input
                     type='file'
-                    accept='image/*,.pdf'
+                    accept='.pdf'
                     onChange={(e) => handleFileChange(index, e)}
                     className='absolute inset-0 cursor-pointer opacity-0'
                   />
-
-                  {(filePreviews[index] || items[index]?.fileUrl) && (
-                    <Button
-                      onClick={() => removeFile(index)}
-                      type='button'
-                      size='sm'
-                      variant='secondary'
-                      className='absolute top-2 right-2 bg-black/50 text-xs text-white hover:bg-black/70'
-                    >
-                      Remove
-                    </Button>
-                  )}
                 </div>
               </div>
             </div>
           ))}
 
-          {/* <button
+          <button
             type='button'
             onClick={() =>
               append({
                 name: '',
-                fileUrl: '',
+                fileKey: '',
                 fileType: '',
                 uploadedAt: '',
               })
@@ -367,7 +330,7 @@ function Upload({
               +
             </span>
             Add Another Document
-          </button> */}
+          </button>
         </div>
 
         {/* Navigation */}
@@ -382,7 +345,7 @@ function Upload({
           </Button>
           <Button
             type='submit'
-            disabled={isLoading || (step !== lastCompletedStep && !isValid)}
+            disabled={isLoading}
             className='bg-mainGreen hover:bg-blue-700'
           >
             Next

@@ -43,7 +43,7 @@ axiosInstance.interceptors.response.use(
 
     // For 401 errors, try to refresh the token
     if (error.response?.status === 401) {
-      console.log('401 error encountered, attempting to refresh token...')
+      console.error('401 error encountered, attempting to refresh token...')
 
       const authStore = useAuthStore.getState().auth
       const { refreshToken, expiresAt } = authStore
@@ -52,19 +52,19 @@ axiosInstance.interceptors.response.use(
       const isExpired = isTokenExpired(expiresAt)
 
       if (!isExpired) {
-        console.log('Access token not expired, skipping refresh.')
+        console.error('Access token not expired, skipping refresh.')
         return Promise.reject(error) // Token might be invalid for another reason
       }
 
       if (!refreshToken) {
-        console.log('No refresh token available, logging out...')
+        console.error('No refresh token available, logging out...')
         authCache.clearAuth()
         authStore.logout()
         return Promise.reject(error)
       }
 
       try {
-        console.log('Attempting to refresh token...')
+        console.error('Attempting to refresh token...')
 
         // Mark request as retried to prevent loops
         originalRequest._retry = true

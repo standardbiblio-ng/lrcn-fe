@@ -69,7 +69,6 @@ export function createPutMutationHook<
         )
       }
       const token = useAuthStore.getState().auth?.accessToken
-      // console.log('Using token:', token)
 
       // Include the token in the headers if required
       const headers = requiresAuth ? { Authorization: `Bearer ${token}` } : {}
@@ -79,7 +78,6 @@ export function createPutMutationHook<
       return axiosInstance
         .put(url, validatedData, { headers })
         .then((response: { data: unknown }) => {
-          console.log('Raw response:', response)
           return responseSchema.parse(response.data)
         })
         .catch((error: unknown) => {
