@@ -310,15 +310,15 @@ export default function StepperForm() {
               <li
                 key={stepItem.id}
                 onClick={() => isClickable && handleStepClick(stepItem.id)}
-                className={`flex cursor-pointer flex-row justify-between space-x-2 rounded-lg p-3 ${
+                className={`flex flex-row justify-between space-x-2 rounded-lg p-3 ${
                   step === stepItem.id
-                    ? 'bg-blue-100 text-blue-700'
+                    ? 'cursor-pointer bg-blue-100 text-blue-700'
                     : isCompleted
-                      ? 'text-green-600 hover:bg-green-50'
+                      ? 'cursor-pointer text-green-600 hover:bg-green-50'
                       : isPaymentAccessibleToMember
-                        ? 'text-green-600 hover:bg-green-50'
+                        ? 'cursor-pointer text-green-600 hover:bg-green-50'
                         : isClickable
-                          ? 'text-gray-700 hover:bg-gray-100'
+                          ? 'cursor-pointer text-gray-700 hover:bg-gray-100'
                           : 'cursor-not-allowed text-gray-400'
                 }`}
               >
