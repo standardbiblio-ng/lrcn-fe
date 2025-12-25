@@ -32,13 +32,7 @@ const useUpdateDocument = createPostMutationHook({
   requiresAuth: true,
 })
 
-function Upload({
-  handleBack,
-  handleNext,
-  step,
-  lastCompletedStep,
-  initialData,
-}: StepperProps) {
+function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [fileObjects, setFileObjects] = useState<{ [key: number]: File }>({})
   const [filePreviews, setFilePreviews] = useState<{ [key: number]: string }>(
@@ -78,7 +72,7 @@ function Upload({
   })
 
   const { control, formState, setValue, watch, reset } = form
-  const { isValid, isDirty } = formState
+  const { isDirty } = formState
 
   const { fields, remove, append } = useFieldArray({
     control,

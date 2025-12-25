@@ -6,10 +6,6 @@ import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
 import { ConfirmApplicationDialog } from '../components/success-appl-dialog'
 
-// Generate unique transaction ID
-const generateTransactionId = () =>
-  String(Math.floor(Math.random() * 1_101_233))
-
 // Declare global RmPaymentEngine
 declare global {
   interface Window {
