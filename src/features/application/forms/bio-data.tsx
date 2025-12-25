@@ -7,6 +7,7 @@ import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import nigeriaData from '@/assets/statesAndLGA/nigeria-state-and-lgas.json'
 import { createPostMutationHook } from '@/api/hooks/usePost'
+import { useAuthStore } from '@/stores/auth-store'
 import { formatNigerianPhoneNumberWithCode } from '@/utils/phoneFormatter'
 import { Button } from '@/components/ui/button'
 import {
@@ -41,36 +42,43 @@ function BioData({
   initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const {
+    auth: { user },
+  } = useAuthStore()
 
   const registerBioDataMutation = useCreateBioData()
-
   const form = useForm<z.infer<typeof bioDataSchema>>({
     resolver: zodResolver(bioDataSchema),
     mode: 'onChange',
     defaultValues: initialData
       ? {
           ...initialData,
+          email: user?.email || initialData.email || '',
+          phoneNumber: user?.phoneNumber || initialData.phoneNumber || '',
           dob: initialData.dob
             ? new Date(initialData.dob).toISOString().split('T')[0]
             : '',
         }
-      : {},
+      : {
+          email: user?.email || '',
+          phoneNumber: user?.phoneNumber || '',
+        },
   })
 
   const { isValid, isDirty } = form.formState
 
-  // Reset form when initialData changes (e.g., after page refresh)
+  // Reset form when initialData or user changes
   useEffect(() => {
-    if (initialData) {
-      const formattedData = {
-        ...initialData,
-        dob: initialData.dob
-          ? new Date(initialData.dob).toISOString().split('T')[0]
-          : '',
-      }
-      form.reset(formattedData)
+    const formattedData = {
+      ...(initialData || {}),
+      email: user?.email || initialData?.email || '',
+      phoneNumber: user?.phoneNumber || initialData?.phoneNumber || '',
+      dob: initialData?.dob
+        ? new Date(initialData.dob).toISOString().split('T')[0]
+        : '',
     }
-  }, [initialData, form])
+    form.reset(formattedData)
+  }, [initialData, user?.email, user?.phoneNumber, form])
 
   // Watch for state changes and validate LGA
   useEffect(() => {
@@ -261,6 +269,7 @@ function BioData({
                       placeholder='Enter email'
                       {...field}
                       className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />
@@ -281,6 +290,7 @@ function BioData({
                       placeholder='Enter phone number'
                       {...field}
                       className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2'
+                      disabled
                     />
                   </FormControl>
                   <FormMessage />
@@ -298,7 +308,11 @@ function BioData({
                 <FormLabel className='block text-sm font-medium text-gray-700'>
                   Nationality <span className='text-red-500'>*</span>
                 </FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={field.onChange}
+                  value={'Nigerian'}
+                  disabled
+                >
                   <FormControl>
                     <SelectTrigger className='mt-2 w-full rounded-[12px]'>
                       <SelectValue placeholder='Select Nationality' />
@@ -306,8 +320,6 @@ function BioData({
                   </FormControl>
                   <SelectContent>
                     <SelectItem value='Nigerian'>Nigerian</SelectItem>
-                    <SelectItem value='American'>American</SelectItem>
-                    <SelectItem value='British'>British</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -352,7 +364,7 @@ function BioData({
                 control={form.control}
                 name='lga'
                 render={({ field }) => {
-                  const formValues = form.getValues()
+                  const formValues = form.watch()
                   const selectedState = formValues.state
                   const lgaList =
                     nigeriaData.find((item) => item.state === selectedState)

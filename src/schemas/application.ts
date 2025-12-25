@@ -20,13 +20,13 @@ export const workExperienceItemSchema = z.object({
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
 })
 
-// Employment History
+// Employment History (New flat structure)
 export const employmentHistoryItemSchema = z.object({
-  employer: z.string().min(1, 'Employer is required'),
   address: z.string().min(1, 'Address is required'),
   status: z.string().min(1, 'Status is required'),
   startDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Invalid date format'),
-  workExperience: z.array(workExperienceItemSchema),
+  organisation: z.string().min(1, 'Organisation is required'),
+  positionHeld: z.string().min(1, 'Position is required'),
 })
 
 // Bio Data
@@ -102,7 +102,9 @@ export const academicHistorySubmitSchema = z.object({
   items: z.array(academicHistoryItemSchema),
 })
 
-export const employmentHistorySubmitSchema = employmentHistoryItemSchema
+export const employmentHistorySubmitSchema = z.object({
+  items: z.array(employmentHistoryItemSchema),
+})
 
 export const recommendationSubmitSchema = recommendationSchema
 
