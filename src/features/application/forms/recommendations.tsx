@@ -4,7 +4,6 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { recommendationSubmitSchema } from '@/schemas/application'
 import { StepperProps } from '@/types/stepper.type'
-import { Plus, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { Button } from '@/components/ui/button'
@@ -50,7 +49,7 @@ function Recommendations({
     defaultValues: formattedInitialData,
   })
 
-  const { control, handleSubmit, reset } = form
+  const { control, reset } = form
   const { fields, append, remove } = useFieldArray({
     control,
     name: 'items',
