@@ -122,6 +122,17 @@ export const useAuthStore = create<AuthState>()((set) => {
       logout: () =>
         set((state) => {
           authCache.clearAuth()
+
+          // Clear all persisted application data stores to prevent data leakage between users
+          localStorage.removeItem('bio-data-storage')
+          localStorage.removeItem('academic-history-storage')
+          localStorage.removeItem('employment-history-storage')
+          localStorage.removeItem('recommendation-storage')
+          localStorage.removeItem('uploaded-document-storage')
+          localStorage.removeItem('attestation-storage')
+          localStorage.removeItem('payment-storage')
+          localStorage.removeItem('application-stepper-storage')
+
           return {
             ...state,
             auth: {
@@ -151,6 +162,17 @@ export const useAuthStore = create<AuthState>()((set) => {
       reset: () =>
         set((state) => {
           authCache.clearAuth()
+
+          // Clear all persisted application data stores to prevent data leakage between users
+          localStorage.removeItem('bio-data-storage')
+          localStorage.removeItem('academic-history-storage')
+          localStorage.removeItem('employment-history-storage')
+          localStorage.removeItem('recommendation-storage')
+          localStorage.removeItem('uploaded-document-storage')
+          localStorage.removeItem('attestation-storage')
+          localStorage.removeItem('payment-storage')
+          localStorage.removeItem('application-stepper-storage')
+
           return {
             ...state,
             auth: {

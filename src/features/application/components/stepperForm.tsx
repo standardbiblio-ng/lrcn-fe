@@ -300,6 +300,8 @@ export default function StepperForm() {
             const isClickable =
               stepItem.id <= maxStep && (!isPaymentStep || canAccessPayment)
 
+            const isCompleted = stepItem.id <= maxStep && stepItem.id !== step
+
             return (
               <li
                 key={stepItem.id}
@@ -307,9 +309,11 @@ export default function StepperForm() {
                 className={`flex cursor-pointer flex-row justify-between space-x-2 rounded-lg p-3 ${
                   step === stepItem.id
                     ? 'bg-blue-100 text-blue-700'
-                    : isClickable
-                      ? 'text-gray-700 hover:bg-gray-100'
-                      : 'cursor-not-allowed text-gray-400'
+                    : isCompleted
+                      ? 'text-green-600 hover:bg-green-50'
+                      : isClickable
+                        ? 'text-gray-700 hover:bg-gray-100'
+                        : 'cursor-not-allowed text-gray-400'
                 }`}
               >
                 <div className='flex flex-col'>
