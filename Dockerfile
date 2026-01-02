@@ -19,11 +19,11 @@ RUN pnpm run build
 # Production stage
 FROM nginx:alpine
 
-# Copy nginx config
-COPY nginx.conf /etc/nginx/nginx.conf
+# Copy custom nginx config
+COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Copy built files from builder stage
-COPY --from=builder /app/dist /app/dist
+# Copy built files to nginx html directory
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Expose port 80
 EXPOSE 80
