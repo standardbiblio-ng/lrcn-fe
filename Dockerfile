@@ -12,7 +12,14 @@ RUN npm install --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build the app
+# Set build-time environment variables
+ARG VITE_API_BASE_URL
+ARG VITE_REMITA_PUBLIC_KEY
+
+ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
+ENV VITE_REMITA_PUBLIC_KEY=${VITE_REMITA_PUBLIC_KEY}
+
+# Build the app (Vite will use the env vars above)
 RUN npm run build
 
 # Production stage
