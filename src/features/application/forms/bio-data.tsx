@@ -59,11 +59,17 @@ function BioData({
           dob: initialData.dob
             ? new Date(initialData.dob).toISOString().split('T')[0]
             : '',
+          // Pre-fill name from registered member if available
+          firstName: initialData.firstName || user?.otherName || '',
+          lastName: initialData.lastName || user?.surname || '',
         }
       : {
           email: user?.email || '',
           phoneNumber: user?.phoneNumber || '',
           nationality: 'Nigerian',
+          // Pre-fill name from registered member if available
+          firstName: user?.otherName || '',
+          lastName: user?.surname || '',
         },
   })
 
@@ -78,9 +84,12 @@ function BioData({
       dob: initialData?.dob
         ? new Date(initialData.dob).toISOString().split('T')[0]
         : '',
+      // Pre-fill name from registered member if available and not already set
+      firstName: initialData?.firstName || user?.otherName || '',
+      lastName: initialData?.lastName || user?.surname || '',
     }
     form.reset(formattedData)
-  }, [initialData, user?.email, user?.phoneNumber, form])
+  }, [initialData, user?.email, user?.phoneNumber, user?.otherName, user?.surname, form])
 
   // Watch for state changes and validate LGA
   useEffect(() => {
