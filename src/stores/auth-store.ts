@@ -18,6 +18,10 @@ interface AuthUser {
   role: string
   phoneNumber?: string
   isEmailVerified?: boolean
+  registeredMember?: {
+    lastName: string
+    otherNames: string
+  }
 }
 
 interface AuthState {
