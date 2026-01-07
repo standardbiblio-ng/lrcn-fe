@@ -31,9 +31,8 @@ export const employmentHistoryItemSchema = z.object({
 
 // Bio Data
 export const bioDataSchema = z.object({
-  firstName: z.string().min(2, 'First name is required').max(100),
+  otherNames: z.string().min(2, 'Other name(s) are required').max(100),
   lastName: z.string().min(2, 'Last name is required').max(100),
-  otherNames: z.string().optional(),
   previousNames: z.string().optional(),
   email: z.string().email('Invalid email address'),
   phoneNumber: z.string().min(10, 'Phone number is required'),
