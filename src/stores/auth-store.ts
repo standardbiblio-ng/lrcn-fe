@@ -21,7 +21,7 @@ interface AuthUser {
   registeredMember?: {
     lastName: string
     otherNames: string
-  }
+  } | null
 }
 
 interface AuthState {
