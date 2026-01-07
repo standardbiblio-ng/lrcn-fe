@@ -5,6 +5,13 @@ export const userSchema = z.object({
   email: z.string().email(),
   role: z.string(),
   phoneNumber: z.string().optional(),
+  registeredMember: z
+    .object({
+      otherNames: z.string(),
+      lastName: z.string(),
+    })
+    .nullable()
+    .optional(),
 })
 
 export const userRequestSchema = z.object({

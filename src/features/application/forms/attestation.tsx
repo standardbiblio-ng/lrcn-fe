@@ -105,10 +105,6 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
           <table className='w-full border-collapse text-left'>
             <tbody>
               <tr className='border-b'>
-                <td className='w-1/2 font-medium'>First Name</td>
-                <td className='capitalize'>{bioData?.firstName}</td>
-              </tr>
-              <tr className='border-b'>
                 <td className='font-medium'>Last Name</td>
                 <td className='capitalize'>{bioData?.lastName}</td>
               </tr>

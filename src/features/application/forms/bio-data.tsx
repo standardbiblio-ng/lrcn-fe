@@ -55,6 +55,10 @@ function BioData({
           ...initialData,
           email: user?.email || initialData.email || '',
           phoneNumber: user?.phoneNumber || initialData.phoneNumber || '',
+          lastName:
+            user?.registeredMember?.lastName || initialData.lastName || '',
+          otherNames:
+            user?.registeredMember?.otherNames || initialData.otherNames || '',
           nationality: 'Nigerian',
           dob: initialData.dob
             ? new Date(initialData.dob).toISOString().split('T')[0]
@@ -63,6 +67,8 @@ function BioData({
       : {
           email: user?.email || '',
           phoneNumber: user?.phoneNumber || '',
+          lastName: user?.registeredMember?.lastName ?? '',
+          otherNames: user?.registeredMember?.otherNames ?? '',
           nationality: 'Nigerian',
         },
   })
@@ -109,6 +115,8 @@ function BioData({
     setIsLoading(true)
     const formattedData = {
       ...data,
+      lastName: user?.registeredMember?.lastName || data.lastName,
+      otherNames: user?.registeredMember?.otherNames || data.otherNames,
       phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
     }
 
@@ -176,15 +184,16 @@ function BioData({
 
           <FormField
             control={form.control}
-            name='firstName'
+            name='otherNames'
             render={({ field }) => (
               <FormItem>
                 <FormLabel className='block text-sm font-medium text-gray-700'>
-                  First Name <span className='text-red-500'>*</span>
+                  Other Names <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <Input
-                    placeholder='Enter first name'
+                    disabled={user?.registeredMember?.otherNames ? true : false}
+                    placeholder='Enter other names'
                     {...field}
                     className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
                   />
@@ -205,27 +214,8 @@ function BioData({
                 </FormLabel>
                 <FormControl>
                   <Input
+                    disabled={user?.registeredMember?.lastName ? true : false}
                     placeholder='Enter last name'
-                    {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name='otherNames'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Other Names
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder='Enter other names'
                     {...field}
                     className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
                   />

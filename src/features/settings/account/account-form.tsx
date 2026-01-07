@@ -16,11 +16,11 @@ import {
 import { Input } from '@/components/ui/input'
 
 const accountFormSchema = z.object({
-  firstName: z
+  otherNames: z
     .string()
-    .min(1, 'Please enter your first name.')
-    .min(2, 'First name must be at least 2 characters.')
-    .max(30, 'First name must not be longer than 30 characters.'),
+    .min(1, 'Please enter your other names.')
+    .min(2, 'Other names must be at least 2 characters.')
+    .max(30, 'Other names must not be longer than 30 characters.'),
   lastName: z
     .string()
     .min(1, 'Please enter your last name.')
@@ -47,7 +47,7 @@ export function AccountForm() {
   const form = useForm<AccountFormValues>({
     resolver: zodResolver(accountFormSchema),
     defaultValues: {
-      firstName: bioData.firstName || '',
+      otherNames: bioData.otherNames || '',
       lastName: bioData.lastName || '',
       email: bioData.email || '',
       phoneNumber: formatNigerianPhoneNumberWithCode(bioData.phoneNumber) || '',
@@ -64,7 +64,7 @@ export function AccountForm() {
         <div className='grid grid-cols-1 gap-6 md:grid-cols-1'>
           <FormField
             control={form.control}
-            name='firstName'
+            name='otherNames'
             render={({ field }) => (
               <FormItem>
                 <FormLabel>First Name</FormLabel>
