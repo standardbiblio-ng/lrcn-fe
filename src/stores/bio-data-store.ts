@@ -7,15 +7,17 @@ import { formatNigerianPhoneNumberWithoutCode } from '@/utils/phoneFormatter'
 export type BioDataFormData = z.infer<typeof bioDataSchema>
 
 interface BioDataStore {
+  applicationStatus?: 'Draft' | 'Completed' | 'Submitted'
   formData: BioDataFormData
   setFormData: (data: Partial<BioDataFormData>) => void
+  setApplicationStatus:(status: 'Draft' | 'Completed' | 'Submitted') => void
   reset: () => void
   markInitialized: () => void
   initialized: boolean
 }
 
 const initialValues: BioDataFormData = {
-  firstName: '',
+  //firstName: '',
   lastName: '',
   otherNames: '',
   previousNames: '',
@@ -32,11 +34,15 @@ export const useBioDataStore = create<BioDataStore>()(
   persist(
     (set) => ({
       formData: initialValues,
+      applicationStatus: 'Draft',
       initialized: false,
       markInitialized: () => set({ initialized: true }),
       setFormData: (data) =>
         set((state) => {
           const updated = { ...state.formData, ...data }
+        
+          
+          
 
           // ✅ Safely format phone number if present
           if (data.phoneNumber !== undefined && data.phoneNumber !== null) {
@@ -52,10 +58,13 @@ export const useBioDataStore = create<BioDataStore>()(
 
           return { formData: updated }
         }),
+
+        setApplicationStatus: (status) => set(() => ({ applicationStatus: status })),
       reset: () => set({ formData: initialValues }),
     }),
     {
       name: 'bio-data-storage',
+      
     }
   )
 )

@@ -1,7 +1,7 @@
 import z from 'zod'
 
 export const bioDataSchema = z.object({
-  firstName: z.string().min(2).max(100),
+  //firstName: z.string().optional(),
   lastName: z.string().min(2).max(100),
   otherNames: z.string().optional(),
   previousNames: z.string().optional(),
