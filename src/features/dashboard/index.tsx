@@ -11,8 +11,10 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
+
 export function Dashboard() {
-  const { formData: bioData } = useBioDataStore()
+  const { formData: bioData,  applicationStatus } = useBioDataStore()
+  
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -42,13 +44,13 @@ export function Dashboard() {
                 <div className='flex flex-col justify-center px-10'>
                   <div>
                     <h1 className='text-2xl font-bold text-[#004B50]'>
-                      Hi,{' '}
+                      Hi, {' '}
                       {bioData
-                        ? bioData?.firstName?.charAt(0).toUpperCase() +
-                          bioData?.firstName?.slice(1) +
+                        ? bioData?.lastName?.charAt(0).toUpperCase() +
+                          bioData?.lastName?.slice(1) +
                           ' ' +
-                          bioData?.lastName?.charAt(0).toUpperCase() +
-                          bioData?.lastName?.slice(1)
+                          bioData?.otherNames?.charAt(0).toUpperCase() +
+                          bioData?.otherNames?.slice(1)
                         : null}
                     </h1>
                   </div>
@@ -88,13 +90,30 @@ export function Dashboard() {
 
                     <div className='flex flex-col items-center justify-center space-y-2'>
                       <p className='text-muted-foreground text-sm'>
-                        Take the first step to join LCRN
+                        {bioData ?  "Take the first step to join LCRN" : "View your Application"}
                       </p>
-                      <Link to='/application'>
+                        <Link to='/application/'>
                         <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
-                          Start here
+                         {applicationStatus === 'Draft' ? 'Start Here' : 'View Application'}
                         </button>
                       </Link>
+
+                      {/* {bioData.application === "Draft" || !bioData.applicationStatus ? (
+                        <Link to='/application/'>
+                        <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
+                         Start Here
+                        </button>
+                      </Link>
+                      ) :
+                      (
+                        <Link to='/application'>
+                        <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
+                          View Application
+                        </button>
+                      </Link>
+                      )
+                      } */}
+                      
                     </div>
                   </div>
                 </CardContent>
