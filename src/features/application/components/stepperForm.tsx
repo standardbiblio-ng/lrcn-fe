@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { USER_ROLES } from '@/types/user-roles'
 import {
   ScrollText,
   Fingerprint,
@@ -81,9 +82,11 @@ export default function StepperForm() {
   const {
     auth: { user },
   } = useAuthStore()
-  const isRegisteredMember = user?.role === "Member"
+  const isRegisteredMember = user?.role === USER_ROLES.MEMBER
 
-  const visibleSteps = isRegisteredMember ? steps.filter((step) => step.id !==8) : steps
+  const visibleSteps = isRegisteredMember
+    ? steps.filter((step) => step.id !== 8)
+    : steps
   const totalSteps = visibleSteps.length
 
   // Fetch all application data once
@@ -128,10 +131,10 @@ export default function StepperForm() {
   }
 
   const handleStepClick = (stepId: number) => {
-    if(stepId <= maxStep) {
+    if (stepId <= maxStep) {
       setStep(stepId)
     }
-    
+
     // Check if user is registered member
     //const isRegisteredMember = user?.role === 'member'
 
@@ -218,17 +221,14 @@ export default function StepperForm() {
               recommendations,
               documents,
             }}
-            
           />
         )
       case 8:
         if (isRegisteredMember) return null
-        return <Payment bioData={bioData}/>
-          
-        
+        return <Payment bioData={bioData} />
+
         // Check if user is already a registered member
         //const isRegisteredMember = user?.role === 'member'
-       
 
         // Only allow payment if user is registered member OR all previous steps are completed
         const allFormsCompleted =
@@ -255,7 +255,6 @@ export default function StepperForm() {
         return <Payment bioData={bioData} />
     }
   }
-  
 
   return (
     <div className='flex min-h-screen overflow-y-auto'>
@@ -286,7 +285,6 @@ export default function StepperForm() {
                   <p>
                     As a registered member, you can skip the application process
                     and go directly to{' '}
-                    
                   </p>
                 </div>
               </div>
@@ -295,7 +293,6 @@ export default function StepperForm() {
         )}
 
         <ul className='space-y-4'>
-          
           {visibleSteps.map((stepItem) => {
             const isClickable = stepItem.id <= maxStep
             const isCompleted = stepItem.id < step
@@ -335,9 +332,9 @@ export default function StepperForm() {
                       ? 'cursor-pointer text-green-600 hover:bg-green-50'
                       : /* isPaymentAccessibleToMember
                         ? 'cursor-pointer text-green-600 hover:bg-green-50' */
-                         isClickable
-                          ? 'cursor-pointer text-gray-700 hover:bg-gray-100'
-                          : 'cursor-not-allowed text-gray-400'
+                        isClickable
+                        ? 'cursor-pointer text-gray-700 hover:bg-gray-100'
+                        : 'cursor-not-allowed text-gray-400'
                 }`}
               >
                 <div className='flex flex-col'>
