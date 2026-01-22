@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import applyImg from '@/assets/images/Group.png'
 import cloud from '@/assets/images/dashboard-cloud.png'
 import { useGetMyApplication } from '@/api/hooks/useGetData'
+import { useAuthStore } from '@/stores/auth-store'
 import { useBioDataStore } from '@/stores/bio-data-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
@@ -13,9 +14,8 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 export function Dashboard() {
-  const { formData: bioData } = useBioDataStore()
   const { data: application } = useGetMyApplication()
-
+  const { auth } = useAuthStore()
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -46,13 +46,21 @@ export function Dashboard() {
                   <div>
                     <h1 className='text-2xl font-bold text-[#004B50]'>
                       Hi,{' '}
-                      {bioData
-                        ? bioData?.lastName?.charAt(0).toUpperCase() +
-                          bioData?.lastName?.slice(1) +
+                      {application?.bioData
+                        ? application?.bioData?.lastName
+                            ?.charAt(0)
+                            .toUpperCase() +
+                          application?.bioData?.lastName?.slice(1) +
                           ' ' +
-                          bioData?.otherNames?.charAt(0).toUpperCase() +
-                          bioData?.otherNames?.slice(1)
-                        : null}
+                          application?.bioData?.otherNames
+                            ?.charAt(0)
+                            .toUpperCase() +
+                          application?.bioData?.otherNames?.slice(1)
+                        : auth?.user?.registeredMember
+                          ? auth?.user.registeredMember?.otherNames +
+                            ' ' +
+                            auth?.user.registeredMember?.lastName
+                          : auth?.user?.email}
                     </h1>
                   </div>
                   <div>
