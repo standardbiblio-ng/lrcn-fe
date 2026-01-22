@@ -7,6 +7,7 @@ import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { Button } from '@/components/ui/button'
+import { useApplicationLock } from '@/utils/useApplicationLock'
 import {
   Form,
   FormControl,
@@ -32,6 +33,7 @@ function Recommendations({
   initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const {isLocked, isLockLoading} =  useApplicationLock()
 
   const registerRecommendationsMutation = useCreateRecommendations()
 
@@ -119,7 +121,8 @@ function Recommendations({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <p className='font-montserrat text-active font-normal italic'>
+        <fieldset disabled={isLocked || isLockLoading}>
+          <p className='font-montserrat text-active font-normal italic'>
           Step {step}
         </p>
         <div className='space-y-6'>
@@ -251,6 +254,7 @@ function Recommendations({
             Next
           </Button>
         </div>
+        </fieldset>
       </form>
     </Form>
   )

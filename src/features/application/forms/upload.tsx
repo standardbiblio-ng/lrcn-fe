@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { useAuthStore } from '@/stores/auth-store'
 import { Button } from '@/components/ui/button'
+import { useApplicationLock } from '@/utils/useApplicationLock'
 import {
   Form,
   FormControl,
@@ -36,6 +37,7 @@ const useUpdateDocument = createPostMutationHook({
 
 function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const {isLocked, isLockLoading} = useApplicationLock()
   const [fileObjects, setFileObjects] = useState<{ [key: number]: File }>({})
   const [filePreviews, setFilePreviews] = useState<{ [key: number]: string }>(
     {}
@@ -214,7 +216,8 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <p className='font-montserrat text-active font-normal italic'>
+        <fieldset disabled={isLocked || isLockLoading}>
+          <p className='font-montserrat text-active font-normal italic'>
           Step {step}
         </p>
         <div className='space-y-4'>
@@ -360,6 +363,7 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
             Next
           </Button>
         </div>
+        </fieldset>
       </form>
     </Form>
   )
