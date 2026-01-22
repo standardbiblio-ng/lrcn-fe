@@ -40,7 +40,7 @@ export function NavUser() {
                 className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
               >
                 <Avatar className='h-8 w-8 rounded-lg'>
-                  <AvatarImage src={profile.profilePicture ?? ''} />
+                  <AvatarImage src={profile?.profilePicture ?? ''} />
                   <AvatarFallback className='rounded-lg'>
                     {bioData?.otherNames
                       ? bioData?.otherNames?.charAt(0).toUpperCase() +
