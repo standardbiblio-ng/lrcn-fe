@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { USER_ROLES } from '@/types/user-roles'
 import {
   ScrollText,
   Fingerprint,
@@ -75,15 +76,16 @@ const steps = [
 export default function StepperForm() {
   const { step, maxStep, setStep, next, previous, markComplete } =
     useStepperStore()
-  //const totalSteps = steps.length
 
   // Auth hook to get user role
   const {
     auth: { user },
   } = useAuthStore()
-  const isRegisteredMember = user?.role === "Member"
+  const isRegisteredMember = user?.role === USER_ROLES.MEMBER
 
-  const visibleSteps = isRegisteredMember ? steps.filter((step) => step.id !==8) : steps
+  const visibleSteps = isRegisteredMember
+    ? steps.filter((step) => step.id !== 8)
+    : steps
   const totalSteps = visibleSteps.length
 
   // Fetch all application data once
@@ -128,18 +130,9 @@ export default function StepperForm() {
   }
 
   const handleStepClick = (stepId: number) => {
-    if(stepId <= maxStep) {
+    if (stepId <= maxStep) {
       setStep(stepId)
     }
-    
-    // Check if user is registered member
-    //const isRegisteredMember = user?.role === 'member'
-
-    // Allow navigation only if step is completed or is the next available step
-    // For registered members, allow direct access to payment step
-    /* if (stepId <= maxStep || (isRegisteredMember && stepId === 8)) {
-      setStep(stepId)
-    } */
   }
 
   // Example content renderer for each step
@@ -152,7 +145,6 @@ export default function StepperForm() {
             handleNext={handleNext}
             step={step}
             lastCompletedStep={maxStep}
-            // totalSteps={totalSteps}
           />
         )
       case 2:
@@ -218,44 +210,13 @@ export default function StepperForm() {
               recommendations,
               documents,
             }}
-            
           />
         )
       case 8:
         if (isRegisteredMember) return null
-        return <Payment bioData={bioData}/>
-          
-        
-        // Check if user is already a registered member
-        //const isRegisteredMember = user?.role === 'member'
-       
-
-        // Only allow payment if user is registered member OR all previous steps are completed
-        const allFormsCompleted =
-          bioData &&
-          academicHistory?.length > 0 &&
-          employmentHistory?.length > 0 &&
-          recommendations?.length > 0 &&
-          documents?.length > 0 &&
-          attestation
-
-        if (!isRegisteredMember && !allFormsCompleted) {
-          return (
-            <div className='p-8 text-center'>
-              <h2 className='mb-4 text-xl font-semibold'>
-                Complete Required Forms
-              </h2>
-              <p className='text-gray-600'>
-                Please complete all previous steps before proceeding to payment.
-              </p>
-            </div>
-          )
-        }
-
         return <Payment bioData={bioData} />
     }
   }
-  
 
   return (
     <div className='flex min-h-screen overflow-y-auto'>
@@ -284,9 +245,8 @@ export default function StepperForm() {
                 </h3>
                 <div className='mt-1 text-sm text-green-700'>
                   <p>
-                    As a registered member, you can skip the application process
-                    and go directly to{' '}
-                    
+                    As an existing registered member, you are not required to
+                    complete the application.
                   </p>
                 </div>
               </div>
@@ -295,34 +255,9 @@ export default function StepperForm() {
         )}
 
         <ul className='space-y-4'>
-          
           {visibleSteps.map((stepItem) => {
             const isClickable = stepItem.id <= maxStep
             const isCompleted = stepItem.id < step
-
-            // Check if user is already a registered member
-            //const isRegisteredMember = user?.role === 'member'
-
-            // For payment step, ensure all previous steps are completed OR user is registered member
-            /* const isPaymentStep = stepItem.id === 8
-            const canAccessPayment = isPaymentStep
-              ? isRegisteredMember ||
-                (bioData &&
-                  academicHistory?.length > 0 &&
-                  employmentHistory?.length > 0 &&
-                  recommendations?.length > 0 &&
-                  documents?.length > 0 &&
-                  attestation)
-              : true
-
-            const isClickable =
-              stepItem.id <= maxStep || (isPaymentStep && canAccessPayment)
-
-            const isCompleted = stepItem.id <= maxStep && stepItem.id !== step
-
-            // Special styling for payment step when accessible to members
-            const isPaymentAccessibleToMember =
-              isPaymentStep && isRegisteredMember && stepItem.id !== step */
 
             return (
               <li
@@ -333,11 +268,9 @@ export default function StepperForm() {
                     ? 'cursor-pointer bg-blue-100 text-blue-700'
                     : isCompleted
                       ? 'cursor-pointer text-green-600 hover:bg-green-50'
-                      : /* isPaymentAccessibleToMember
-                        ? 'cursor-pointer text-green-600 hover:bg-green-50' */
-                         isClickable
-                          ? 'cursor-pointer text-gray-700 hover:bg-gray-100'
-                          : 'cursor-not-allowed text-gray-400'
+                      : isClickable
+                        ? 'cursor-pointer text-gray-700 hover:bg-gray-100'
+                        : 'cursor-not-allowed text-gray-400'
                 }`}
               >
                 <div className='flex flex-col'>

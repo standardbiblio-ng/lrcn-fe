@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import applyImg from '@/assets/images/Group.png'
 import cloud from '@/assets/images/dashboard-cloud.png'
+import { useGetMyApplication } from '@/api/hooks/useGetData'
+import { useAuthStore } from '@/stores/auth-store'
 import { useBioDataStore } from '@/stores/bio-data-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
@@ -11,10 +13,9 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
-
 export function Dashboard() {
-  const { formData: bioData,  applicationStatus } = useBioDataStore()
-  
+  const { data: application } = useGetMyApplication()
+  const { auth } = useAuthStore()
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -44,14 +45,22 @@ export function Dashboard() {
                 <div className='flex flex-col justify-center px-10'>
                   <div>
                     <h1 className='text-2xl font-bold text-[#004B50]'>
-                      Hi, {' '}
-                      {bioData
-                        ? bioData?.lastName?.charAt(0).toUpperCase() +
-                          bioData?.lastName?.slice(1) +
+                      Hi,{' '}
+                      {application?.bioData
+                        ? application?.bioData?.lastName
+                            ?.charAt(0)
+                            .toUpperCase() +
+                          application?.bioData?.lastName?.slice(1) +
                           ' ' +
-                          bioData?.otherNames?.charAt(0).toUpperCase() +
-                          bioData?.otherNames?.slice(1)
-                        : null}
+                          application?.bioData?.otherNames
+                            ?.charAt(0)
+                            .toUpperCase() +
+                          application?.bioData?.otherNames?.slice(1)
+                        : auth?.user?.registeredMember
+                          ? auth?.user.registeredMember?.otherNames +
+                            ' ' +
+                            auth?.user.registeredMember?.lastName
+                          : auth?.user?.email}
                     </h1>
                   </div>
                   <div>
@@ -89,31 +98,22 @@ export function Dashboard() {
                     />
 
                     <div className='flex flex-col items-center justify-center space-y-2'>
-                      <p className='text-muted-foreground text-sm'>
-                        {bioData ?  "Take the first step to join LCRN" : "View your Application"}
+                      <p className='text-muted-foreground hidden text-sm'>
+                        {application?.status?.toLowerCase() === 'submitted'
+                          ? 'Your application has been submitted'
+                          : application?.bioData
+                            ? 'Continue your application'
+                            : 'Start your application'}
                       </p>
-                        <Link to='/application/'>
+                      <Link to='/application/'>
                         <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
-                         {applicationStatus === 'Draft' ? 'Start Here' : 'View Application'}
+                          {application?.status?.toLowerCase() === 'submitted'
+                            ? 'View Application'
+                            : application?.bioData
+                              ? 'Continue Application'
+                              : 'Start Application'}
                         </button>
                       </Link>
-
-                      {/* {bioData.application === "Draft" || !bioData.applicationStatus ? (
-                        <Link to='/application/'>
-                        <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
-                         Start Here
-                        </button>
-                      </Link>
-                      ) :
-                      (
-                        <Link to='/application'>
-                        <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
-                          View Application
-                        </button>
-                      </Link>
-                      )
-                      } */}
-                      
                     </div>
                   </div>
                 </CardContent>
