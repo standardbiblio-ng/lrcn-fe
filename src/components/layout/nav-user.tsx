@@ -1,4 +1,6 @@
+import { AvatarImage } from '@radix-ui/react-avatar'
 import { ChevronsUpDown, LogOut } from 'lucide-react'
+import { useGetUserProfile } from '@/api/hooks/useGetData'
 import { useAuthStore } from '@/stores/auth-store'
 import { useBioDataStore } from '@/stores/bio-data-store'
 import useDialogState from '@/hooks/use-dialog-state'
@@ -23,6 +25,7 @@ export function NavUser() {
   const { isMobile } = useSidebar()
   const [open, setOpen] = useDialogState()
   const { formData: bioData } = useBioDataStore()
+  const { data: profile } = useGetUserProfile()
   const { auth } = useAuthStore()
   const user = auth.user
 
@@ -37,6 +40,7 @@ export function NavUser() {
                 className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
               >
                 <Avatar className='h-8 w-8 rounded-lg'>
+                  <AvatarImage src={profile.profilePicture ?? ''} />
                   <AvatarFallback className='rounded-lg'>
                     {bioData?.otherNames
                       ? bioData?.otherNames?.charAt(0).toUpperCase() +
