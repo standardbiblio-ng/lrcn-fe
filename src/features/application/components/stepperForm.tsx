@@ -245,8 +245,8 @@ export default function StepperForm() {
                 </h3>
                 <div className='mt-1 text-sm text-green-700'>
                   <p>
-                    As a registered member, you can skip the application process
-                    and go directly to{' '}
+                    As an existing registered member, you are not required to
+                    complete the application.
                   </p>
                 </div>
               </div>

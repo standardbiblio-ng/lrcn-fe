@@ -10,7 +10,7 @@ interface BioDataStore {
   applicationStatus?: 'Draft' | 'Completed' | 'Submitted'
   formData: BioDataFormData
   setFormData: (data: Partial<BioDataFormData>) => void
-  setApplicationStatus:(status: 'Draft' | 'Completed' | 'Submitted') => void
+  setApplicationStatus: (status: 'Draft' | 'Completed' | 'Submitted') => void
   reset: () => void
   markInitialized: () => void
   initialized: boolean
@@ -40,9 +40,6 @@ export const useBioDataStore = create<BioDataStore>()(
       setFormData: (data) =>
         set((state) => {
           const updated = { ...state.formData, ...data }
-        
-          
-          
 
           // ✅ Safely format phone number if present
           if (data.phoneNumber !== undefined && data.phoneNumber !== null) {
@@ -59,12 +56,12 @@ export const useBioDataStore = create<BioDataStore>()(
           return { formData: updated }
         }),
 
-        setApplicationStatus: (status) => set(() => ({ applicationStatus: status })),
+      setApplicationStatus: (status) =>
+        set(() => ({ applicationStatus: status })),
       reset: () => set({ formData: initialValues }),
     }),
     {
       name: 'bio-data-storage',
-      
     }
   )
 )

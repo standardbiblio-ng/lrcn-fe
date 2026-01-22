@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import applyImg from '@/assets/images/Group.png'
 import cloud from '@/assets/images/dashboard-cloud.png'
+import { useGetMyApplication } from '@/api/hooks/useGetData'
 import { useBioDataStore } from '@/stores/bio-data-store'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent } from '@/components/ui/tabs'
@@ -12,7 +13,8 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 
 export function Dashboard() {
-  const { formData: bioData, applicationStatus } = useBioDataStore()
+  const { formData: bioData } = useBioDataStore()
+  const { data: application } = useGetMyApplication()
 
   return (
     <>
@@ -88,16 +90,20 @@ export function Dashboard() {
                     />
 
                     <div className='flex flex-col items-center justify-center space-y-2'>
-                      <p className='text-muted-foreground text-sm'>
-                        {bioData
-                          ? 'Take the first step to join LCRN'
-                          : 'View your Application'}
+                      <p className='text-muted-foreground hidden text-sm'>
+                        {application?.status?.toLowerCase() === 'submitted'
+                          ? 'Your application has been submitted'
+                          : application?.bioData
+                            ? 'Continue your application'
+                            : 'Start your application'}
                       </p>
                       <Link to='/application/'>
                         <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
-                          {applicationStatus?.toLowerCase() === 'draft'
-                            ? 'Start Here'
-                            : 'View Application'}
+                          {application?.status?.toLowerCase() === 'submitted'
+                            ? 'View Application'
+                            : application?.bioData
+                              ? 'Continue Application'
+                              : 'Start Application'}
                         </button>
                       </Link>
                     </div>
