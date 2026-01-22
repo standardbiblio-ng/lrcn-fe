@@ -10,6 +10,7 @@ import logo from '@/assets/images/LOGO.png'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { Button } from '@/components/ui/button'
 import { Form, FormField, FormItem, FormControl } from '@/components/ui/form'
+import  {useApplicationLock} from '@/utils/useApplicationLock'
 
 const usePostAttestation = createPostMutationHook({
   endpoint: '/applications',
@@ -19,6 +20,7 @@ const usePostAttestation = createPostMutationHook({
 })
 function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const {isLocked, isLoading:isLockLoading} = useApplicationLock()
 
   const attestationMutation = usePostAttestation()
 
@@ -78,7 +80,8 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 p-4'>
-        {/* === HEADER SECTION === */}
+        <fieldset>
+          {/* === HEADER SECTION === */}
         <div className='text-center'>
           <img
             src={logo}
@@ -369,6 +372,7 @@ function Attestation({ handleBack, handleNext, initialData }: StepperProps) {
             Next
           </Button>
         </div>
+        </fieldset>
       </form>
     </Form>
   )
