@@ -99,7 +99,6 @@ function EmploymentHistory({
     setIsLoading(true)
 
     if (isFormEmpty && !isDirty) {
-      // when i want to move to next step without changes
       setIsLoading(false)
       handleNext()
       return

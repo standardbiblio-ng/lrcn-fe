@@ -25,6 +25,8 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
+const REQUIRED_DOCS = ['BLS', 'NYSC']
+
 const useUpdateDocument = createPostMutationHook({
   endpoint: '/applications',
   requestSchema: z.any(),
@@ -55,14 +57,12 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
           })),
         }
       : {
-          items: [
-            {
-              name: '',
-              fileKey: '',
-              fileType: '',
-              uploadedAt: '',
-            },
-          ],
+          items: REQUIRED_DOCS.map((name) => ({
+            name,
+            fileKey: '',
+            fileType: '',
+            uploadedAt: '',
+          })),
         }
 
   const form = useForm<z.infer<typeof documentsSubmitSchema>>({
@@ -90,8 +90,10 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
   const items = watch('items')
   const documentTypes = {
     1: 'NYSC',
-    2: 'BLIS',
+    2: 'BLS',
     3: 'NLA Certificate',
+    4: 'MSc',
+    5: 'Others',
   }
 
   // Utility function to extract filename from fileKey (format: "693fdbb7a0f215cd54e3685f/filename.pdf")
@@ -157,7 +159,6 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
     setIsLoading(true)
 
     if (!isDirty) {
-      // when i want to move to next step without changes
       setIsLoading(false)
       handleNext()
       return
@@ -207,6 +208,9 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
     }
   }
 
+  const requiredDocsUploaded = items
+    ?.filter((item) => REQUIRED_DOCS.includes(item.name))
+    .every((item) => item.fileKey && item.fileKey !== '')
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -218,7 +222,8 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
             Upload Documents
           </h2>
           <h4 className='font-montserrat text-md text-active font-normal'>
-            Please upload valid PDF documents.
+            Please upload valid PDF documents, BLS and NYSC are compulsory
+            documents.
           </h4>
 
           {/* {items.map((doc, index) => ( */}
@@ -229,7 +234,7 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
             >
               <div className='flex items-center justify-between'>
                 <p className='text-sm font-semibold'>Document {index + 1}</p>
-                {items.length > 1 && (
+                {!REQUIRED_DOCS.includes(items[index]?.name) && (
                   <Button
                     type='button'
                     variant='ghost'
@@ -250,9 +255,13 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm'>
-                      Document type <span className='text-red-500'>*</span>
+                      Document type {REQUIRED_DOCS.includes(field.value) && '*'}
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={REQUIRED_DOCS.includes(field.value)}
+                    >
                       <FormControl>
                         <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
                           <SelectValue placeholder='Select document type' />
@@ -345,7 +354,7 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
           </Button>
           <Button
             type='submit'
-            disabled={isLoading}
+            disabled={isLoading || !requiredDocsUploaded}
             className='bg-mainGreen hover:bg-blue-700'
           >
             Next

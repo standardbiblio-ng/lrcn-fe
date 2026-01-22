@@ -8,6 +8,15 @@ export const uploadResquestSchema = z.array(
     uploadedAt: z.string().optional(),
   })
 )
+.min(2, "BLS qnd NYSC document are required")
+.refine((items) => {
+  const hasBLS = items.some((item) => item.name === 'BLS')
+  const hasNYSC = items.some((item) => item.name === 'NYSC')
+  return hasBLS && hasNYSC
+}, {
+  message: 'BLS and NYSC are compulsory document'
+} )
+
 
 export const uploadSchema = z.object({
   documents: uploadResquestSchema,

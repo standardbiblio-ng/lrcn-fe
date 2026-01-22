@@ -29,8 +29,8 @@ export function ProfileDropdown() {
             <Avatar className='h-8 w-8'>
               {/* <AvatarImage src='/avatars/01.png' alt='@shadcn' /> */}
               <AvatarFallback>
-                {bioData?.firstName
-                  ? bioData?.firstName?.charAt(0).toUpperCase() +
+                {bioData?.otherNames
+                  ? bioData?.otherNames?.charAt(0).toUpperCase() +
                     bioData?.lastName?.charAt(0).toUpperCase()
                   : user?.email?.charAt(0).toUpperCase()}
               </AvatarFallback>
@@ -40,9 +40,9 @@ export function ProfileDropdown() {
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              {bioData?.firstName && (
+              {bioData?.otherNames && (
                 <p className='text-sm leading-none font-medium'>
-                  {bioData?.firstName}
+                  {bioData?.otherNames}
                 </p>
               )}
               <p className='text-muted-foreground text-xs leading-none'>

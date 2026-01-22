@@ -55,7 +55,7 @@ function BioData({
           ...initialData,
           email: user?.email || initialData.email || '',
           phoneNumber: user?.phoneNumber || initialData.phoneNumber || '',
-          lastName:
+          surname:
             user?.registeredMember?.lastName || initialData.lastName || '',
           otherNames:
             user?.registeredMember?.otherNames || initialData.otherNames || '',
@@ -121,7 +121,6 @@ function BioData({
     }
 
     if (initialData && !isDirty) {
-      // when i want to move to next step without changes
       setIsLoading(false)
       handleNext()
       return
@@ -180,7 +179,28 @@ function BioData({
             </h4>
           </header>
 
-          {/* First Name */}
+          {/* Surname*/}
+          <FormField
+            control={form.control}
+            name='lastName'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className='block text-sm font-medium text-gray-700'>
+                  Surname <span className='text-red-500'>*</span>
+                </FormLabel>
+                <FormControl>
+                  <Input
+                    disabled={user?.registeredMember?.lastName ? true : false}
+                    placeholder='Enter Surname'
+                    {...field}
+                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          {/* Other Names */}
 
           <FormField
             control={form.control}
@@ -194,28 +214,6 @@ function BioData({
                   <Input
                     disabled={user?.registeredMember?.otherNames ? true : false}
                     placeholder='Enter other names'
-                    {...field}
-                    className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Last Name */}
-          <FormField
-            control={form.control}
-            name='lastName'
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className='block text-sm font-medium text-gray-700'>
-                  Last Name <span className='text-red-500'>*</span>
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={user?.registeredMember?.lastName ? true : false}
-                    placeholder='Enter last name'
                     {...field}
                     className='bg-neutral2 mt-2 w-full rounded-[12px] border px-3 py-2 capitalize'
                   />

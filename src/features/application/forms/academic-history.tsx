@@ -83,7 +83,6 @@ function AcademicHistory({
     name: 'items',
   })
 
-  // Reset form when initialData changes (e.g., after page refresh)
   useEffect(() => {
     if (initialData?.length > 0) {
       form.reset(formattedInitialData)
@@ -96,7 +95,6 @@ function AcademicHistory({
     setIsLoading(true)
 
     if (isFormEmpty && !isDirty) {
-      // when i want to move to next step without changes
       setIsLoading(false)
       handleNext()
       return
