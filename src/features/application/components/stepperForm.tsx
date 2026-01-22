@@ -82,6 +82,7 @@ export default function StepperForm() {
     auth: { user },
   } = useAuthStore()
   const isRegisteredMember = user?.role === USER_ROLES.MEMBER
+  const isApplicant = user?.role === USER_ROLES.APPLICANT
 
   const visibleSteps = isRegisteredMember
     ? steps.filter((step) => step.id !== 8)
@@ -223,7 +224,7 @@ export default function StepperForm() {
       {/* Sidebar Steps */}
       <aside className='bg-background/50 w-1/3 border-r p-6'>
         {/* Member Skip Notice */}
-        {user?.role === 'member' && (
+        {isRegisteredMember ? (
           <div className='mb-6 rounded-lg border border-green-200 bg-green-50 p-4'>
             <div className='mb-2 flex items-center'>
               <div className='flex-shrink-0'>
@@ -252,7 +253,41 @@ export default function StepperForm() {
               </div>
             </div>
           </div>
+        ) :
+        isApplicant && (
+          <div className='mb-6 rounded-lg border border-green-200 bg-green-50 p-4'>
+            <div className='mb-2 flex items-center'>
+              <div className='flex-shrink-0'>
+                <svg
+                  className='h-5 w-5 text-green-400'
+                  viewBox='0 0 20 20'
+                  fill='currentColor'
+                >
+                  <path
+                    fillRule='evenodd'
+                    d='M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z'
+                    clipRule='evenodd'
+                  />
+                </svg>
+              </div>
+              <div className='ml-3'>
+                <h3 className='text-sm font-medium text-green-800'>
+                 New Applicant
+                </h3>
+                <div className='mt-1 text-sm text-green-700'>
+                  <p>
+                    As a new applicant, you are required to
+                    complete the application.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
+
+           
+        
+       
 
         <ul className='space-y-4'>
           {visibleSteps.map((stepItem) => {
@@ -285,6 +320,9 @@ export default function StepperForm() {
           })}
         </ul>
       </aside>
+
+
+     
 
       {/* Main Content */}
       <main className='mb-40 flex-1 overflow-y-auto p-8'>
