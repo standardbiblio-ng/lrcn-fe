@@ -14,3 +14,14 @@ export const useGetMyApplication = createGetQueryHook({
     refetchOnWindowFocus: false, // Don't refetch on window focus
   },
 })
+
+export const useGetUserProfile = createGetQueryHook({
+  endpoint: '/users/profile',
+  responseSchema: z.any(),
+  queryKey: ['user-profile'],
+  requiresAuth: true,
+  options: {
+    staleTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  },
+})
