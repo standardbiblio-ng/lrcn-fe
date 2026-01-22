@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { queryClient } from '@/api'
 import { toast } from 'sonner'
-import {  useGetUserProfile } from '@/api/hooks/useGetData'
+import { useGetUserProfile } from '@/api/hooks/useGetData'
 import { useAuthStore } from '@/stores/auth-store'
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -164,7 +164,9 @@ export function AccountForm() {
                           return
                         }
                         if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-                          toast.error('Only .jpg, .jpeg, .png, .webp and .gif formats are supported')
+                          toast.error(
+                            'Only .jpg, .jpeg, .png, .webp and .gif formats are supported'
+                          )
                           event.target.value = ''
                           return
                         }
