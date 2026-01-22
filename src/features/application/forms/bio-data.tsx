@@ -46,8 +46,6 @@ function BioData({
     auth: { user },
   } = useAuthStore()
 
- 
-
   const registerBioDataMutation = useCreateBioData()
   const form = useForm<z.infer<typeof bioDataSchema>>({
     resolver: zodResolver(bioDataSchema),
@@ -121,10 +119,8 @@ function BioData({
       otherNames: user?.registeredMember?.otherNames || data.otherNames,
       phoneNumber: formatNigerianPhoneNumberWithCode(data.phoneNumber),
     }
-    
 
     if (initialData && !isDirty) {
-      // when i want to move to next step without changes
       setIsLoading(false)
       handleNext()
       return
@@ -183,8 +179,7 @@ function BioData({
             </h4>
           </header>
 
-
-         {/* Surname*/}
+          {/* Surname*/}
           <FormField
             control={form.control}
             name='lastName'

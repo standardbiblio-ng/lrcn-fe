@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 
-const REQUIRED_DOCS = ["BLS", "NYSC"]
+const REQUIRED_DOCS = ['BLS', 'NYSC']
 
 const useUpdateDocument = createPostMutationHook({
   endpoint: '/applications',
@@ -58,12 +58,11 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
         }
       : {
           items: REQUIRED_DOCS.map((name) => ({
-              name,
-              fileKey: '',
-              fileType: '',
-              uploadedAt: '',
-          }))
-           
+            name,
+            fileKey: '',
+            fileType: '',
+            uploadedAt: '',
+          })),
         }
 
   const form = useForm<z.infer<typeof documentsSubmitSchema>>({
@@ -160,7 +159,6 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
     setIsLoading(true)
 
     if (!isDirty) {
-      // when i want to move to next step without changes
       setIsLoading(false)
       handleNext()
       return
@@ -210,7 +208,7 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
     }
   }
 
-    const requiredDocsUploaded = items
+  const requiredDocsUploaded = items
     ?.filter((item) => REQUIRED_DOCS.includes(item.name))
     .every((item) => item.fileKey && item.fileKey !== '')
   return (
@@ -224,9 +222,9 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
             Upload Documents
           </h2>
           <h4 className='font-montserrat text-md text-active font-normal'>
-            Please upload valid PDF documents, BLS and NYSC are compulsory documents.
+            Please upload valid PDF documents, BLS and NYSC are compulsory
+            documents.
           </h4>
-          
 
           {/* {items.map((doc, index) => ( */}
           {fields.map((field, index) => (
@@ -257,10 +255,13 @@ function Upload({ handleBack, handleNext, step, initialData }: StepperProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className='block text-sm'>
-                      Document type {' '}
-                      {REQUIRED_DOCS.includes(field.value) && '*'}
+                      Document type {REQUIRED_DOCS.includes(field.value) && '*'}
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value} disabled={REQUIRED_DOCS.includes(field.value)}>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={REQUIRED_DOCS.includes(field.value)}
+                    >
                       <FormControl>
                         <SelectTrigger className='mt-[12px] w-full rounded-[12px]'>
                           <SelectValue placeholder='Select document type' />
