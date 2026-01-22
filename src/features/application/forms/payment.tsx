@@ -38,7 +38,7 @@ function Payment({ bioData }: { bioData: any }) {
   const handlePayment = async () => {
     if (
       user?.role === 'applicant' &&
-      (!bioData?.email || !bioData?.firstName || !bioData?.lastName)
+      (!bioData?.email || !bioData?.otherNames || !bioData?.lastName)
     ) {
       toast.error(
         'Bio data is incomplete. Please complete your bio data first.'

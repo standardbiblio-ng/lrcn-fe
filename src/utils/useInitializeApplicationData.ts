@@ -18,8 +18,12 @@ interface FormItem<T = any> {
 }
 
 export function useInitializeApplicationData() {
+  
+
   const { markComplete, next } = useStepperStore()
   //   const forms: FormItem[] = []
+
+    const { setApplicationStatus } = useBioDataStore()
 
   // all form stores
   const { setFormData: setBioData, markInitialized: markBioInit } =
@@ -38,6 +42,7 @@ export function useInitializeApplicationData() {
 
   // Single query for entire application
   const { data: application } = useGetMyApplication()
+  
 
   // Extract data from unified response
   const bio = application?.bioData
@@ -48,12 +53,18 @@ export function useInitializeApplicationData() {
   const attest = application?.attestation
 
   useEffect(() => {
+    if (!application) return
+    
+    if (application.status) {
+  setApplicationStatus(application.status) // Draft, Completed, Submitted
+}
     const forms: FormItem[] = []
 
     if (bio) {
       forms.push({ data: bio, set: setBioData, mark: markBioInit, step: 2 })
     }
 
+     
     if (academic?.length > 0) {
       const formattedData = {
         items: academic.map((record: any) => ({
@@ -126,6 +137,7 @@ export function useInitializeApplicationData() {
         step: 7, // ✅ FIXED
       })
     }
+     
     // Run all updates
     let anyFormProcessed = false
     forms.forEach((form) => {
@@ -140,6 +152,7 @@ export function useInitializeApplicationData() {
       next()
     }
   }, [
+    application,
     bio,
     academic,
     employment,
@@ -160,5 +173,7 @@ export function useInitializeApplicationData() {
     markRecInit,
     markUploadInit,
     markAttInit,
+    
+    
   ])
 }

@@ -1,7 +1,8 @@
+import { useGetUserProfile } from '@/api/hooks/useGetData'
 import { useAuthStore } from '@/stores/auth-store'
 import { useBioDataStore } from '@/stores/bio-data-store'
 import useDialogState from '@/hooks/use-dialog-state'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -20,6 +21,7 @@ export function ProfileDropdown() {
   const { formData: bioData } = useBioDataStore()
   const { auth } = useAuthStore()
   const user = auth.user
+  const { data: profile } = useGetUserProfile()
 
   return (
     <>
@@ -27,10 +29,13 @@ export function ProfileDropdown() {
         <DropdownMenuTrigger asChild>
           <Button variant='ghost' className='relative h-8 w-8 rounded-full'>
             <Avatar className='h-8 w-8'>
-              {/* <AvatarImage src='/avatars/01.png' alt='@shadcn' /> */}
+              <AvatarImage
+                src={profile?.profilePicture ?? ''}
+                alt={user?.email ?? 'User avatar'}
+              />
               <AvatarFallback>
-                {bioData?.firstName
-                  ? bioData?.firstName?.charAt(0).toUpperCase() +
+                {bioData?.otherNames
+                  ? bioData?.otherNames?.charAt(0).toUpperCase() +
                     bioData?.lastName?.charAt(0).toUpperCase()
                   : user?.email?.charAt(0).toUpperCase()}
               </AvatarFallback>
@@ -40,9 +45,9 @@ export function ProfileDropdown() {
         <DropdownMenuContent className='w-56' align='end' forceMount>
           <DropdownMenuLabel className='font-normal'>
             <div className='flex flex-col gap-1.5'>
-              {bioData?.firstName && (
+              {bioData?.otherNames && (
                 <p className='text-sm leading-none font-medium'>
-                  {bioData?.firstName}
+                  {bioData?.otherNames}
                 </p>
               )}
               <p className='text-muted-foreground text-xs leading-none'>
