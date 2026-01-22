@@ -15,7 +15,6 @@ export const bioDataSchema = z.object({
   gender: z.enum(['Male', 'Female', '']).optional(),
 })
 
-// API schema (for data sent to backend)
 export const submitBioDataApiSchema = bioDataSchema.extend({
   phoneNumber: z.string().regex(/^\+234\d{10}$/, {
     message: 'Phone number must be in format +2348012345678',
