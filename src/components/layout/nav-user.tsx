@@ -38,16 +38,16 @@ export function NavUser() {
               >
                 <Avatar className='h-8 w-8 rounded-lg'>
                   <AvatarFallback className='rounded-lg'>
-                    {bioData?.firstName
-                      ? bioData?.firstName?.charAt(0).toUpperCase() +
+                    {bioData?.otherNames
+                      ? bioData?.otherNames?.charAt(0).toUpperCase() +
                         bioData?.lastName?.charAt(0).toUpperCase()
                       : user?.email?.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-start text-sm leading-tight'>
-                  {bioData?.firstName && (
+                  {bioData?.otherNames && (
                     <span className='truncate font-semibold'>
-                      {bioData?.firstName}
+                      {bioData?.otherNames}
                     </span>
                   )}
 
@@ -66,16 +66,16 @@ export function NavUser() {
                 <div className='flex items-center gap-2 px-1 py-1.5 text-start text-sm'>
                   <Avatar className='h-8 w-8 rounded-lg'>
                     <AvatarFallback className='rounded-lg'>
-                      {bioData?.firstName
-                        ? bioData?.firstName?.charAt(0).toUpperCase() +
+                      {bioData?.otherNames
+                        ? bioData?.otherNames?.charAt(0).toUpperCase() +
                           bioData?.lastName?.charAt(0).toUpperCase()
                         : user?.email?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className='grid flex-1 text-start text-sm leading-tight'>
-                    {bioData?.firstName && (
+                    {bioData?.otherNames && (
                       <span className='truncate font-semibold'>
-                        {bioData?.firstName}
+                        {bioData?.otherNames}
                       </span>
                     )}
                     <span className='truncate text-xs'>{user?.email}</span>
