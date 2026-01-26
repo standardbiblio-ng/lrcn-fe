@@ -5,7 +5,7 @@ import { createGetQueryHook } from './useGet'
 // Uses staleTime: 5 minutes by default (set in useGet.ts)
 // Data is automatically refetched when invalidated after mutations
 export const useGetMyApplication = createGetQueryHook({
-  endpoint: '/applications',
+  endpoint: '/applications/me',
   responseSchema: z.any(),
   queryKey: ['my-application'],
   requiresAuth: true,
