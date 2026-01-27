@@ -7,6 +7,7 @@ import { StepperProps } from '@/types/stepper.type'
 import { toast } from 'sonner'
 import { createPostMutationHook } from '@/api/hooks/usePost'
 import { Button } from '@/components/ui/button'
+import { useApplicationLock } from '@/utils/useApplicationLock'
 import {
   Form,
   FormControl,
@@ -39,6 +40,7 @@ function EmploymentHistory({
   initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const {isLocked, isLoading:isLockLoading} = useApplicationLock()
 
   const registerEmploymentHistoryMutation = useCreateEmploymentHistory()
 
@@ -138,7 +140,8 @@ function EmploymentHistory({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <p className='font-montserrat text-active font-normal italic'>
+        <fieldset disabled={isLocked || isLockLoading}>
+          <p className='font-montserrat text-active font-normal italic'>
           Step {step}
         </p>
 
@@ -329,6 +332,7 @@ function EmploymentHistory({
             Next
           </Button>
         </div>
+        </fieldset>
       </form>
     </Form>
   )

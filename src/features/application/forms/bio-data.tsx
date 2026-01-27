@@ -10,6 +10,7 @@ import { createPostMutationHook } from '@/api/hooks/usePost'
 import { useAuthStore } from '@/stores/auth-store'
 import { formatNigerianPhoneNumberWithCode } from '@/utils/phoneFormatter'
 import { Button } from '@/components/ui/button'
+import { useApplicationLock } from '@/utils/useApplicationLock'
 import {
   Form,
   FormControl,
@@ -42,6 +43,7 @@ function BioData({
   initialData,
 }: StepperProps) {
   const [isLoading, setIsLoading] = useState(false)
+  const { isLocked, isLoading:isLockLoading } = useApplicationLock()
   const {
     auth: { user },
   } = useAuthStore()
@@ -164,7 +166,8 @@ function BioData({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <p className='font-montserrat text-active font-normal italic'>
+        <fieldset disabled={isLocked || isLockLoading}>
+          <p className='font-montserrat text-active font-normal italic'>
           Step {step}
         </p>
 
@@ -477,6 +480,7 @@ function BioData({
             Next
           </Button>
         </div>
+        </fieldset>
       </form>
     </Form>
   )

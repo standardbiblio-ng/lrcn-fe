@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import applyImg from '@/assets/images/Group.png'
 import cloud from '@/assets/images/dashboard-cloud.png'
 import { useGetMyApplication } from '@/api/hooks/useGetData'
@@ -15,6 +15,17 @@ import { ThemeSwitch } from '@/components/theme-switch'
 export function Dashboard() {
   const { data: application } = useGetMyApplication()
   const { auth } = useAuthStore()
+  const navigate = useNavigate()
+
+  const handleApplicationClick = () => {
+    if (application.status === 'submitted') {
+      navigate('/application/', {
+        state: { targetStet: 'attestation'}
+      })
+    } else {
+      navigate('/application/')
+    }
+  }
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -105,7 +116,9 @@ export function Dashboard() {
                             : 'Start your application'}
                       </p>
                       <Link to='/application/'>
-                        <button className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
+                        <button 
+                        onClick={handleApplicationClick}
+                        className='rounded-lg bg-[#2C5F94] px-4 py-2 text-sm font-medium text-white hover:bg-[#2C5F94]/90'>
                           {application?.status?.toLowerCase() === 'submitted'
                             ? 'View Application'
                             : application?.bioData
