@@ -50,7 +50,7 @@ const Member = () => {
     }
 
     if (hasRegNo && status === 'inactive') {
-      return <Button onClick={makePayment}>Renew</Button>
+      return <Button onClick={viewApplicationDetails}>View</Button>
     }
 
     if (!hasRegNo && status !== 'active') {
