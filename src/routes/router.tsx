@@ -205,18 +205,6 @@ export const router = createBrowserRouter([
         index: true,
         element: <Member />,
       },
-      // {
-      //   path: paths.dashboard.applications.myApplication.split('/').pop(),
-      //   element: LazyPage(() => import('@/features/dashboard/applications/my-application')),
-      // },
-      // {
-      //   path: paths.dashboard.applications.newApplication.split('/').pop(),
-      //   element: LazyPage(() => import('@/features/dashboard/applications/new-application')),
-      // },
-      // {
-      //   path: paths.dashboard.applications.status.split('/').pop(),
-      //   element: LazyPage(() => import('@/features/dashboard/applications/status')),
-      // },
     ],
   },
 
