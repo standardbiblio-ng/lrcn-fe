@@ -4,6 +4,7 @@ import {
   GalleryVerticalEnd,
   House,
   FilePenLine,
+  Users,
 } from 'lucide-react'
 import { Logo } from '@/assets/logo'
 import { type SidebarData } from '../types'
@@ -44,6 +45,11 @@ export const sidebarData: SidebarData = {
           title: 'Application',
           url: '/application',
           icon: FilePenLine,
+        },
+        {
+          title: 'Membership',
+          url: '/membership',
+          icon: Users,
         },
         {
           title: 'Settings',
