@@ -64,6 +64,12 @@ export const paths = {
     // newEntry: '/dashboard/home/new-entry',
     // getStarted: '/dashboard/home/get-started',
   },
+  membership: {
+    root: '/membership',
+    // overview: '/dashboard/home/overview',
+    // newEntry: '/dashboard/home/new-entry',
+    // getStarted: '/dashboard/home/get-started',
+  },
 
   // ---------------- Error Pages Section ----------------
   /**
