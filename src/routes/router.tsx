@@ -10,6 +10,7 @@ import { Application } from '@/features/application'
 import { SignIn } from '@/features/auth/sign-in'
 import { SignUp } from '@/features/auth/sign-up'
 import { Dashboard } from '@/features/dashboard'
+import Member from '@/features/member'
 import { Settings } from '@/features/settings'
 import { AuthGuard } from './guards/auth-guard'
 import { GuestGuard } from './guards/guest-guard'
@@ -187,6 +188,23 @@ export const router = createBrowserRouter([
       //   path: paths.dashboard.applications.status.split('/').pop(),
       //   element: LazyPage(() => import('@/features/dashboard/applications/status')),
       // },
+    ],
+  },
+
+  {
+    path: paths.membership.root,
+    element: (
+      <AuthGuard>
+        <AuthenticatedLayout>
+          <Outlet />
+        </AuthenticatedLayout>
+      </AuthGuard>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Member />,
+      },
     ],
   },
 
